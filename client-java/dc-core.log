@@ -1,0 +1,326 @@
+2012-05-23 11:54:03.627 (main) [DEBUG] RestAdapter - PUT  http://localhost:8080/dc1-core/__ctl/cell
+2012-05-23 11:54:03.646 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Token token="c3s-innov"
+2012-05-23 11:54:03.647 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 11:54:03.648 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 11:54:03.648 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 11:54:03.649 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 11:54:03.650 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337741586454"}
+2012-05-23 11:54:07.574 (main) [DEBUG] RestAdapter - ResponseCode: 401
+2012-05-23 11:54:07.575 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 02:54:07 GMT
+2012-05-23 11:54:07.575 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 11:54:07.576 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 11:54:07.576 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 11:54:07.577 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : Jetty(8.0.0.M3)
+2012-05-23 13:15:52.340 (main) [DEBUG] RestAdapter - PUT  http://localhost:8080/dc1-core/__ctl/cell
+2012-05-23 13:15:52.343 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 13:15:52.344 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 13:15:52.344 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 13:15:52.344 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 13:15:52.344 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 13:15:52.344 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337746551844"}
+2012-05-23 13:15:52.530 (main) [DEBUG] RestAdapter - ResponseCode: 405
+2012-05-23 13:15:52.530 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 04:15:52 GMT
+2012-05-23 13:15:52.530 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 13:15:52.530 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 13:15:52.530 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 13:15:52.531 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : Jetty(8.0.0.M3)
+2012-05-23 13:18:40.039 (main) [DEBUG] RestAdapter - POST  http://localhost:8080/dc1-core/__ctl/cell
+2012-05-23 13:18:40.049 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 13:18:40.050 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 13:18:40.050 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 13:18:40.051 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 13:18:40.051 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337746696696"}
+2012-05-23 13:19:15.894 (main) [DEBUG] RestAdapter - ResponseCode: 500
+2012-05-23 13:19:15.894 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 04:18:40 GMT
+2012-05-23 13:19:15.894 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 13:19:15.894 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 13:19:15.894 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 13:19:15.895 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : Jetty(8.0.0.M3)
+2012-05-23 13:20:53.284 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 13:20:53.286 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 13:20:53.287 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 13:20:53.287 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 13:20:53.287 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 13:20:53.287 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337746853065"}
+2012-05-23 13:20:53.679 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 13:20:53.680 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 13:20:53.680 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 13:20:53.680 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_4a069afbafa84399bb5be4a43a6237d2')
+2012-05-23 13:20:53.680 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 13:20:53.680 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337746849374"
+2012-05-23 13:20:53.680 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 13:20:53.681 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 13:20:53.681 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 13:20:53.681 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 04:20:49 GMT
+2012-05-23 13:40:59.025 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 13:40:59.028 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 13:40:59.028 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 13:40:59.028 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 13:40:59.028 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 13:40:59.028 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337748058798"}
+2012-05-23 13:40:59.440 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 13:40:59.441 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 13:40:59.441 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 13:40:59.441 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_a0e493b8ba6e4f8aae03b55ff5b53c06')
+2012-05-23 13:40:59.441 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 13:40:59.441 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337748055079"
+2012-05-23 13:40:59.441 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 13:40:59.442 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 13:40:59.442 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 13:40:59.442 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 04:40:55 GMT
+2012-05-23 14:07:08.297 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 14:07:08.301 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:07:08.301 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:07:08.301 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:07:08.301 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:07:08.301 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337749622912"}
+2012-05-23 14:07:08.765 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 14:07:08.766 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:07:08.766 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:07:08.766 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_682f204cda3e4536b0d8a80f41f38022')
+2012-05-23 14:07:08.766 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:07:08.767 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337749624361"
+2012-05-23 14:07:08.767 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:07:08.767 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:07:08.767 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:07:08.768 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:07:04 GMT
+2012-05-23 14:07:50.323 (main) [DEBUG] RestAdapter - DELETE  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/api/persona/cell_name1337749622912
+2012-05-23 14:07:50.324 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:07:50.324 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:07:50.325 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:07:50.325 (main) [DEBUG] RestAdapter - RequestBody:  
+2012-05-23 14:07:50.642 (main) [DEBUG] RestAdapter - ResponseCode: 404
+2012-05-23 14:07:50.643 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:07:50.643 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:07:50.643 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:07:50.643 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:07:50.643 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:07:50.644 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:07:46 GMT
+2012-05-23 14:08:02.641 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 14:08:02.645 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:08:02.646 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:08:02.646 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:08:02.646 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:08:02.646 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337749681002"}
+2012-05-23 14:08:03.026 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 14:08:03.027 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:08:03.028 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:08:03.028 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_efcfefbcc7da4c7c93485725c0effa0a')
+2012-05-23 14:08:03.028 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:08:03.029 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337749678628"
+2012-05-23 14:08:03.029 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:08:03.030 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:08:03.030 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:08:03.030 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:07:58 GMT
+2012-05-23 14:10:34.123 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 14:10:34.127 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:10:34.127 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:10:34.127 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:10:34.127 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:10:34.127 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337749832517"}
+2012-05-23 14:10:34.525 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 14:10:34.526 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:10:34.526 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:10:34.527 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_9e31e9c7ea8d4a9fa512075c4120e706')
+2012-05-23 14:10:34.527 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:10:34.528 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337749830113"
+2012-05-23 14:10:34.528 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:10:34.529 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:10:34.529 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:10:34.529 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:10:30 GMT
+2012-05-23 14:14:47.057 (main) [DEBUG] RestAdapter - DELETE  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('cell_name1337749832517')
+2012-05-23 14:14:47.058 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:14:47.058 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:14:47.058 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:14:47.058 (main) [DEBUG] RestAdapter - RequestBody:  
+2012-05-23 14:14:47.392 (main) [DEBUG] RestAdapter - ResponseCode: 404
+2012-05-23 14:14:47.392 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:14:47.392 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:14:47.392 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:14:47.393 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:14:47.393 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:14:47.393 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:14:43 GMT
+2012-05-23 14:15:04.398 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 14:15:04.401 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:15:04.401 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:15:04.401 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:15:04.401 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:15:04.401 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337750104191"}
+2012-05-23 14:15:04.834 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 14:15:04.834 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:15:04.834 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:15:04.834 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_39f0b608be0c4726a46bd597407821be')
+2012-05-23 14:15:04.835 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:15:04.835 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337750100367"
+2012-05-23 14:15:04.835 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:15:04.835 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:15:04.836 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:15:04.836 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:15:00 GMT
+2012-05-23 14:15:04.843 (main) [DEBUG] RestAdapter - DELETE  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_39f0b608be0c4726a46bd597407821be')
+2012-05-23 14:15:04.844 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:15:04.844 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:15:04.844 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:15:04.844 (main) [DEBUG] RestAdapter - RequestBody:  
+2012-05-23 14:15:05.145 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:15:05.145 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:15:05.145 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:15:05.145 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:15:05.146 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:15:00 GMT
+2012-05-23 14:25:27.195 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 14:25:27.198 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:25:27.199 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:25:27.199 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:25:27.199 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:25:27.199 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337750725192"}
+2012-05-23 14:25:27.589 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 14:25:27.590 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:25:27.590 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:25:27.590 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_9faf2147fd1447c290ceaa98b73edbbf')
+2012-05-23 14:25:27.590 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:25:27.590 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337750723168"
+2012-05-23 14:25:27.590 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:25:27.591 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:25:27.591 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:25:27.591 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:25:23 GMT
+2012-05-23 14:25:51.961 (main) [DEBUG] RestAdapter - PUT  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_9faf2147fd1447c290ceaa98b73edbbf')
+2012-05-23 14:25:51.962 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:25:51.962 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:25:51.963 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:25:51.963 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:25:51.964 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:25:51.964 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337750725192_updated"}
+2012-05-23 14:25:52.316 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:25:52.318 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:25:52.319 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:25:52.320 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:25:52.322 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:25:47 GMT
+2012-05-23 14:31:33.537 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 14:31:33.539 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:31:33.539 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:31:33.540 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:31:33.540 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:31:33.540 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337751093337"}
+2012-05-23 14:31:33.965 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 14:31:33.965 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:31:33.966 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:31:33.966 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_0ae6c8fa66e54eb9812bc094d5112881')
+2012-05-23 14:31:33.966 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:31:33.966 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337751089510"
+2012-05-23 14:31:33.966 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:31:33.966 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:31:33.966 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:31:33.967 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:31:29 GMT
+2012-05-23 14:31:33.974 (main) [DEBUG] RestAdapter - PUT  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_0ae6c8fa66e54eb9812bc094d5112881')
+2012-05-23 14:31:33.975 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:31:33.975 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:31:33.975 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:31:33.975 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:31:33.975 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:31:33.975 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337751093337_updated"}
+2012-05-23 14:31:34.285 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:31:34.285 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:31:34.285 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:31:34.285 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:31:34.286 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:31:29 GMT
+2012-05-23 14:31:34.287 (main) [DEBUG] RestAdapter - PUT  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_0ae6c8fa66e54eb9812bc094d5112881')
+2012-05-23 14:31:34.287 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:31:34.288 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:31:34.288 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:31:34.288 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:31:34.288 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:31:34.288 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337751093337_updated2"}
+2012-05-23 14:31:34.573 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:31:34.573 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:31:34.573 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:31:34.573 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:31:34.574 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:31:29 GMT
+2012-05-23 14:31:34.575 (main) [DEBUG] RestAdapter - DELETE  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_0ae6c8fa66e54eb9812bc094d5112881')
+2012-05-23 14:31:34.575 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:31:34.575 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:31:34.575 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:31:34.575 (main) [DEBUG] RestAdapter - RequestBody:  
+2012-05-23 14:31:34.861 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:31:34.861 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:31:34.861 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:31:34.862 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:31:34.862 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:31:29 GMT
+2012-05-23 14:53:58.919 (main) [DEBUG] RestAdapter - POST  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell
+2012-05-23 14:53:58.921 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:53:58.922 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:53:58.922 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:53:58.922 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:53:58.922 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337752438722"}
+2012-05-23 14:53:59.311 (main) [DEBUG] RestAdapter - ResponseCode: 201
+2012-05-23 14:53:59.312 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:53:59.312 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:53:59.312 (main) [DEBUG] RestAdapter - ResponseHeader[Location] : http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_1960a00886944b90bad58d164f326434')
+2012-05-23 14:53:59.312 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:53:59.312 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"1-1337752434835"
+2012-05-23 14:53:59.312 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:53:59.313 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:53:59.313 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:53:59.313 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:53:54 GMT
+2012-05-23 14:53:59.320 (main) [DEBUG] RestAdapter - PUT  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_1960a00886944b90bad58d164f326434')
+2012-05-23 14:53:59.321 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:53:59.321 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:53:59.321 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:53:59.321 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:53:59.321 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:53:59.321 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337752438722_updated"}
+2012-05-23 14:53:59.620 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:53:59.620 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:53:59.620 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:53:59.621 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:53:59.621 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:53:54 GMT
+2012-05-23 14:53:59.622 (main) [DEBUG] RestAdapter - GET  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_1960a00886944b90bad58d164f326434')
+2012-05-23 14:53:59.622 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:53:59.623 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:53:59.623 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:53:59.623 (main) [DEBUG] RestAdapter - RequestHeader[Accept-Encoding] : gzip
+2012-05-23 14:53:59.623 (main) [DEBUG] RestAdapter - RequestBody:  
+2012-05-23 14:53:59.964 (main) [DEBUG] RestAdapter - ResponseCode: 200
+2012-05-23 14:53:59.965 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:53:59.965 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:53:59.965 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:53:59.966 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"2-1337752435161"
+2012-05-23 14:53:59.966 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:53:59.967 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:53:59.967 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:53:59.967 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:53:54 GMT
+2012-05-23 14:53:59.969 (main) [DEBUG] RestAdapter - PUT  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_1960a00886944b90bad58d164f326434')
+2012-05-23 14:53:59.970 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:53:59.970 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:53:59.971 (main) [DEBUG] RestAdapter - RequestHeader[Content-Type] : application/json
+2012-05-23 14:53:59.971 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:53:59.972 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:53:59.972 (main) [DEBUG] RestAdapter - RequestBody:  {"name":"cell_name1337752438722_updated2"}
+2012-05-23 14:54:00.258 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:54:00.261 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:54:00.263 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:54:00.263 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:54:00.263 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:53:54 GMT
+2012-05-23 14:54:00.264 (main) [DEBUG] RestAdapter - GET  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_1960a00886944b90bad58d164f326434')
+2012-05-23 14:54:00.264 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:54:00.264 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:54:00.264 (main) [DEBUG] RestAdapter - RequestHeader[Accept] : application/json
+2012-05-23 14:54:00.265 (main) [DEBUG] RestAdapter - RequestHeader[Accept-Encoding] : gzip
+2012-05-23 14:54:00.265 (main) [DEBUG] RestAdapter - RequestBody:  
+2012-05-23 14:54:00.554 (main) [DEBUG] RestAdapter - ResponseCode: 200
+2012-05-23 14:54:00.555 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:54:00.555 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:54:00.555 (main) [DEBUG] RestAdapter - ResponseHeader[DataServiceVersion] : 2.0
+2012-05-23 14:54:00.555 (main) [DEBUG] RestAdapter - ResponseHeader[ETag] : W/"3-1337752435803"
+2012-05-23 14:54:00.555 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:54:00.556 (main) [DEBUG] RestAdapter - ResponseHeader[Content-Type] : application/json
+2012-05-23 14:54:00.556 (main) [DEBUG] RestAdapter - ResponseHeader[Transfer-Encoding] : chunked
+2012-05-23 14:54:00.556 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:53:56 GMT
+2012-05-23 14:54:00.557 (main) [DEBUG] RestAdapter - DELETE  http://nakamachidai.c3.fla.fujitsu.com:8888/dc1-core/__ctl/cell('00_1960a00886944b90bad58d164f326434')
+2012-05-23 14:54:00.558 (main) [DEBUG] RestAdapter - RequestHeader[Authorization] : Bearer c3s-innov
+2012-05-23 14:54:00.558 (main) [DEBUG] RestAdapter - RequestHeader[X-Tritium-Version] : 0.10
+2012-05-23 14:54:00.558 (main) [DEBUG] RestAdapter - RequestHeader[If-Match] : *
+2012-05-23 14:54:00.558 (main) [DEBUG] RestAdapter - RequestBody:  
+2012-05-23 14:54:00.843 (main) [DEBUG] RestAdapter - ResponseCode: 204
+2012-05-23 14:54:00.844 (main) [DEBUG] RestAdapter - ResponseHeader[X-Powered-By] : Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2 Java/Oracle Corporation/1.7)
+2012-05-23 14:54:00.844 (main) [DEBUG] RestAdapter - ResponseHeader[Server] : GlassFish Server Open Source Edition 3.1.2
+2012-05-23 14:54:00.845 (main) [DEBUG] RestAdapter - ResponseHeader[Access-Control-Allow-Origin] : *
+2012-05-23 14:54:00.845 (main) [DEBUG] RestAdapter - ResponseHeader[Date] : Wed, 23 May 2012 05:53:56 GMT

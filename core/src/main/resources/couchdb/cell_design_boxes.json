@@ -1,0 +1,23 @@
+{
+	"language": "javascript",
+   	"views": {
+    	"byname": {
+        	"map": "function(doc) {
+        		var id = doc['_id'];
+        		if (id.indexOf('bx') != 0) {
+        		  return;
+        		}
+        		emit(doc.name, id);
+           	}"
+       	},
+       	"byschema": {
+           	"map": "function(doc) {
+        		var id = doc['_id'];
+        		if (!id.indexOf('bx') != 0) {
+        		  return;
+        		}
+        		emit(doc.schema, id);
+        	}"
+       	}
+    }
+}

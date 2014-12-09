@@ -1,0 +1,47 @@
+{
+  "Account": {
+    "properties": {
+      "c": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "s": {
+        "properties": {
+          "Name": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "LastAuthenticated": {
+            "type": "long",
+            "fields": {
+              "untouched": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      },
+      "h": {
+        "properties": {
+          "HashedCredential": {
+            "type": "string",
+            "index": "no"
+          }
+        }
+      },
+      "u": {
+        "type": "long",
+        "store": true
+      },
+      "p": {
+        "type": "long",
+        "store": true
+      }
+    }
+  }
+}

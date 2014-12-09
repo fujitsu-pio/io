@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE logback:configuration>
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5thread] [%-5level] %-20logger{0} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.fujitsu.dc">
+        <level value="DEBUG" />
+        <appender-ref ref="stdout" />
+    </logger>
+</configuration>

@@ -1,0 +1,48 @@
+{
+  "Cell": {
+    "properties": {
+      "s": {
+        "properties": {
+          "Name": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          }
+        }
+      },
+      "h": {
+        "properties": {
+          "Owner": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          }
+        }
+      },
+      "l": {
+        "properties": {
+          "Domain": {
+            "type": "string",
+            "index": "not_analyzed"
+          }
+        }
+      },
+      "u": {
+        "type": "long",
+        "store": true
+      },
+      "p": {
+        "type": "long",
+        "store": true
+      }
+    }
+  }
+}

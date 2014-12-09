@@ -1,0 +1,86 @@
+{	
+	"language": "javascript",
+	"views": { 
+		"children": {
+			"map": "function(doc){
+			  var meta = doc['::meta'];
+			  if (meta == null) {
+			    return;
+			  }
+			  var links = meta['links'];
+			  var type = meta['type'];
+			  var nodeid = doc['node'];
+			  emit(null, type);
+			  for(var i in links){
+			    var ln = links[i];
+			    var key = '::' + nodeid + ':' + ln['type'] + ':' + ln['id'];
+			    emit(key, type);
+			    key += ':' + meta['type'];
+			    emit(key, type);
+			    if (ln['rel']) {
+			      key += '::' + ln['rel'];
+			      emit(key, type);
+			    }
+			  }
+			}",
+			"reduce": "function(keys, values, rereduce){
+			  var out = {};
+			  if (rereduce){
+			    for (var idx in values){
+			      for(var kk in values[idx]){
+			        if (out[kk]){
+			          out[kk] += values[idx][kk];
+			        }else{
+			          out[kk] = values[idx][kk];
+			        }
+			      }
+			    }
+			  }else{
+			    for (var vidx in values) {
+			      var v = values[vidx];
+			      if (out[v]) {
+			        out[v] += 1;
+			      }else{
+			        out[v] = 1;
+			      }
+			    };
+			  }
+			  return out;
+			}"
+		},
+		"search_by_item": {
+			"map": "function(doc){
+			  var meta = doc['::meta'];
+			  var type= doc['::meta'].type;
+			  var links = meta['links'];
+			  var type_vars = [type];
+			  var attr_vars = [''];
+			  for(var i in links){
+			    var l = links[i];
+			    type_vars.push(l['type'] + '(' + l['id'] + ')/' + type);
+			  }
+			  for(var k in doc){
+			    if (k != '::meta') {
+			      if (k != '_id') {
+			        if (k != '_rev') {
+			          if (doc[k]) {
+			            attr_vars.push(k + '=' + doc[k]);
+			            attr_vars.push('$val=' + doc[k]);
+			          }
+			        }
+			      }
+			    }
+			  }
+			  for (var i2 in type_vars) {
+			    for (var i3 in attr_vars) {
+			      var key = '::' + type_vars[i2] + ':' + attr_vars[i3];
+			      emit(key, doc._id);
+			    }
+			  }
+			}",
+			"reduce": "function(keys, values, rereduce) { 
+    			return rereduce?sum(values):values.length;
+			}"
+		}
+	}
+}

@@ -1,4 +1,0 @@
-io
-==
-
-personium.io repository

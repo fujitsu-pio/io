@@ -1,0 +1,10 @@
+                                                         -*- coding: utf-8 -*-
+
+Changes with personium 1.3.XX
+
+Example)
+  
+  Please add CHANGES in below format.
+
+  *) core CellResource.java: Rename variable. [NAME] [2014-XX-XX]
+

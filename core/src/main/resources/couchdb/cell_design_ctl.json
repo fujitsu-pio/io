@@ -1,0 +1,20 @@
+{
+	"language": "javascript",
+   	"views": {
+    	"ents": {
+        	"map": "function(doc) {
+        		var id = doc['_id'];
+        		var t = doc['t'];
+        		emit(t, id);
+           	}"
+       	},
+       	"links": {
+           	"map": "function(doc) {
+           	     if (doc.t == '_link') {
+        		   emit(doc.t1 + ' ' + doc.k1 + ' ' + doc.t2 , doc.k2);
+        		   emit(doc.t2 + ' ' + doc.k2 + ' ' + doc.t1 , doc.k1);
+        		 }
+        	}"
+       	}
+    }
+}

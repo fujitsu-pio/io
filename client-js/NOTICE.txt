@@ -1,0 +1,20 @@
+personium.io
+Copyright 2014 FUJITSU LIMITED
+
+This product is licensed under Apache License, Version 2.0.
+
+Following open source software products are partially reused with/without some modifications in this product.
+Use of such parts may be subject to the license terms of original products.
+
+ - Apache2 
+   -odata4j        https://github.com/odata4j/odata4j  
+   -oauth(commons) https://github.com/spullara/oauth
+ - EPL v1.0
+   -logback(logback-classic,logback-core) https://github.com/qos-ch/logback
+
+Especially, note that the parts based on EPL v1.0 source software are also licensed under EPL v1.0.
+
+For details, see the source code comment of each part.
+
+This software is designed to dynamically link with dependent libraries using maven.
+See the pom.xml file for the dependent libraries.

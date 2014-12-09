@@ -1,0 +1,39 @@
+{
+  "EntityType": {
+    "properties": {
+      "c": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "b": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "n": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "s": {
+        "properties": {
+          "Name": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          }
+        }
+      },
+      "u": {
+        "type": "long",
+        "store": true
+      },
+      "p": {
+        "type": "long",
+        "store": true
+      }
+    }
+  }
+}

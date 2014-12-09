@@ -1,0 +1,8 @@
+{
+   "language": "javascript",
+   "views": {
+       "url": {
+           "map": "function(doc) {  if(doc.url){    if(doc.url.domain){ emit(\":\" + doc.url.domain+\":\" +doc.url.path, doc);    }else{      emit(\"::\" + doc.url.path, doc);    }  }  if(doc.aliases){  for(var i in doc.aliases){     var al = doc.aliases[i];     var ret = {};      ret.alias = true;      ret.url = doc.url;    if(al.domain){    emit(\":\" + al.domain+\":\" +al.path, ret);    }else{      emit('::' + al.path, ret);    }   } }}"
+       }
+   }
+}

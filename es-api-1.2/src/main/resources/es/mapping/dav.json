@@ -1,0 +1,34 @@
+{
+  "dav": {
+    "properties": {
+      "c": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "b": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "s": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "o": {
+        "type": "object",
+        "dynamic": false
+      },
+      "d": {
+        "type": "object",
+        "dynamic": false
+      },
+      "u": {
+        "type": "long",
+        "store": true
+      },
+      "p": {
+        "type": "long",
+        "store": true
+      }
+    }
+  }
+}

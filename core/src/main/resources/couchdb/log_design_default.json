@@ -1,0 +1,45 @@
+{	
+	"language": "javascript",
+	"fulltext": { 
+		"default": {
+			"index": "function(doc) {
+		        var ret=new Document();
+		
+		        /* キー指定での検索インデックス */
+		        ret.add(doc._id,{\"field\": \"id\", \"type\": \"string\", \"store\":\"yes\"});
+		        ret.add(doc.timestamp,{\"field\": \"timestamp\", \"type\": \"string\", \"store\":\"yes\"});
+		        ret.add(doc.type,{\"field\": \"type\", \"store\":\"yes\"});
+		        ret.add(doc.level,{\"field\": \"level\", \"store\":\"yes\"});
+		        ret.add(doc.principal,{\"field\": \"principal\", \"store\":\"yes\"});
+		        ret.add(doc.action,{\"field\": \"action\", \"store\":\"yes\"});
+		        ret.add(doc.object,{\"field\": \"object\", \"store\":\"yes\"});
+		        ret.add(doc.result,{\"field\": \"result\", \"store\":\"yes\"});
+		        ret.add(doc.context_id,{\"field\": \"context_id\", \"store\":\"yes\"});
+		
+		        /* 全文検索用検索インデックス */
+		        ret.add(doc.type,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+		        ret.add(doc.level,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+		        ret.add(doc.principal,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+		        ret.add(doc.action,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+		        ret.add(doc.object,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+		        ret.add(doc.result,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+		        ret.add(doc.context_id,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+		
+		        return ret
+		      }
+			",
+			"analyzer": "perfield:{
+		        id:\"keyword\",
+		        timestamp:\"keyword\",
+		        type:\"keyword\",
+		        level:\"keyword\",
+		        principal:\"keyword\",
+		        action:\"keyword\",
+		        object:\"keyword\",
+		        result:\"keyword\",
+		        context_id:\"keyword\",
+		        _fulltext:\"cjk\"
+		      }"
+		}
+	}
+}

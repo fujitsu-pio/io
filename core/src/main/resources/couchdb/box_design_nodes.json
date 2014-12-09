@@ -1,0 +1,27 @@
+{	
+	"language": "javascript",
+	"views": { 
+		"parent": {
+			"map": "function(doc) {  
+				if (!doc.children){
+					return;
+				} 
+				for (var k in doc.children) {
+					var id = doc.children[k];
+					emit(id, doc);
+				}
+			}"
+		},
+		"children": {
+			"map": "function(doc) {
+				if (!doc.children){
+					return;
+				}
+				var pa = doc.children['..'];
+				if (pa) {
+					emit(doc.children['..'], doc);
+				}
+			}"
+		}
+	}
+}
