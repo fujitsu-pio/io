@@ -9,9 +9,9 @@ http://personium.io/
 
 	core                    - Core module of personium.io
 	engine                  - Module to enable server-side JS execution.
-	cell-sweeper            - cell-sweeper programs
-	logback                 - logback programs
-	logback-settings        - settings programs for logback
+	cell-sweeper            - A batch program to delete the cells that are marked to be deleted.
+	logback                 - A logback customization to rotate the event logs.
+	logback-settings        - A shell command to run logback as a daemon process .
 	es-api-1.2              - Abstraction Layer to absorb versions incompatibility of ElasticSearch.
 	common                  - Common modules used in the above modules.
 	engine-extension-common - Common modules for implementing Engine Extension.
@@ -28,8 +28,8 @@ http://personium.io/docs/
 	to accelerate Fujitsu's social innovations business. 
 
 	As of Dec. 2014, this project is still on the way from properietary 
-	to open source, and thus is not ready to be comfortably used by 
-	everyone yet.
+	to open source, and thus this product is not ready to be comfortably 
+	used by everyone yet.
 	
 	We are going to prepare missing parts, e.g. documents, tools, etc., 
 	to resolve this situation as soon as possible.
