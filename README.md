@@ -34,6 +34,31 @@ http://personium.io/docs/
 	We are going to prepare missing parts, e.g. documents, tools, etc., 
 	to resolve this situation as soon as possible.
 
+## Build (on unix)
+
+Clone io repository
+
+```bash
+$ git clone https://github.com/personium/io.git
+```
+### core
+
+Run maven package, then `core/target/dc1-core.war` is created.
+
+```bash
+$ cd ./io/core
+$ mvn package
+```
+
+### engine
+
+Run maven package, then `engine/target/dc1-engine.war` is created.
+
+```bash
+$ cd ./io/core
+$ mvn package
+```
+
 ## Licence
 
 	Licensed under the Apache License, Version 2.0 (the "License");
