@@ -105,22 +105,6 @@
             <version>1.7R3</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.wst</groupId>
-            <artifactId>org.eclipse.wst.jsdt.debug.rhino.debugger</artifactId>
-            <version>1.0.300</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.wst</groupId>
-            <artifactId>org.eclipse.wst.jsdt.debug.rhino.debugger.source</artifactId>
-            <version>1.0.300</version>
-            <classifier>sources</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.wst.jsdt</groupId>
-            <artifactId>debug.transport</artifactId>
-            <version>1.0.100</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
