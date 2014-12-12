@@ -55,7 +55,7 @@ $ mvn package
 Run maven package, then `engine/target/dc1-engine.war` is created.
 
 ```bash
-$ cd ./io/core
+$ cd ./io/engine
 $ mvn package
 ```
 
