@@ -12,7 +12,7 @@ http://personium.io/
 	cell-sweeper            - A batch program to delete the cells that are marked to be deleted.
 	logback                 - A logback customization to rotate the event logs.
 	logback-settings        - A shell command to run logback as a daemon process .
-	es-api-1.2              - Abstraction Layer to absorb versions incompatibility of ElasticSearch.
+	es-api-1.2              - Abstraction layer to absorb version incompatibilities of ElasticSearch.
 	common                  - Common modules used in the above modules.
 	engine-extension-common - Common modules for implementing Engine Extension.
 	client-java             - Java client. Engine internally uses it.
@@ -34,14 +34,26 @@ http://personium.io/docs/
 	We are going to prepare missing parts, e.g. documents, tools, etc., 
 	to resolve this situation as soon as possible.
 
-## Build (on unix)
+## Setup 
 
-Clone io repository
+### Option 1:  Try with Vagrant
+
+Now preparing
+
+
+### Option 2:  Run on AWS
+
+Now preparing
+
+
+### Option 3:  Build from source
+
+Clone this repository (https://github.com/personium/io.git)
 
 ```bash
 $ git clone https://github.com/personium/io.git
 ```
-### core
+#### core
 
 Run maven package, then `core/target/dc1-core.war` is created.
 
@@ -50,7 +62,7 @@ $ cd ./io/core
 $ mvn package
 ```
 
-### engine
+#### engine
 
 Run maven package, then `engine/target/dc1-engine.war` is created.
 
@@ -58,6 +70,9 @@ Run maven package, then `engine/target/dc1-engine.war` is created.
 $ cd ./io/engine
 $ mvn package
 ```
+
+You also need MySQL 5.x, ElasticSearch 1.2.x and Java Servlet Container to 
+configure personium.io unit.
 
 ## Licence
 
