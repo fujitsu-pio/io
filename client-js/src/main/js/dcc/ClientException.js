@@ -31,10 +31,9 @@ dcc.ClientException = function(msg, code) {
 };
 dcc.DcClass.inherit(dcc.ClientException, Error);
 
-if (typeof exports === "undefined") {
-  exports = {};
+if (typeof exports !== "undefined") {
+  exports.ClientException = dcc.ClientException;
 }
-exports.ClientException = dcc.ClientException;
 
 ///**
 //* プロパティを初期化する.
