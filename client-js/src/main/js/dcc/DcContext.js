@@ -35,10 +35,9 @@ dcc.DcContext = function(url, name, boxSchema, bName) {
   this.initializeProperties(this, url, name, boxSchema, bName);
 };
 
-if (typeof exports === "undefined") {
-  exports = {};
+if (typeof exports !== "undefined") {
+  exports.DcContext = dcc.DcContext;
 }
-exports.DcContext = dcc.DcContext;
 
 ///**
 //* バージョン情報を指定するヘッダ.

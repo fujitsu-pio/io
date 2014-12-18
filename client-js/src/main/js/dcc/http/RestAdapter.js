@@ -30,10 +30,9 @@ dcc.http.RestAdapter = function(as) {
   this.initializeProperties(as);
 };
 
-if (typeof exports === "undefined") {
-  exports = {};
+if (typeof exports !== "undefined") {
+  exports.RestAdapter = dcc.http.RestAdapter;
 }
-exports.RestAdapter = dcc.http.RestAdapter;
 
 ///**
 //* プロパティを初期化する.
