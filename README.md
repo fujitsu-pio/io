@@ -34,45 +34,9 @@ http://personium.io/docs/
 	We are going to prepare missing parts, e.g. documents, tools, etc., 
 	to resolve this situation as soon as possible.
 
-## Setup 
+## Set up 
 
-### Option 1:  Try with Vagrant
-
-Now preparing
-
-
-### Option 2:  Run on AWS
-
-Now preparing
-
-
-### Option 3:  Build from source
-
-Clone this repository (https://github.com/personium/io.git)
-
-```bash
-$ git clone https://github.com/personium/io.git
-```
-#### core
-
-Run maven package, then `core/target/dc1-core.war` is created.
-
-```bash
-$ cd ./io/core
-$ mvn package
-```
-
-#### engine
-
-Run maven package, then `engine/target/dc1-engine.war` is created.
-
-```bash
-$ cd ./io/engine
-$ mvn package
-```
-
-You also need MySQL 5.x, ElasticSearch 1.2.x and Java Servlet Container to 
-configure personium.io unit.
+Please look at set up page. ([set up page](https://github.com/personium/io-vagrant-ansible))
 
 ## Licence
 
