@@ -36,7 +36,15 @@ http://personium.io/docs/
 
 ## Set up 
 
-Please look at set up page. ([set up page](https://github.com/personium/io-vagrant-ansible))
+1. Try it on your machine
+
+	Please refer __io-vagrant-ansible__ page. ([io-vagrant-ansible](https://github.com/personium/io-vagrant-ansible))
+
+2. Try it on your cloud
+
+	**On AWS**
+
+	Now preparing
 
 ## Licence
 
