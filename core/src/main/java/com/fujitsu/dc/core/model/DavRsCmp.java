@@ -36,11 +36,14 @@ import org.apache.wink.webdav.model.Propfind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fujitsu.dc.common.auth.token.Role;
 import com.fujitsu.dc.common.utils.DcCoreUtils;
+import com.fujitsu.dc.core.DcCoreAuthzException;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.auth.OAuth2Helper;
+import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.rs.box.DavCollectionResource;
 import com.fujitsu.dc.core.rs.box.DavFileResource;
@@ -332,20 +335,41 @@ public class DavRsCmp {
             return;
         }
 
+        AcceptableAuthScheme allowedAuthScheme = getAcceptableAuthScheme();
+
         // スキーマ認証チェック
-        ac.checkSchemaAccess(this.getConfidentialLevel(), this.getBox());
+        ac.checkSchemaAccess(this.getConfidentialLevel(), this.getBox(), allowedAuthScheme);
+
+        // Basic認証できるかチェック
+        ac.updateBasicAuthenticationStateForResource(this.getBox());
 
         // アクセス権チェック
         if (!this.hasPrivilege(ac, privilege)) {
             // トークンの有効性チェック
             // トークンがINVALIDでもACL設定でPrivilegeがallに設定されているとアクセスを許可する必要があるのでこのタイミングでチェック
+
             if (AccessContext.TYPE_INVALID.equals(ac.getType())) {
-                ac.throwInvalidTokenException();
+                ac.throwInvalidTokenException(allowedAuthScheme);
             } else if (AccessContext.TYPE_ANONYMOUS.equals(ac.getType())) {
-                throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+                throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(ac.getRealm(), allowedAuthScheme);
             }
             throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
         }
+    }
+
+    /**
+     * 認証に使用できるAuth Schemeを取得する.
+     * @return 認証に使用できるAuth Scheme
+     */
+    public AcceptableAuthScheme getAcceptableAuthScheme() {
+        AcceptableAuthScheme allowedAuthScheme = AcceptableAuthScheme.ALL;
+        // スキーマ有のBox配下のリソースであるかチェックする
+        String boxSchema = this.getBox().getSchema();
+        // ボックスのスキーマが設定されている場合はBasicのWWW-Authenticateヘッダは付加しない
+        if (boxSchema != null && boxSchema.length() > 0 && !Role.DEFAULT_BOX_NAME.equals(this.getBox().getName())) {
+            allowedAuthScheme = AcceptableAuthScheme.BEARER;
+        }
+        return allowedAuthScheme;
     }
 
     /**

@@ -402,7 +402,7 @@ public final class DcCoreUtils {
             return null;
         }
         try {
-            // 6番目の文字からを取得
+            // 認証スキーマ以外の部分を取得
             byte[] bytes = DcCoreUtils.decodeBase64Url(authzHeaderValue.substring(AUTHZ_BASIC.length()));
             String rawStr = new String(bytes, CharEncoding.UTF_8);
             int pos = rawStr.indexOf(":");
@@ -412,7 +412,7 @@ public final class DcCoreUtils {
             }
             String username = rawStr.substring(0, pos);
             String password = rawStr.substring(pos + 1);
-            return new String[] {decodeUrlComp(username), decodeUrlComp(password)};
+            return new String[] {decodeUrlComp(username), decodeUrlComp(password) };
         } catch (UnsupportedEncodingException e) {
             return null;
         }

@@ -38,18 +38,24 @@ import com.fujitsu.dc.common.auth.token.Role;
 import com.fujitsu.dc.common.auth.token.TransCellAccessToken;
 import com.fujitsu.dc.common.auth.token.TransCellRefreshToken;
 import com.fujitsu.dc.common.auth.token.UnitLocalUnitUserToken;
+import com.fujitsu.dc.common.utils.DcCoreUtils;
+import com.fujitsu.dc.core.DcCoreAuthzException;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.DcCoreLog;
+import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.Cell;
 import com.fujitsu.dc.core.model.jaxb.Ace;
 import com.fujitsu.dc.core.model.jaxb.Acl;
+import com.fujitsu.dc.core.odata.OEntityWrapper;
+import com.fujitsu.dc.core.rs.cell.AuthResourceUtils;
 
 /**
  * アクセス文脈情報.
  * Authorization ヘッダから取り出した情報に基づいて 誰がどいう役割で、どういうアプリからアクセスしているのかといったAccess文脈情報を 生成し、これをこのオブジェクトに保持する。
  * ACLとの突合でpermissionを生成する。 cell, id, pw → AC AC → Token(issuer, subj, roles) Token → AC AC + ACL → permissions
+ * なお、本クラスでは認証・認可のチェック結果を保持しており、これらの情報を扱う場所によって対処方法が異なるため、安易に例外はスローしないこと。
  */
 public final class AccessContext {
     private Cell cell;
@@ -104,9 +110,6 @@ public final class AccessContext {
      */
     public static final String TYPE_UNIT_ADMIN_ROLE = "unitAdmin";
 
-    // TODO V1.1 Basic認証対応時に解除
-    // private static final String AUTHZ_BASIC = "Basic ";
-
     /**
      * 無効なトークンの原因.
      */
@@ -124,9 +127,21 @@ public final class AccessContext {
          */
         basicAuthFormat,
         /**
-         * 認証エラー.
+         * ベーシック認証できないリソースに対してベーシック認証しようとした.
          */
-        authError,
+        basicNotAllowed,
+        /**
+         * ベーシック認証エラー.
+         */
+        basicAuthError,
+        /**
+         * 認証エラー(Accountロック中).
+         */
+        basicAuthErrorInAccountLock,
+        /**
+         * Cookie認証エラー.
+         */
+        cookieAuthError,
         /**
          * トークンパースエラー.
          */
@@ -238,17 +253,17 @@ public final class AccessContext {
      * @return 生成されたAccessContextオブジェクト
      */
     public static AccessContext create(final String authzHeaderValue,
-                final UriInfo requestURIInfo, final String dcCookiePeer, final String dcCookieAuthValue,
-                final Cell cell, final String baseUri, final String host, String xDcUnitUser) {
+            final UriInfo requestURIInfo, final String dcCookiePeer, final String dcCookieAuthValue,
+            final Cell cell, final String baseUri, final String host, String xDcUnitUser) {
         if (authzHeaderValue == null) {
-            if (dcCookiePeer == null  || 0 == dcCookiePeer.length()) {
+            if (dcCookiePeer == null || 0 == dcCookiePeer.length()) {
                 return new AccessContext(TYPE_ANONYMOUS, cell, baseUri);
             }
             // クッキー認証の場合
             // クッキー内の値を復号化した値を取得
             try {
                 if (null == dcCookieAuthValue) {
-                    throw DcCoreException.Auth.COOKIE_AUTHENTICATION_FAILED;
+                    return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.cookieAuthError);
                 }
                 String decodedCookieValue = LocalToken.decode(dcCookieAuthValue,
                         UnitLocalUnitUserToken.getIvBytes(
@@ -262,56 +277,78 @@ public final class AccessContext {
                     return create(OAuth2Helper.Scheme.BEARER + " " + authToken,
                             requestURIInfo, null, null, cell, baseUri, host, xDcUnitUser);
                 } else {
-                    throw DcCoreException.Auth.COOKIE_AUTHENTICATION_FAILED;
+                    return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.cookieAuthError);
                 }
             } catch (TokenParseException e) {
-                throw DcCoreException.Auth.COOKIE_AUTHENTICATION_FAILED;
+                return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.cookieAuthError);
             }
         }
 
         // TODO V1.1 ここはキャッシュできる部分。ここでキャッシュから取得すればいい。
 
         // まずは認証方式によって分岐
-        // TODO V1.1 Basic認証であるとき。
-        // if (authzHeaderValue.startsWith(AUTHZ_BASIC)) {
-        // return AccessContext.createBasicAuthz(authzHeaderValue, cell, baseUri);
-        // } else if (authzHeaderValue.startsWith(OAuth2Helper.Scheme.BEARER)) {
-        // return createBearerAuthz(authzHeaderValue, cell, baseUri, host, xDcUnitUser);
-        // }
-        if (authzHeaderValue.startsWith(OAuth2Helper.Scheme.BEARER)) {
+
+        if (authzHeaderValue.startsWith(OAuth2Helper.Scheme.BASIC)) {
+            // Basic認証
+            return AccessContext.createBasicAuthz(authzHeaderValue, cell, baseUri);
+
+        } else if (authzHeaderValue.startsWith(OAuth2Helper.Scheme.BEARER)) {
+            // OAuth2.0認証
             return createBearerAuthz(authzHeaderValue, cell, baseUri, host, xDcUnitUser);
         }
         return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.authenticationScheme);
     }
 
-    // TODO V1.1 Basic認証対応時に解除
-    // /**
-    // * ファクトリメソッド. アクセスしているCellとAuthorizationヘッダの値を元にBasic認証にてオブジェクトを生成して返します.
-    // * @param authzHeaderValue Authorizationヘッダの値
-    // * @param cell アクセスしているCell
-    // * @param baseUri アクセスしているbaseUri
-    // * @return 生成されたAccessContextオブジェクト
-    // */
-    // private static AccessContext createBasicAuthz(final String authzHeaderValue, final Cell cell,
-    // final String baseUri) {
-    // String[] idpw = DcCoreUtils.parseBasicAuthzHeader(authzHeaderValue);
-    // if (idpw == null) {
-    // return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.basicAuthFormat);
-    // }
-    //
-    // String username = idpw[0];
-    // String password = idpw[1];
-    // boolean authnSuccess = cell.authenticateAccount(username, password);
-    // if (!authnSuccess) {
-    // return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.authError);
-    // }
-    // // 認証して成功なら
-    // AccessContext ret = new AccessContext(TYPE_BASIC, cell, baseUri);
-    // ret.subject = username;
-    // // ロール情報を取得
-    // ret.roles = cell.getRoleListForAccount(username);
-    // return ret;
-    // }
+    /**
+     * ファクトリメソッド. アクセスしているCellとAuthorizationヘッダの値を元にBasic認証にてオブジェクトを生成して返します.
+     * @param authzHeaderValue Authorizationヘッダの値
+     * @param cell アクセスしているCell
+     * @param baseUri アクセスしているbaseUri
+     * @return 生成されたAccessContextオブジェクト
+     */
+    private static AccessContext createBasicAuthz(final String authzHeaderValue, final Cell cell,
+            final String baseUri) {
+
+        // Unitコントロールへのアクセスの場合は、Basic認証不可
+        if (cell == null) {
+            return new AccessContext(TYPE_INVALID, null, baseUri, InvalidReason.basicAuthError);
+        }
+
+        String[] idpw = DcCoreUtils.parseBasicAuthzHeader(authzHeaderValue);
+        if (idpw == null) {
+            return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.basicAuthFormat);
+        }
+
+        String username = idpw[0];
+        String password = idpw[1];
+
+        OEntityWrapper oew = cell.getAccount(username);
+        if (oew == null) {
+            return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.basicAuthFormat);
+        }
+
+        // Accountのロックチェック
+        String accountId = oew.getUuid();
+        Boolean isLock = AuthResourceUtils.isLockedAccount(accountId);
+        if (isLock) {
+            // memcachedのロック時間を更新
+            AuthResourceUtils.registAccountLock(accountId);
+            return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.basicAuthErrorInAccountLock);
+        }
+
+        boolean authnSuccess = cell.authenticateAccount(oew, password);
+        if (!authnSuccess) {
+            // memcachedにロックを作成
+            AuthResourceUtils.registAccountLock(accountId);
+            return new AccessContext(TYPE_INVALID, cell, baseUri, InvalidReason.basicAuthError);
+        }
+        // 認証して成功なら
+        AccessContext ret = new AccessContext(TYPE_BASIC, cell, baseUri);
+        ret.subject = username;
+        // ロール情報を取得
+        ret.roles = cell.getRoleListForAccount(username);
+        return ret;
+    }
 
     /**
      * ファクトリメソッド. アクセスしているCellとAuthorizationヘッダの値を元にBearer認証にてオブジェクトを生成して返します.
@@ -380,7 +417,8 @@ public final class AccessContext {
             String acct = tk.getSubject();
             ret.roles = cell.getRoleListForAccount(acct);
             if (ret.roles == null) {
-                throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+                throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(getRealm(baseUri, cell),
+                        AcceptableAuthScheme.BEARER);
             }
             // AccessContextではSubjectはURLに正規化。
             ret.subject = cell.getUrl() + "#" + tk.getSubject();
@@ -561,18 +599,19 @@ public final class AccessContext {
 
     /**
      * アクセス制御を行う(SubjectがCELLのトークンのみアクセス可能とする).
+     * @param acceptableAuthScheme Basic認証を許可しないリソースからの呼び出しであるかどうか
      */
-    public void checkCellIssueToken() {
+    public void checkCellIssueToken(AcceptableAuthScheme acceptableAuthScheme) {
         if (AccessContext.TYPE_TRANS.equals(this.getType())
                 && this.getSubject().equals(this.getIssuer())) {
             // トークンのISSUER（発行者）とSubject（トークンの持ち主）が一致した場合のみ有効。
             return;
 
         } else if (AccessContext.TYPE_INVALID.equals(this.getType())) {
-            this.throwInvalidTokenException();
+            this.throwInvalidTokenException(acceptableAuthScheme);
 
         } else if (AccessContext.TYPE_ANONYMOUS.equals(this.getType())) {
-            throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+            throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(getRealm(), acceptableAuthScheme);
 
         } else {
             throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
@@ -582,14 +621,16 @@ public final class AccessContext {
     /**
      * トークンが自分セルローカルトークンか確認する.
      * @param cellname cell
+     * @param acceptableAuthScheme Basic認証を許可しないリソースからの呼び出しであるかどうか
      */
-    public void checkMyLocalToken(Cell cellname) {
+    public void checkMyLocalToken(Cell cellname, AcceptableAuthScheme acceptableAuthScheme) {
         // 不正なトークンorトークン指定がない場合401を返却
         // 自分セルローカルトークン以外のトークンの場合403を返却
         if (AccessContext.TYPE_INVALID.equals(this.getType())) {
-            this.throwInvalidTokenException();
-        } else if (AccessContext.TYPE_ANONYMOUS.equals(this.getType())) {
-            throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+            this.throwInvalidTokenException(acceptableAuthScheme);
+        } else if (AccessContext.TYPE_ANONYMOUS.equals(this.getType())
+                || AccessContext.TYPE_BASIC.equals(this.getType())) {
+            throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(getRealm(), acceptableAuthScheme);
         } else if (!(this.getType() == AccessContext.TYPE_LOCAL
         && this.getCell().getName().equals(cellname.getName()))) {
             throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
@@ -600,8 +641,9 @@ public final class AccessContext {
      * スキーマ設定をチェックしアクセス可能か判断する.
      * @param settingConfidentialLevel スキーマレベル設定
      * @param box box
+     * @param acceptableAuthScheme Basic認証を許可しないリソースからの呼び出しであるかどうか
      */
-    public void checkSchemaAccess(String settingConfidentialLevel, Box box) {
+    public void checkSchemaAccess(String settingConfidentialLevel, Box box, AcceptableAuthScheme acceptableAuthScheme) {
         // マスタートークンかユニットユーザ、ユニットローカルユニットユーザの場合はスキーマ認証をスルー。
         if (this.isUnitUserToken()) {
             return;
@@ -617,9 +659,9 @@ public final class AccessContext {
         // トークンの有効性チェック
         // トークンがINVALIDでもスキーマレベル設定が未設定だとアクセスを許可する必要があるのでこのタイミングでチェック
         if (AccessContext.TYPE_INVALID.equals(this.getType())) {
-            this.throwInvalidTokenException();
+            this.throwInvalidTokenException(acceptableAuthScheme);
         } else if (AccessContext.TYPE_ANONYMOUS.equals(this.getType())) {
-            throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+            throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(getRealm(), acceptableAuthScheme);
         }
 
         // トークン内のスキーマチェック(Boxレベル以下かつマスタートークン以外のアクセスの場合のみ)
@@ -653,24 +695,75 @@ public final class AccessContext {
     }
 
     /**
-     * 無効なトークンの例外を投げ分ける.
+     * Basic認証できるかどうかチェックし、Basic認証できない場合は、コンテキストにBasic認証不可の状態を設定する.<br />
+     * 本メソッドではチェックのみを行い、実際に認証エラーとするかどうかは構造のアクセス権限チェック処理に任せる。
+     * @param box Boxオブジェクト(Cellレベルの場合はnullを指定)
      */
-    public void throwInvalidTokenException() {
+    public void updateBasicAuthenticationStateForResource(Box box) {
+        // Basic認証でなければチェック不要
+        if (!TYPE_BASIC.equals(this.getType())) {
+            return;
+        }
+
+        // Basic認証できるリソースであるかチェックする
+        if (box == null) {
+            invalidateBasicAuthentication();
+            return;
+        }
+
+        // メインボックスはスキーマを持っているがBasic認証可能
+        if (Role.DEFAULT_BOX_NAME.equals(box.getName())) {
+            return;
+        }
+
+        // スキーマ有のBox配下のリソースであるかチェックする
+        String boxSchema = box.getSchema();
+        // ボックスのスキーマが設定されている場合はBasic認証を受け付けない
+        if (boxSchema != null && boxSchema.length() > 0) {
+            invalidateBasicAuthentication();
+            return;
+        }
+    }
+
+    /**
+     * コンテキストにBasic認証不可の状態を設定する.
+     */
+    private void invalidateBasicAuthentication() {
+        this.accessType = TYPE_INVALID;
+        this.invalidReason = InvalidReason.basicNotAllowed;
+        this.subject = null;
+        this.roles = new ArrayList<Role>();
+    }
+
+    /**
+     * 無効なトークンの例外を投げ分ける.
+     * @param allowedAuthScheme Basic認証を許可しないリソースからの呼び出しであるかどうか
+     */
+    public void throwInvalidTokenException(AcceptableAuthScheme allowedAuthScheme) {
+        String realm = getRealm();
+
         switch (this.invalidReason) {
         case expired:
-            throw DcCoreException.Auth.EXPIRED_ACCESS_TOKEN;
+            throw DcCoreAuthzException.EXPIRED_ACCESS_TOKEN.realm(realm, allowedAuthScheme);
         case authenticationScheme:
-            throw DcCoreException.Auth.INVALID_AUTHN_SCHEME;
+            throw DcCoreAuthzException.INVALID_AUTHN_SCHEME.realm(realm, allowedAuthScheme);
         case basicAuthFormat:
-            throw DcCoreException.Auth.BASIC_AUTH_FORMAT_ERROR;
-        case authError:
-            throw DcCoreException.Auth.AUTHENTICATION_FAILED;
+            throw DcCoreAuthzException.BASIC_AUTH_FORMAT_ERROR.realm(realm, allowedAuthScheme);
+        case basicNotAllowed:
+            throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(getRealm(), allowedAuthScheme);
+        case basicAuthError:
+            throw DcCoreAuthzException.BASIC_AUTHENTICATION_FAILED.realm(realm, allowedAuthScheme);
+        case basicAuthErrorInAccountLock:
+            throw DcCoreAuthzException.BASIC_AUTHENTICATION_FAILED_IN_ACCOUNT_LOCK.realm(realm,
+                    allowedAuthScheme);
+        case cookieAuthError:
+            throw DcCoreAuthzException.COOKIE_AUTHENTICATION_FAILED.realm(realm, allowedAuthScheme);
         case tokenParseError:
-            throw DcCoreException.Auth.TOKEN_PARSE_ERROR;
+            throw DcCoreAuthzException.TOKEN_PARSE_ERROR.realm(realm, allowedAuthScheme);
         case refreshToken:
-            throw DcCoreException.Auth.ACCESS_WITH_REFRESH_TOKEN;
+            throw DcCoreAuthzException.ACCESS_WITH_REFRESH_TOKEN.realm(realm, allowedAuthScheme);
         case tokenDsigError:
-            throw DcCoreException.Auth.TOKEN_DISG_ERROR;
+            throw DcCoreAuthzException.TOKEN_DISG_ERROR.realm(realm, allowedAuthScheme);
         default:
             throw DcCoreException.Server.UNKNOWN_ERROR;
         }
@@ -686,5 +779,26 @@ public final class AccessContext {
         // URIのホスト名を基にキーを生成する。
         // ホスト名を加工する。
         return uri.getHost().replaceAll("[aiueo]", "#");
+    }
+
+    /**
+     * realm情報(CellのURL)を生成する.
+     * @return realm情報
+     */
+    public String getRealm() {
+        return getRealm(this.baseUri, this.cell);
+    }
+
+    /**
+     * realm情報(CellのURL)を生成する(内部用).
+     * @return realm情報
+     */
+    private static String getRealm(String baseUri, Cell cellobj) {
+        // ユニットコントロールリソースの場合はcellがnullになるため判定が必要
+        String realm = baseUri;
+        if (null != cellobj) {
+            realm = cellobj.getUrl();
+        }
+        return realm;
     }
 }

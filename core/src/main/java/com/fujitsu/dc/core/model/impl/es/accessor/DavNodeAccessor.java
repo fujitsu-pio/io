@@ -98,7 +98,7 @@ public class DavNodeAccessor extends DataSourceAccessor {
             // 一時ファイルコピー
             String unitUserName = getIndex().getName().replace(DcCoreConfig.getEsUnitPrefix() + "_", "");
             BinaryDataAccessor binaryDataAccessor = new BinaryDataAccessor(DcCoreConfig.getBlobStoreRoot(),
-                    unitUserName);
+                    unitUserName, DcCoreConfig.getFsyncEnabled());
             binaryDataAccessor.copyFile(id);
 
             // MySQL更新
@@ -117,7 +117,7 @@ public class DavNodeAccessor extends DataSourceAccessor {
     private void deleteTmpFile(String id) {
         String unitUserName = getIndex().getName().replace(DcCoreConfig.getEsUnitPrefix() + "_", "");
         BinaryDataAccessor binaryDataAccessor = new BinaryDataAccessor(DcCoreConfig.getBlobStoreRoot(),
-                unitUserName);
+                unitUserName, DcCoreConfig.getFsyncEnabled());
         try {
             // 一時ファイル物理削除
             binaryDataAccessor.deletePhysicalFile(id + ".tmp");
@@ -243,7 +243,7 @@ public class DavNodeAccessor extends DataSourceAccessor {
             // 一時ファイルコピー
             String unitUserName = getIndex().getName().replace(DcCoreConfig.getEsUnitPrefix() + "_", "");
             BinaryDataAccessor binaryDataAccessor = new BinaryDataAccessor(DcCoreConfig.getBlobStoreRoot(),
-                    unitUserName);
+                    unitUserName, DcCoreConfig.getFsyncEnabled());
             binaryDataAccessor.copyFile(id);
 
             // MySQL更新

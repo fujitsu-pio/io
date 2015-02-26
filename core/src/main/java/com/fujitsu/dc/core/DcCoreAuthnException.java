@@ -180,6 +180,8 @@ public final class DcCoreAuthnException extends DcCoreException {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .entity(errorJson.toJSONString());
 
+        // レルム値が設定されていれば、WWW-Authenticateヘッダーを返却する。
+        // __authエンドポイントでは、認証失敗時(401返却時)には、同ヘッダーに Auth SchemeがBasicの値を返却するため、ここでは固定値とする。
         if (this.realm != null) {
             rb = rb.header(HttpHeaders.WWW_AUTHENTICATE, Scheme.BASIC + " realm=\"" + this.realm + "\"");
         }

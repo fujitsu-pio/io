@@ -21,12 +21,13 @@ import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.odata4j.core.OEntityKey;
 
-import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.AuthUtils;
 import com.fujitsu.dc.core.auth.CellPrivilege;
+import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.DavRsCmp;
@@ -64,22 +65,16 @@ public final class CellCtlResource extends ODataResource {
 
     @Override
     public void checkAccessContext(final AccessContext ac, Privilege privilege) {
-        // ユニットユーザトークンチェック
-        if (ac.isUnitUserToken()) {
-            return;
-        }
+        this.davRsCmp.checkAccessContext(ac, privilege);
+    }
 
-        // アクセス権チェック
-        if (!this.davRsCmp.hasPrivilege(ac, privilege)) {
-            // トークンの有効性チェック
-            // トークンがINVALIDでもACL設定でPrivilegeがallに設定されているとアクセスを許可する必要があるのでこのタイミングでチェック
-            if (AccessContext.TYPE_INVALID.equals(ac.getType())) {
-                ac.throwInvalidTokenException();
-            } else if (AccessContext.TYPE_ANONYMOUS.equals(ac.getType())) {
-                throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
-            }
-            throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
-        }
+    /**
+     * 認証に使用できるAuth Schemeを取得する.
+     * @return 認証に使用できるAuth Scheme
+     */
+    @Override
+    public AcceptableAuthScheme getAcceptableAuthScheme() {
+        return this.davRsCmp.getAcceptableAuthScheme();
     }
 
     @Override
@@ -179,5 +174,22 @@ public final class CellCtlResource extends ODataResource {
     @Override
     public Privilege getNecessaryOptionsPrivilege() {
         return CellPrivilege.SOCIAL_READ;
+    }
+
+    @Override
+    public void setBasicAuthenticateEnableInBatchRequest(AccessContext ac) {
+        // CellレベルAPIはバッチリクエストに対応していないため、ここでは何もしない
+    }
+
+    /**
+     * Not Implemented. <br />
+     * 現状、$batchのアクセス制御でのみ必要なメソッドのため未実装. <br />
+     * アクセスコンテキストが$batchしてよい権限を持っているかを返す.
+     * @param ac アクセスコンテキスト
+     * @return true: アクセスコンテキストが$batchしてよい権限を持っている
+     */
+    @Override
+    public boolean hasPrivilegeForBatch(AccessContext ac) {
+        throw new NotImplementedException();
     }
 }

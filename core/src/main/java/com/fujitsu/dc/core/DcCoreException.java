@@ -556,43 +556,6 @@ public class DcCoreException extends RuntimeException {
          * パスワード文字列が不正.
          */
         public static final DcCoreException DC_CREDENTIAL_REQUIRED = create("PR400-AU-0003");
-        /**
-         * 認証ヘッダが必要.
-         */
-        public static final DcCoreException AUTHORIZATION_REQUIRED = create("PR401-AU-0001");
-        /**
-         * トークン有効期限切れ.
-         */
-        public static final DcCoreException EXPIRED_ACCESS_TOKEN = create("PR401-AU-0002");
-        /**
-         * AuthenticationSchemeが無効.
-         */
-        public static final DcCoreException INVALID_AUTHN_SCHEME = create("PR401-AU-0003");
-        /**
-         * ベーシック認証ヘッダのフォーマットが無効.
-         */
-        public static final DcCoreException BASIC_AUTH_FORMAT_ERROR = create("PR401-AU-0004");
-        /**
-         * 認証エラー.
-         */
-        public static final DcCoreException AUTHENTICATION_FAILED = create("PR401-AU-0005");
-        /**
-         * トークンパースエラー.
-         */
-        public static final DcCoreException TOKEN_PARSE_ERROR = create("PR401-AU-0006");
-        /**
-         * リフレッシュトークンでのアクセス.
-         */
-        public static final DcCoreException ACCESS_WITH_REFRESH_TOKEN = create("PR401-AU-0007");
-        /**
-         * トークン署名検証エラー.
-         */
-        public static final DcCoreException TOKEN_DISG_ERROR = create("PR401-AU-0008");
-
-        /**
-         * クッキー認証エラー.
-         */
-        public static final DcCoreException COOKIE_AUTHENTICATION_FAILED = create("PR401-AU-0009");
 
         /**
          * ユニットユーザアクセスではない.

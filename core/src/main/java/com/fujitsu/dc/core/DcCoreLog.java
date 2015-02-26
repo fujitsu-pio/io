@@ -88,6 +88,11 @@ public final class DcCoreLog {
          * {0}：詳細メッセージ
          */
         public static final DcCoreLog ROOT_CA_CRT_SETTING_ERROR = create("PL-AU-0003");
+        /**
+         * 最終ログイン時刻の更新時にAccountが存在しない場合.
+         * {0}：詳細メッセージ
+         */
+        public static final DcCoreLog ACCOUNT_ALREADY_DELETED = create("PL-AU-0004");
     }
 
     /**

@@ -33,6 +33,7 @@ import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.annotations.ACL;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
+import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavRsCmp;
@@ -140,6 +141,31 @@ public final class ODataSvcCollectionResource extends ODataResource {
         this.davRsCmp.checkAccessContext(ac, privilege);
     }
 
+    /**
+     * 認証に使用できるAuth Schemeを取得する.
+     * @return 認証に使用できるAuth Scheme
+     */
+    @Override
+    public AcceptableAuthScheme getAcceptableAuthScheme() {
+        return this.davRsCmp.getAcceptableAuthScheme();
+    }
+
+    /**
+     * アクセスコンテキストが$batchしてよい権限を持っているかを返す.
+     * @param ac アクセスコンテキスト
+     * @return true: アクセスコンテキストが$batchしてよい権限を持っている
+     */
+    @Override
+    public boolean hasPrivilegeForBatch(AccessContext ac) {
+        if (ac.requirePrivilege(this.davCmp.getAcl(), BoxPrivilege.READ, this.davRsCmp.getCell().getUrl())) {
+            return true;
+        }
+        if (ac.requirePrivilege(this.davCmp.getAcl(), BoxPrivilege.WRITE, this.davRsCmp.getCell().getUrl())) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean hasPrivilege(AccessContext ac, Privilege privilege) {
         return this.davRsCmp.hasPrivilege(ac, privilege);
@@ -147,7 +173,16 @@ public final class ODataSvcCollectionResource extends ODataResource {
 
     @Override
     public void checkSchemaAuth(AccessContext ac) {
-        ac.checkSchemaAccess(this.davRsCmp.getConfidentialLevel(), this.davRsCmp.getBox());
+        ac.checkSchemaAccess(this.davRsCmp.getConfidentialLevel(), this.davRsCmp.getBox(),
+                getAcceptableAuthScheme());
+    }
+
+    /**
+     * basic認証できるかチェックする.
+     * @param ac アクセスコンテキスト
+     */
+    public void setBasicAuthenticateEnableInBatchRequest(AccessContext ac) {
+        ac.updateBasicAuthenticationStateForResource(this.davRsCmp.getBox());
     }
 
     /**
@@ -156,7 +191,6 @@ public final class ODataSvcCollectionResource extends ODataResource {
      */
     @Path("{first: \\$}metadata")
     public ODataSvcSchemaResource metadata() {
-        this.checkAccessContext(this.getAccessContext(), BoxPrivilege.READ);
         return new ODataSvcSchemaResource(this.davRsCmp, this);
     }
 
@@ -174,4 +208,5 @@ public final class ODataSvcCollectionResource extends ODataResource {
     public Privilege getNecessaryOptionsPrivilege() {
         return BoxPrivilege.READ;
     }
+
 }

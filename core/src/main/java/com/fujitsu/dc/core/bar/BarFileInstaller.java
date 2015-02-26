@@ -17,11 +17,13 @@
 package com.fujitsu.dc.core.bar;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.SyncFailedException;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -229,6 +231,15 @@ public class BarFileInstaller {
     }
 
     /**
+     * ファイルディスクリプタの同期.
+     * @param fd ファイルディスクリプタ
+     * @throws SyncFailedException 同期に失敗
+     */
+    public void sync(FileDescriptor fd) throws SyncFailedException {
+        fd.sync();
+    }
+
+    /**
      * Httpリクエストボディからbarファイルを読み込み、一時領域へ格納する.
      * @param inStream Httpリクエストボディ用InputStreamオブジェクト
      * @return 一時領域に格納したbarファイルのFileオブジェクト
@@ -261,6 +272,13 @@ public class BarFileInstaller {
             }
             throw DcCoreException.Server.FILE_SYSTEM_ERROR.params(message);
         } finally {
+            if (null != outStream && DcCoreConfig.getFsyncEnabled()) {
+                try {
+                    sync(((FileOutputStream) outStream).getFD());
+                } catch (Exception e) {
+                    throw DcCoreException.Server.FILE_SYSTEM_ERROR.params(e.getMessage());
+                }
+            }
             IOUtils.closeQuietly(outStream);
         }
         return barFile;

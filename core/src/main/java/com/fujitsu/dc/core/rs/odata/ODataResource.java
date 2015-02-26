@@ -48,6 +48,7 @@ import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
+import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.odata.DcODataProducer;
 import com.fujitsu.dc.core.odata.OEntityWrapper;
@@ -97,6 +98,12 @@ public abstract class ODataResource extends ODataCtlResource {
     public abstract void checkAccessContext(AccessContext ac, Privilege privilege);
 
     /**
+     * 認証に使用できるAuth Schemeを取得する.
+     * @return 認証に使用できるAuth Scheme
+     */
+    public abstract AcceptableAuthScheme getAcceptableAuthScheme();
+
+    /**
      * リソースに対するアクセス権限チェック処理.
      * @param ac accessContext
      * @param privilege privilege
@@ -109,6 +116,12 @@ public abstract class ODataResource extends ODataCtlResource {
      * @param ac accessContext
      */
     public abstract void checkSchemaAuth(AccessContext ac);
+
+    /**
+     * Basic認証できるかのチェック処理（Batchリクエスト専用）.
+     * @param ac accessContext
+     */
+    public abstract void setBasicAuthenticateEnableInBatchRequest(AccessContext ac);
 
     /**
      * エンティティ毎のアクセス可否判断.
@@ -331,4 +344,10 @@ public abstract class ODataResource extends ODataCtlResource {
      */
     public abstract Privilege getNecessaryOptionsPrivilege();
 
+    /**
+     * アクセスコンテキストが$batchしてよい権限を持っているかを返す.
+     * @param ac アクセスコンテキスト
+     * @return true: アクセスコンテキストが$batchしてよい権限を持っている
+     */
+    public abstract boolean hasPrivilegeForBatch(AccessContext ac);
 }

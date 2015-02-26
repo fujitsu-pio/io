@@ -71,7 +71,8 @@ public class CellBulkDeletionRunner implements Runnable {
         // 1000件ずつ、WebDavファイルの管理情報件数まで以下を実施する
         int fetchCount = DAVFILE_DEFAULT_FETCH_COUNT;
         BinaryDataAccessor accessor = new BinaryDataAccessor(
-                DcCoreConfig.getBlobStoreRoot(), unitUserNameWithOutPrefix, DcCoreConfig.getPhysicalDeleteMode());
+                DcCoreConfig.getBlobStoreRoot(), unitUserNameWithOutPrefix,
+                DcCoreConfig.getPhysicalDeleteMode(), DcCoreConfig.getFsyncEnabled());
         for (int i = 0; i <= davfileCount; i += fetchCount) {
             // WebDavファイルのID一覧を取得する
             List<String> davFileIdList = cellAccessor.getDavFileIdList(

@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.fujitsu.dc</groupId>
 	<artifactId>dc1-client</artifactId>
 	<packaging>jar</packaging>
 	<!-- changes required of Jenkins -->
-	<version>1.3.20</version>
+	<version>1.3.21</version>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -18,14 +17,13 @@
 		<java.version>1.7</java.version>
 		<jvm.option>-Xms512m -Xmx512m -XX:MaxPermSize=256m -XX:-UseSplitVerifier</jvm.option>
 		<logback.version>1.0.13</logback.version>
-		<slf4j.version>1.7.6</slf4j.version>
-	</properties>
+		<slf4j.version>1.7.6</slf4j.version>	</properties>
 
 	<build>
 		<resources>
 				<resource>
-					<directory>src/main/resources</directory>
-					<filtering>true</filtering>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
 				</resource>
 				<resource>
 						<targetPath>META-INF</targetPath>
@@ -126,7 +124,7 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
-					<header>../copyright.txt</header>
+					<header>./copyright.txt</header>
 					<excludes>
 						<exclude>.checkstyle</exclude>
 						<exclude>checkstyle.header</exclude>
@@ -138,7 +136,7 @@
 						<exclude>logback.xml</exclude>
 						<exclude>log4j.xml</exclude>
 						<exclude>commons-logging.properties</exclude>
-						<exclude>formatter.xml</exclude>
+                        <exclude>formatter.xml</exclude>
 						<exclude>NOTICE.txt</exclude>
 						<exclude>LICENSE.txt</exclude>
 						<exclude>CHANGES.txt</exclude>

@@ -138,7 +138,7 @@ public class AuthResourceUtils {
      * @param accountId アカウントID
      * @return ロックが存在していればtrueを返却
      */
-    protected static Boolean isLockedAccount(String accountId) {
+    public static Boolean isLockedAccount(String accountId) {
         return AccountLockManager.hasLockObject(accountId);
     }
 
@@ -146,7 +146,7 @@ public class AuthResourceUtils {
      * Accountロックを登録する.
      * @param accountId アカウントID
      */
-    protected static void registAccountLock(String accountId) {
+    public static void registAccountLock(String accountId) {
         AccountLockManager.registAccountLockObjct(accountId);
     }
 }

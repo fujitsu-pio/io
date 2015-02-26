@@ -310,4 +310,16 @@ public final class OAuth2Helper {
          */
         public static final String CONFIDENTIAL = "confidential";
     }
+
+    /**
+     * リソースに応じて許可するAuthSchemeの種別.
+     */
+    public enum AcceptableAuthScheme {
+        /** Basicのみを許可する. */
+        BASIC,
+        /** Bearerのみを許可する. */
+        BEARER,
+        /** 全てのAuthSchemeを許可する. */
+        ALL
+    }
 }

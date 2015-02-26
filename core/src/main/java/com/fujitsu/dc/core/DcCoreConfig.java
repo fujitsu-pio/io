@@ -367,6 +367,11 @@ public class DcCoreConfig {
         public static final String PHYSICAL_DELETE_MODE = KEY_ROOT + "binaryData.physical.delete.mode";
 
         /**
+         * ファイルへの書き込み時にfsyncを有効にするか否か(true:有効 false:無効(デフォルト)).
+         */
+        public static final String FSYNC_ENABLED = KEY_ROOT + "binaryData.fsync.enabled";
+
+        /**
          * Davファイルの読み書き時、ハードリンク作成/ファイル名改変時の最大リトライ回数.
          */
         public static final String MAX_RETRY_COUNT = KEY_ROOT + "binaryData.dav.retry.count";
@@ -937,6 +942,14 @@ public class DcCoreConfig {
      */
     public static int getMaxCollectionDepth() {
         return Integer.parseInt(get(Dav.COLLECTION_DEPTH_MAX_NUM));
+    }
+
+    /**
+     * ファイル書き込み時にfsyncが有効であるか否かを返す.
+     * @return 有効である場合はtrue
+     */
+    public static boolean getFsyncEnabled() {
+        return Boolean.parseBoolean(get(BinaryData.FSYNC_ENABLED));
     }
 
     /**

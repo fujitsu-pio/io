@@ -86,7 +86,8 @@ public class EventUtils {
     public static void deleteEventLog(String cellId, String owner) throws BinaryDataAccessException {
         // ログの一覧を取得
         List<String> logFiles = getLogFileList(cellId, owner);
-        BinaryDataAccessor accessor = new BinaryDataAccessor("", null, DcCoreConfig.getPhysicalDeleteMode());
+        BinaryDataAccessor accessor = new BinaryDataAccessor("", null,
+                DcCoreConfig.getPhysicalDeleteMode(), DcCoreConfig.getFsyncEnabled());
 
         // ファイル論理削除
         for (String logFile : logFiles) {

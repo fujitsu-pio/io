@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.model.Cell;
+import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.Account;
 import com.fujitsu.dc.core.odata.DcODataProducer;
@@ -50,19 +51,22 @@ public class PasswordResource {
     private String key;
     private String keyString = null;
     private OEntityKey oEntityKey;
+    private DavRsCmp davRsCmp;
 
     /**
      * コンストラクタ.
      * @param accessContext accessContext
      * @param dcCredHeader dcCredHeader
      * @param cell cell
+     * @param davRsCmp DavRsCmp
      */
     public PasswordResource(final AccessContext accessContext,
             final String dcCredHeader,
-            Cell cell) {
+            Cell cell, DavRsCmp davRsCmp) {
         this.accessContext = accessContext;
         this.dcCredHeader = dcCredHeader;
         this.cell = cell;
+        this.davRsCmp = davRsCmp;
     }
 
     /**
@@ -72,7 +76,7 @@ public class PasswordResource {
     @PUT
     public Response mypass() {
         // アクセス制御
-        this.accessContext.checkMyLocalToken(cell);
+        this.accessContext.checkMyLocalToken(cell, this.davRsCmp.getAcceptableAuthScheme());
         // セルローカルトークンからパスワード変更するAccount名を取得する
         this.key = this.accessContext.getSubject();
         String[] keyName;

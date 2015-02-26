@@ -24,6 +24,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.odata4j.core.OEntityKey;
 import org.odata4j.producer.EntityQueryInfo;
 import org.odata4j.producer.EntityResponse;
@@ -31,9 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.common.es.util.IndexNameEncoder;
+import com.fujitsu.dc.core.DcCoreAuthzException;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.AccessContext;
+import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.event.EventUtils;
 import com.fujitsu.dc.core.model.Box;
@@ -94,13 +97,22 @@ public class UnitCtlResource extends ODataResource {
         } else if (AccessContext.TYPE_UNIT_LOCAL.equals(ac.getType())) {
             return;
         } else if (AccessContext.TYPE_INVALID.equals(ac.getType())) {
-            ac.throwInvalidTokenException();
+            ac.throwInvalidTokenException(getAcceptableAuthScheme());
         } else if (AccessContext.TYPE_ANONYMOUS.equals(ac.getType())) {
-            throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+            throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(ac.getRealm(), getAcceptableAuthScheme());
         }
 
         // ユニットマスター、ユニットユーザ、ユニットローカルユニットユーザ以外なら権限エラー
         throw DcCoreException.Auth.UNITUSER_ACCESS_REQUIRED;
+    }
+
+    /**
+     * 認証に使用できるAuth Schemeを取得する.
+     * @return 認証に使用できるAuth Scheme
+     */
+    @Override
+    public AcceptableAuthScheme getAcceptableAuthScheme() {
+        return AcceptableAuthScheme.BEARER;
     }
 
     @Override
@@ -237,5 +249,22 @@ public class UnitCtlResource extends ODataResource {
     public Privilege getNecessaryOptionsPrivilege() {
         // UnitレベルにはPrivilegeを設定できない仕様のためnullを返す。そもそもこの関数呼ぶことはない。
         return null;
+    }
+
+    @Override
+    public void setBasicAuthenticateEnableInBatchRequest(AccessContext ac) {
+        // UnitレベルAPIはバッチリクエストに対応していないため、ここでは何もしない
+    }
+
+    /**
+     * Not Implemented. <br />
+     * 現状、$batchのアクセス制御でのみ必要なメソッドのため未実装. <br />
+     * アクセスコンテキストが$batchしてよい権限を持っているかを返す.
+     * @param ac アクセスコンテキスト
+     * @return true: アクセスコンテキストが$batchしてよい権限を持っている
+     */
+    @Override
+    public boolean hasPrivilegeForBatch(AccessContext ac) {
+        throw new NotImplementedException();
     }
 }

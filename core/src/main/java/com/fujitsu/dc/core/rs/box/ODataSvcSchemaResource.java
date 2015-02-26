@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.odata4j.core.ODataConstants;
 import org.odata4j.core.OEntityId;
 import org.odata4j.core.OEntityKey;
@@ -47,6 +48,7 @@ import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
+import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.model.ctl.AssociationEnd;
@@ -85,6 +87,15 @@ public final class ODataSvcSchemaResource extends ODataResource {
     @Override
     public void checkAccessContext(AccessContext ac, Privilege privilege) {
         this.davRsCmp.checkAccessContext(ac, privilege);
+    }
+
+    /**
+     * 認証に使用できるAuth Schemeを取得する.
+     * @return 認証に使用できるAuth Scheme
+     */
+    @Override
+    public AcceptableAuthScheme getAcceptableAuthScheme() {
+        return this.davRsCmp.getAcceptableAuthScheme();
     }
 
     @Override
@@ -175,7 +186,7 @@ public final class ODataSvcSchemaResource extends ODataResource {
 
     @Override
     public Privilege getNecessaryWritePrivilege(String entitySetNameStr) {
-        return BoxPrivilege.WRITE;
+        return BoxPrivilege.ALTER_SCHEMA;
     }
 
     @Override
@@ -327,6 +338,23 @@ public final class ODataSvcSchemaResource extends ODataResource {
                 && targetNavProp.equals(ComplexType.EDM_TYPE_NAME))) {
             throw DcCoreException.OData.NO_SUCH_ASSOCIATION;
         }
+    }
+
+    @Override
+    public void setBasicAuthenticateEnableInBatchRequest(AccessContext ac) {
+        // スキーマレベルAPIはバッチリクエストに対応していないため、ここでは何もしない
+    }
+
+    /**
+     * Not Implemented. <br />
+     * 現状、$batchのアクセス制御でのみ必要なメソッドのため未実装. <br />
+     * アクセスコンテキストが$batchしてよい権限を持っているかを返す.
+     * @param ac アクセスコンテキスト
+     * @return true: アクセスコンテキストが$batchしてよい権限を持っている
+     */
+    @Override
+    public boolean hasPrivilegeForBatch(AccessContext ac) {
+        throw new NotImplementedException();
     }
 
 }

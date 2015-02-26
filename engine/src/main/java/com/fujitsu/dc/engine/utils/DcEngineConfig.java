@@ -75,6 +75,16 @@ public class DcEngineConfig {
     }
 
     /**
+     * BinaryDataの設定.
+     */
+    public static final class BinaryData {
+        /**
+         * ファイルへの書き込み時にfsyncを有効にするか否か(true:有効 false:無効(デフォルト)).
+         */
+        public static final String FSYNC_ENABLED = KEY_ROOT + "binaryData.fsync.enabled";
+    }
+
+    /**
      * Blobの設定.
      */
     public static final class BlobStore {
@@ -390,5 +400,12 @@ public class DcEngineConfig {
      */
     public static String getUnitPrefix() {
         return get(ES.UNIT_PREFIX);
+    }
+
+    /**
+     * @return 有効である場合はtrue
+     */
+    public static boolean getFsyncEnabled() {
+        return Boolean.parseBoolean(get(BinaryData.FSYNC_ENABLED));
     }
 }

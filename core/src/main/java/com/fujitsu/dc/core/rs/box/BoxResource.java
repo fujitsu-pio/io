@@ -104,7 +104,7 @@ public final class BoxResource {
         // ただし、boxインストールではBoxがないことを前提としているため、以下の条件に合致する場合は処理を継続する。
         // －HTTPメソッドが MKCOL である。かつ、
         // －PathInfoが インストール先Box名 で終了している。
-        //   （CollectionへのMKCOLの場合があるため、boxインストールであることを確認する）
+        // （CollectionへのMKCOLの場合があるため、boxインストールであることを確認する）
         this.box = this.cell.getBoxForName(boxName);
         // boxインストールではCellレベルで動作させる必要がある。
         this.cellRsCmp = cellRsCmp;
@@ -346,7 +346,7 @@ public final class BoxResource {
             log.debug(requestKey);
 
             event = EventResource.createEvent(reqBody, requestKey, this.accessContext);
-        //        eventBus.outputEventLog(event);
+            // eventBus.outputEventLog(event);
 
             if (Box.DEFAULT_BOX_NAME.equals(this.boxName)) {
                 throw DcCoreException.Misc.METHOD_NOT_ALLOWED;

@@ -28,7 +28,7 @@ import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.auth.OAuth2Helper;
 import com.fujitsu.dc.core.model.Box;
-import com.fujitsu.dc.core.model.BoxRsCmp;
+import com.fujitsu.dc.core.model.BoxUrlRsCmp;
 import com.fujitsu.dc.core.model.Cell;
 import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavRsCmp;
@@ -42,14 +42,16 @@ public class BoxUrlResource {
 
     private AccessContext accessContext = null;
     private Cell cell = null;
+    private DavRsCmp davRsCmp;
 
     /**
      * コンストラクタ.
      * @param cell Cell
-     * @param accessContext AccessContext
+     * @param davRsCmp DavRsCmp
      */
-    public BoxUrlResource(final Cell cell, final AccessContext accessContext) {
-        this.accessContext = accessContext;
+    public BoxUrlResource(final Cell cell, final DavRsCmp davRsCmp) {
+        this.davRsCmp = davRsCmp;
+        this.accessContext = this.davRsCmp.getAccessContext();
         this.cell = cell;
     }
 
@@ -60,6 +62,7 @@ public class BoxUrlResource {
      */
     @GET
     public final Response boxUrl(@QueryParam("schema") final String querySchema) {
+
         String schema = querySchema;
         if (schema == null) {
             // スキーマパラメタが存在しない場合は、認証トークンからスキーマ情報を取得する
@@ -81,17 +84,23 @@ public class BoxUrlResource {
 
         // Boxが存在しない場合も権限エラーを返却する
         if (box == null) {
+            // Basic認証が許可されているかのチェック
+            this.accessContext.updateBasicAuthenticationStateForResource(null);
+            if (AccessContext.TYPE_INVALID.equals(accessContext.getType())) {
+                accessContext.throwInvalidTokenException(this.davRsCmp.getAcceptableAuthScheme());
+            }
             throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
         }
 
         // 認証トークンの有効性チェック（有効期限の切れているトークンなど）
         DavCmp davCmp = ModelFactory.boxCmp(box);
-        DavRsCmp davRsCmp = new BoxRsCmp(davCmp, this.cell, this.accessContext, box);
-        davRsCmp.checkAccessContext(this.accessContext, BoxPrivilege.READ);
+        DavRsCmp boxUrlRsCmp = new BoxUrlRsCmp(davCmp, this.cell, this.accessContext, box);
+        boxUrlRsCmp.checkAccessContext(this.accessContext, BoxPrivilege.READ);
 
         // レスポンスを返却する
-        return Response.status(HttpStatus.SC_MOVED_TEMPORARILY)
+        return Response.status(HttpStatus.SC_OK)
                 .header(HttpHeaders.LOCATION, box.getCell().getUrl() + box.getName())
                 .build();
     }
+
 }

@@ -2717,7 +2717,9 @@ public abstract class EsODataProducer implements DcODataProducer {
             EntitySetAccessor esType = this.getAccessorForEntitySet(entitySet.getName());
             DcGetResponse dcGetResponseNew = esType.get(accountId);
             if (dcGetResponseNew == null) {
-                throw DcCoreException.Auth.AUTHENTICATION_FAILED;
+                // 認証から最終ログイン時刻更新までにAccountが削除された場合は、更新対象が存在しないため、正常終了する。
+                DcCoreLog.Auth.ACCOUNT_ALREADY_DELETED.params(originalKey.toKeyString()).writeLog();
+                return;
             }
             EntitySetDocHandler oedhNew = new OEntityDocHandler(dcGetResponseNew);
             // 取得したAccountの最終ログイン日時を上書きする

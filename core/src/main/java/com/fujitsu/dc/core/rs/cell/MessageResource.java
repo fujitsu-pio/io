@@ -30,10 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.common.utils.DcCoreUtils;
-import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.CellPrivilege;
-import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.ReceivedMessagePort;
@@ -84,7 +82,7 @@ public final class MessageResource extends ODataCtlResource {
             @Context final UriInfo uriInfo,
             final Reader reader) {
         // アクセス制御
-        checkAccessContext(this.accessContext, CellPrivilege.MESSAGE);
+        this.davRsCmp.checkAccessContext(this.accessContext, CellPrivilege.MESSAGE);
 
         // データ登録
         DcODataProducer producer = ModelFactory.ODataCtl.cellCtl(this.accessContext.getCell());
@@ -92,25 +90,6 @@ public final class MessageResource extends ODataCtlResource {
         moResource.setVersion(version);
         Response respose = moResource.createMessage(uriInfo, reader);
         return respose;
-    }
-
-    private void checkAccessContext(final AccessContext ac, Privilege privilege) {
-        // ユニットユーザトークンチェック
-        if (ac.isUnitUserToken()) {
-            return;
-        }
-
-        // アクセス権チェック
-        if (!this.davRsCmp.hasPrivilege(ac, privilege)) {
-            // トークンの有効性チェック
-            // トークンがINVALIDでもACL設定でPrivilegeがallに設定されているとアクセスを許可する必要があるのでこのタイミングでチェック
-            if (AccessContext.TYPE_INVALID.equals(ac.getType())) {
-                ac.throwInvalidTokenException();
-            } else if (AccessContext.TYPE_ANONYMOUS.equals(ac.getType())) {
-                throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
-            }
-            throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
-        }
     }
 
     /**
@@ -125,7 +104,7 @@ public final class MessageResource extends ODataCtlResource {
             @Context final UriInfo uriInfo,
             final Reader reader) {
         // アクセス制御
-        this.accessContext.checkCellIssueToken();
+        this.accessContext.checkCellIssueToken(this.davRsCmp.getAcceptableAuthScheme());
 
         // 受信メッセージの登録
         DcODataProducer producer = ModelFactory.ODataCtl.cellCtl(this.accessContext.getCell());
@@ -145,7 +124,7 @@ public final class MessageResource extends ODataCtlResource {
     public Response messagesApprove(@PathParam("key") final String key,
             final Reader reader) {
         // アクセス制御
-        checkAccessContext(this.accessContext, CellPrivilege.MESSAGE);
+        this.davRsCmp.checkAccessContext(this.accessContext, CellPrivilege.MESSAGE);
 
         // 受信メッセージの承認
         DcODataProducer producer = ModelFactory.ODataCtl.cellCtl(this.accessContext.getCell());

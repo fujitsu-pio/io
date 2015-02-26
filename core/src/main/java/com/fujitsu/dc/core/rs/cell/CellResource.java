@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.common.es.util.IndexNameEncoder;
 import com.fujitsu.dc.common.utils.DcCoreUtils;
+import com.fujitsu.dc.core.DcCoreAuthzException;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.annotations.ACL;
@@ -151,8 +152,7 @@ public final class CellResource {
         // アクセス権限の確認を実施する
         // ユニットマスター、ユニットユーザ、ユニットローカルユニットユーザ以外は権限エラーとする
         String cellOwner = this.cell.getOwner();
-        String accessType = this.accessContext.getType();
-        checkAccessContextForCellBulkDeletion(cellOwner, accessType);
+        checkAccessContextForCellBulkDeletion(cellOwner);
 
         // X-Dc-Recursiveヘッダの指定が"true"でない場合はエラーとする
         if (!"true".equals(recursiveHeader)) {
@@ -217,12 +217,18 @@ public final class CellResource {
         throw DcCoreException.Misc.CONFLICT_CELLACCESS;
     }
 
-    private void checkAccessContextForCellBulkDeletion(String cellOwner, String accessType) {
+    private void checkAccessContextForCellBulkDeletion(String cellOwner) {
+
+        // Basic認証できるかチェック
+        this.accessContext.updateBasicAuthenticationStateForResource(null);
+
+        String accessType = this.accessContext.getType();
         // ユニットマスター、ユニットユーザ、ユニットローカルユニットユーザ以外は権限エラーとする
         if (AccessContext.TYPE_INVALID.equals(accessType)) {
-            this.accessContext.throwInvalidTokenException();
+            this.accessContext.throwInvalidTokenException(this.cellRsCmp.getAcceptableAuthScheme());
         } else if (AccessContext.TYPE_ANONYMOUS.equals(accessType)) {
-            throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+            throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(accessContext.getRealm(),
+                    this.cellRsCmp.getAcceptableAuthScheme());
         } else if (!AccessContext.TYPE_UNIT_MASTER.equals(accessType)
                 && !AccessContext.TYPE_UNIT_USER.equals(accessType)
                 && !AccessContext.TYPE_UNIT_LOCAL.equals(accessType)) {
@@ -254,7 +260,7 @@ public final class CellResource {
     @Path("__mypassword")
     public PasswordResource mypassword(
             @HeaderParam(DcCoreUtils.HttpHeaders.X_DC_CREDENTIAL) final String dcCredHeader) {
-        return new PasswordResource(this.accessContext, dcCredHeader, this.cell);
+        return new PasswordResource(this.accessContext, dcCredHeader, this.cell, this.cellRsCmp);
     }
 
     /**
@@ -306,7 +312,7 @@ public final class CellResource {
      */
     @Path("__box")
     public BoxUrlResource boxUrl() {
-        return new BoxUrlResource(this.cell, this.accessContext);
+        return new BoxUrlResource(this.cell, this.cellRsCmp);
     }
 
     /**
@@ -442,10 +448,12 @@ public final class CellResource {
         AccessContext ac = this.cellRsCmp.getAccessContext();
         // トークンの有効性チェック
         // トークンがINVALIDでもACL設定でPrivilegeがallに設定されているとアクセスを許可する必要があるのでこのタイミングでチェック
+        ac.updateBasicAuthenticationStateForResource(null);
         if (AccessContext.TYPE_INVALID.equals(ac.getType())) {
-            ac.throwInvalidTokenException();
+            ac.throwInvalidTokenException(this.cellRsCmp.getAcceptableAuthScheme());
         } else if (AccessContext.TYPE_ANONYMOUS.equals(ac.getType())) {
-            throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
+            throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(ac.getRealm(),
+                    this.cellRsCmp.getAcceptableAuthScheme());
         }
 
         // アクセス制御 CellレベルPROPPATCHはユニットユーザのみ可能とする

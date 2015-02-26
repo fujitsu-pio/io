@@ -19,12 +19,16 @@ package com.fujitsu.dc.core.model.file;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.SyncFailedException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -57,26 +61,30 @@ public class BinaryDataAccessor {
     private String baseDir;
     private String unitUserName;
     private boolean isPhysicalDeleteMode = false;
+    private boolean fsyncEnabled = false;
 
     /**
      * コンストラクタ.
      * @param path 格納ディレクトリ
+     * @param fsyncEnabled ファイル書き込み時にfsyncを有効にするか否か（true: 有効, false: 無効）
      */
-    public BinaryDataAccessor(String path) {
-        this(path, null);
+    public BinaryDataAccessor(String path, boolean fsyncEnabled) {
+        this(path, null, fsyncEnabled);
     }
 
     /**
      * コンストラクタ.
      * @param path 格納ディレクトリ
      * @param unitUserName ユニットユーザ名
+     * @param fsyncEnabled ファイル書き込み時にfsyncを有効にするか否か（true: 有効, false: 無効）
      */
-    public BinaryDataAccessor(String path, String unitUserName) {
+    public BinaryDataAccessor(String path, String unitUserName, boolean fsyncEnabled) {
         this.baseDir = path;
         if (!this.baseDir.endsWith("/")) {
             this.baseDir += "/";
         }
         this.unitUserName = unitUserName;
+        this.fsyncEnabled = fsyncEnabled;
     }
 
     /**
@@ -84,14 +92,16 @@ public class BinaryDataAccessor {
      * @param path 格納ディレクトリ
      * @param unitUserName ユニットユーザ名
      * @param isPhysicalDeleteMode ファイル削除時に物理削除するか（true: 物理削除, false: 論理削除）
+     * @param fsyncEnabled ファイル書き込み時にfsyncを有効にするか否か（true: 有効, false: 無効）
      */
-    public BinaryDataAccessor(String path, String unitUserName, boolean isPhysicalDeleteMode) {
+    public BinaryDataAccessor(String path, String unitUserName, boolean isPhysicalDeleteMode, boolean fsyncEnabled) {
         this.baseDir = path;
         if (!this.baseDir.endsWith("/")) {
             this.baseDir += "/";
         }
         this.unitUserName = unitUserName;
         this.isPhysicalDeleteMode = isPhysicalDeleteMode;
+        this.fsyncEnabled = fsyncEnabled;
     }
 
     /**
@@ -391,11 +401,58 @@ public class BinaryDataAccessor {
         try {
             if (outputStream != null) {
                 outputStream.flush();
+                if (this.fsyncEnabled) {
+                    fsyncIfFileOutputStream(outputStream);
+                }
                 outputStream.close();
             }
         } catch (IOException ex) {
             logger.debug("StreamCloseFailed:" + ex.getMessage());
         }
+    }
+
+    /**
+     * ファイルディスクリプタの同期.
+     * @param fd ファイルディスクリプタ
+     * @exception SyncFailedException 同期に失敗
+     */
+    public void sync(FileDescriptor fd) throws SyncFailedException {
+        fd.sync();
+    }
+
+    private void fsyncIfFileOutputStream(OutputStream outputStream) throws IOException {
+        if (outputStream instanceof FileOutputStream) {
+            FileDescriptor desc = ((FileOutputStream) outputStream).getFD();
+            if (null != desc && desc.valid()) {
+                sync(desc);
+            }
+        } else if (outputStream instanceof FilterOutputStream) {
+            // FilterOutputStream の場合には、"out"field から FileOutputStream を取り出してfsyncする
+            fsyncIfFileOutputStream(getInternalOutputStream(((FilterOutputStream) outputStream)));
+        }
+    }
+
+    private OutputStream getInternalOutputStream(FilterOutputStream sourceOutputStream) {
+        if (null != sourceOutputStream) {
+            try {
+                Field internalOut;
+                internalOut = FilterOutputStream.class.getDeclaredField("out");
+                internalOut.setAccessible(true);
+                Object out = internalOut.get(sourceOutputStream);
+                if (out instanceof OutputStream) {
+                    return (OutputStream) out;
+                }
+            } catch (NoSuchFieldException e) {
+                return null;
+            } catch (SecurityException e) {
+                return null;
+            } catch (IllegalArgumentException e) {
+                return null;
+            } catch (IllegalAccessException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     private void deleteFile(String srcFullPathName) throws BinaryDataAccessException {

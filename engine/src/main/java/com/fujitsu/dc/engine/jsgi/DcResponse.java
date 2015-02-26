@@ -111,6 +111,10 @@ public final class DcResponse extends ScriptableObject {
                 throw new Exception(msg);
             }
             String key = Context.toString(o);
+            // Transfer-Encodingの指定は無効にする
+            if ("Transfer-Encoding".equalsIgnoreCase(key)) {
+                continue;
+            }
             Object value = nHeaders.get(key, nHeaders);
             if (!(value instanceof String)) {
                 String msg = "header value format error";

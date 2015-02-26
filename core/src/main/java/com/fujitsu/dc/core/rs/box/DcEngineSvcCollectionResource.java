@@ -346,12 +346,12 @@ public final class DcEngineSvcCollectionResource {
             // Engineから返却されたTransfer-Encodingはリレーしない。
             // 後続のMWにてレスポンスの長さに応じてContent-LengthまたはTransfer-Encodingが付加されるので
             // 2重に付加されてしまうのを防ぐため、ここでは外しておく。
-            if ("Transfer-Encoding".equals(headersResEngine[i].getName())) {
+            if ("Transfer-Encoding".equalsIgnoreCase(headersResEngine[i].getName())) {
                 continue;
             }
             // Engineから返却されたDateはリレーしない。
             // WebサーバのMWがJettyの場合は2重に付加されてしまうため。
-            if (HttpHeaders.DATE.equals(headersResEngine[i].getName())) {
+            if (HttpHeaders.DATE.equalsIgnoreCase(headersResEngine[i].getName())) {
                 continue;
             }
             res.header(headersResEngine[i].getName(), headersResEngine[i].getValue());

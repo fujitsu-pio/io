@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.common.es.util.DcUUID;
 import com.fujitsu.dc.common.utils.DcCoreUtils;
+import com.fujitsu.dc.core.DcCoreAuthzException;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.DcReadDeleteModeManager;
@@ -158,8 +159,7 @@ public class ODataBatchResource extends AbstractODataResource {
 
         timer = new BatchElapsedTimer(startTime, batchTimeoutInSec, priority);
 
-        // スキーマ認証
-        this.odataResource.checkSchemaAuth(this.odataResource.getAccessContext());
+        checkAccessContext(this.odataResource.getAccessContext());
 
         // TODO 不正なコンテントタイプが指定された場合エラーを返却する
         String boundary = headers.getMediaType().getParameters().get("boundary");
@@ -1324,9 +1324,9 @@ public class ODataBatchResource extends AbstractODataResource {
             OEntityId targetEntityId = ODataLinksResource.parseRequestUri(DcCoreUtils.createUriInfo(uriInfo, 1),
                     requestReader, bodyPart.getEntitySetName(), this.odataResource.metadata);
 
-             this.odataResource.getODataProducer().createLink(sourceEntityId, bodyPart.getTargetEntitySetName(),
+            this.odataResource.getODataProducer().createLink(sourceEntityId, bodyPart.getTargetEntitySetName(),
                     targetEntityId);
-             // レスポンス作成
+            // レスポンス作成
             res.setResponseCode(HttpStatus.SC_NO_CONTENT);
             res.setHeader(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataVersion.V2.asString);
 
@@ -1339,26 +1339,53 @@ public class ODataBatchResource extends AbstractODataResource {
     }
 
     /**
-     * $batch用アクセス制御.
+     * $batchリクエストに対して行うアクセス制御.
+     * @param ac アクセスコンテキスト
+     */
+    private void checkAccessContext(AccessContext ac) {
+        // スキーマ認証
+        this.odataResource.checkSchemaAuth(this.odataResource.getAccessContext());
+
+        // ユニットユーザトークンチェック
+        if (ac.isUnitUserToken()) {
+            return;
+        }
+
+        // Basic認証できるかチェック
+        this.odataResource.setBasicAuthenticateEnableInBatchRequest(ac);
+
+        // principalがALL以外の場合は、認証処理を行う
+        // なお、アクセス制御は$batchリクエスト内の各MIMEパートにて行っている
+        if (!this.odataResource.hasPrivilegeForBatch(ac)) {
+            // トークンの有効性チェック
+            // トークンがINVALIDでもACL設定でPrivilegeがallに設定されているとアクセスを許可する必要があるのでこのタイミングでチェック
+            if (AccessContext.TYPE_INVALID.equals(ac.getType())) {
+                ac.throwInvalidTokenException(this.odataResource.getAcceptableAuthScheme());
+            } else if (AccessContext.TYPE_ANONYMOUS.equals(ac.getType())) {
+                throw DcCoreAuthzException.AUTHORIZATION_REQUIRED.realm(ac.getRealm(),
+                        this.odataResource.getAcceptableAuthScheme());
+            }
+            // $batchとして許可しないprivilegeが指定された場合はここに到達するため403エラーとする
+            throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
+        }
+    }
+
+    /**
+     * $batchリクエスト内の各MIMEパートに対して行うアクセス制御.
      * @param ac アクセスコンテキスト
      * @param privilege 許可する権限
      */
-    private void checkAccessContext(AccessContext ac, Privilege privilege) {
+    private void checkAccessContextForMimePart(AccessContext ac, Privilege privilege) {
         // ユニットユーザトークンチェック
         if (ac.isUnitUserToken()) {
             return;
         }
 
         if (!this.odataResource.hasPrivilege(ac, privilege)) {
-            // トークンの有効性チェック
-            // トークンがINVALIDでもACL設定でPrivilegeがallに設定されているとアクセスを許可する必要があるのでこのタイミングでチェック
-            if (AccessContext.TYPE_INVALID.equals(ac.getType())) {
-                ac.throwInvalidTokenException();
-            } else if (AccessContext.TYPE_ANONYMOUS.equals(ac.getType())) {
-                throw DcCoreException.Auth.AUTHORIZATION_REQUIRED;
-            }
+            // $batchのリクエストに対し、すでに認証処理は実施済みのため、ここでは認可の判定のみ行う
             throw DcCoreException.Auth.NECESSARY_PRIVILEGE_LACKING;
         }
+
     }
 
     /**
@@ -1376,7 +1403,7 @@ public class ODataBatchResource extends AbstractODataResource {
             batchAccess = new BatchAccess();
             writeAccess.put(priv, batchAccess);
             try {
-                this.checkAccessContext(this.odataResource.getAccessContext(), priv);
+                this.checkAccessContextForMimePart(this.odataResource.getAccessContext(), priv);
             } catch (DcCoreException ex) {
                 batchAccess.setAccessContext(ex);
             }
@@ -1400,7 +1427,7 @@ public class ODataBatchResource extends AbstractODataResource {
             batchAccess = new BatchAccess();
             readAccess.put(priv, batchAccess);
             try {
-                this.checkAccessContext(this.odataResource.getAccessContext(), priv);
+                this.checkAccessContextForMimePart(this.odataResource.getAccessContext(), priv);
             } catch (DcCoreException ex) {
                 batchAccess.setAccessContext(ex);
             }

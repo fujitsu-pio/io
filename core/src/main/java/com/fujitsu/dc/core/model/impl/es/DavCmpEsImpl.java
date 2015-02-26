@@ -1197,7 +1197,7 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         }
 
         return new BinaryDataAccessor(DcCoreConfig.getBlobStoreRoot(), unitUserName,
-                DcCoreConfig.getPhysicalDeleteMode());
+                DcCoreConfig.getPhysicalDeleteMode(), DcCoreConfig.getFsyncEnabled());
     }
 
     @Override

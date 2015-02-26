@@ -24,6 +24,7 @@ import java.util.Map;
  */
 class InProcessLockManager extends LockManager {
     Map<String, Object> inProcessLock = new HashMap<String, Object>();
+    Map<String, AccountLock> inProcessAccountLock = new HashMap<String, AccountLock>();
 
     @Override
     Lock doGetLock(String fullKey) {
@@ -67,14 +68,16 @@ class InProcessLockManager extends LockManager {
 
     @Override
     String doGetAccountLock(String fullKey) {
-        return (String) inProcessLock.get(fullKey);
+        AccountLock lock = inProcessAccountLock.get(fullKey);
+        if (lock == null) {
+            return null;
+        }
+        return lock.value();
     }
 
     @Override
     Boolean doPutAccountLock(String fullKey, String value, int expired) {
-        // expiredは無視される
-        // パスワード認証に失敗してアカウントがロックされた場合はそのアカウントに対してパスワード認証リクエストが不可となる。(coreの再起動が必要)
-        inProcessLock.put(fullKey, value);
+        inProcessAccountLock.put(fullKey, new AccountLock(value, expired));
         return Boolean.TRUE;
     }
 
@@ -154,5 +157,43 @@ class InProcessLockManager extends LockManager {
             value = (String) inProcessLock.get(fullKey);
         }
         return value;
+    }
+
+    /**
+     * InProcessでのAccountLock用の情報を保持するクラス.
+     */
+    static class AccountLock {
+
+        private static final int TIME_MILLIS = 1000;
+        private String value;
+        private int expiredInSeconds;
+        private long createdAt;
+
+        /**
+         * コンストラクタ.
+         * @param value 値
+         * @param expired ロックの保持期間(秒)
+         */
+        public AccountLock(String value, int expired) {
+            this.value = value;
+            this.expiredInSeconds = expired;
+            this.createdAt = System.currentTimeMillis();
+        }
+
+        /**
+         * 指定されたAccountLockを返却する. <br />
+         * expiredを超えている場合は、nullを返却する.
+         * @return 指定されたキーに対応する値（存在しない場合、expiredを超えている場合はnull）
+         */
+        public String value() {
+            long now = System.currentTimeMillis();
+
+            // expiredを超えている場合は、nullを返却
+            if (now > this.createdAt + expiredInSeconds * TIME_MILLIS) {
+                return null;
+
+            }
+            return this.value;
+        }
     }
 }

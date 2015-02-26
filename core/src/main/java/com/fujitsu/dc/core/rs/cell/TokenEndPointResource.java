@@ -175,7 +175,7 @@ public class TokenEndPointResource {
         } else if (OAuth2Helper.GrantType.REFRESH_TOKEN.equals(grantType)) {
             return this.receiveRefresh(target, dcOwner, host, refreshToken);
         } else {
-            throw DcCoreAuthnException.UNSUPPORTED_GRANT_TYPE;
+            throw DcCoreAuthnException.UNSUPPORTED_GRANT_TYPE.realm(this.cell.getUrl());
         }
     }
 
@@ -189,11 +189,11 @@ public class TokenEndPointResource {
                 }
                 if (target.contains("\n") || target.contains("\r")) {
                     // dc_targetがURLでない場合はエラー
-                    throw DcCoreAuthnException.INVALID_TARGET;
+                    throw DcCoreAuthnException.INVALID_TARGET.realm(this.cell.getUrl());
                 }
             } catch (MalformedURLException e) {
                 // dc_targetがURLでない場合はエラー
-                throw DcCoreAuthnException.INVALID_TARGET;
+                throw DcCoreAuthnException.INVALID_TARGET.realm(this.cell.getUrl());
             }
         }
         return target;
@@ -238,7 +238,7 @@ public class TokenEndPointResource {
         } catch (TokenDsigException e) {
             // 署名検証エラー
             DcCoreLog.Auth.TOKEN_DISG_ERROR.params(e.getMessage()).writeLog();
-            throw DcCoreAuthnException.TOKEN_DSIG_INVALID;
+            throw DcCoreAuthnException.TOKEN_DSIG_INVALID.realm(this.cell.getUrl());
         } catch (TokenRootCrtException e) {
             // ルートCA証明書の設定エラー
             DcCoreLog.Auth.ROOT_CA_CRT_SETTING_ERROR.params(e.getMessage()).writeLog();
@@ -277,13 +277,13 @@ public class TokenEndPointResource {
             final String owner, final String schema, final String assertion) {
         if (Key.TRUE_STR.equals(owner)) {
             // トークン認証でのユニットユーザ昇格はさせない
-            throw DcCoreAuthnException.TC_ACCESS_REPRESENTING_OWNER;
+            throw DcCoreAuthnException.TC_ACCESS_REPRESENTING_OWNER.realm(this.cell.getUrl());
         }
 
         // assertionのnullチェック
         if (assertion == null) {
             // assertionが未設定の場合、パースエラーとみなす
-            throw DcCoreAuthnException.TOKEN_PARSE_ERROR;
+            throw DcCoreAuthnException.TOKEN_PARSE_ERROR.realm(this.cell.getUrl());
         }
 
         // まずはパースする
@@ -293,11 +293,11 @@ public class TokenEndPointResource {
         } catch (TokenParseException e) {
             // パース失敗時
             DcCoreLog.Auth.TOKEN_PARSE_ERROR.params(e.getMessage()).writeLog();
-            throw DcCoreAuthnException.TOKEN_PARSE_ERROR;
+            throw DcCoreAuthnException.TOKEN_PARSE_ERROR.realm(this.cell.getUrl());
         } catch (TokenDsigException e) {
             // 署名検証でエラー
             DcCoreLog.Auth.TOKEN_DISG_ERROR.params(e.getMessage()).writeLog();
-            throw DcCoreAuthnException.TOKEN_DSIG_INVALID;
+            throw DcCoreAuthnException.TOKEN_DSIG_INVALID.realm(this.cell.getUrl());
         } catch (TokenRootCrtException e) {
             // ルートCA証明書の設定エラー
             DcCoreLog.Auth.ROOT_CA_CRT_SETTING_ERROR.params(e.getMessage()).writeLog();
@@ -307,16 +307,16 @@ public class TokenEndPointResource {
         // Tokenの検証
         // 1．有効期限チェック
         if (tcToken.isExpired()) {
-            throw DcCoreAuthnException.TOKEN_EXPIRED;
+            throw DcCoreAuthnException.TOKEN_EXPIRED.realm(this.cell.getUrl());
         }
 
         // トークンのターゲットが自分でない場合はエラー応答
         try {
             if (!(AuthResourceUtils.checkTargetUrl(this.cell, tcToken))) {
-                throw DcCoreAuthnException.TOKEN_TARGET_WRONG.params(tcToken.getTarget());
+                throw DcCoreAuthnException.TOKEN_TARGET_WRONG.realm(this.cell.getUrl()).params(tcToken.getTarget());
             }
         } catch (MalformedURLException e) {
-            throw DcCoreAuthnException.TOKEN_TARGET_WRONG.params(tcToken.getTarget());
+            throw DcCoreAuthnException.TOKEN_TARGET_WRONG.realm(this.cell.getUrl()).params(tcToken.getTarget());
         }
 
         // 認証は成功 -------------------------------
@@ -360,18 +360,18 @@ public class TokenEndPointResource {
             // refreshTokenのnullチェック
             if (refreshToken == null) {
                 // refreshTokenが未設定の場合、パースエラーとみなす
-                throw DcCoreAuthnException.TOKEN_PARSE_ERROR;
+                throw DcCoreAuthnException.TOKEN_PARSE_ERROR.realm(this.cell.getUrl());
             }
 
             AbstractOAuth2Token token = AbstractOAuth2Token.parse(refreshToken, cell.getUrl(), host);
 
             if (!(token instanceof IRefreshToken)) {
-                throw DcCoreAuthnException.NOT_REFRESH_TOKEN;
+                throw DcCoreAuthnException.NOT_REFRESH_TOKEN.realm(this.cell.getUrl());
             }
 
             // リフレッシュトークンの有効期限チェック
             if (token.isRefreshExpired()) {
-                throw DcCoreAuthnException.TOKEN_EXPIRED;
+                throw DcCoreAuthnException.TOKEN_EXPIRED.realm(this.cell.getUrl());
             }
 
             long issuedAt = new Date().getTime();
@@ -379,15 +379,15 @@ public class TokenEndPointResource {
             if (Key.TRUE_STR.equals(owner)) {
                 // 自分セルリフレッシュの場合のみ昇格できる。
                 if (token.getClass() != CellLocalRefreshToken.class) {
-                    throw DcCoreAuthnException.TC_ACCESS_REPRESENTING_OWNER;
+                    throw DcCoreAuthnException.TC_ACCESS_REPRESENTING_OWNER.realm(this.cell.getUrl());
                 }
                 // ユニット昇格権限設定のチェック
                 if (!this.davRsCmp.checkOwnerRepresentativeAccounts(token.getSubject())) {
-                    throw DcCoreAuthnException.NOT_ALLOWED_REPRESENT_OWNER;
+                    throw DcCoreAuthnException.NOT_ALLOWED_REPRESENT_OWNER.realm(this.cell.getUrl());
                 }
                 // セルのオーナーが未設定のセルに対しては昇格させない。
                 if (cell.getOwner() == null) {
-                    throw DcCoreAuthnException.NO_CELL_OWNER;
+                    throw DcCoreAuthnException.NO_CELL_OWNER.realm(this.cell.getUrl());
                 }
 
                 // uluut発行処理
@@ -422,11 +422,11 @@ public class TokenEndPointResource {
         } catch (TokenParseException e) {
             // パースに失敗したので
             DcCoreLog.Auth.TOKEN_PARSE_ERROR.params(e.getMessage()).writeLog();
-            throw DcCoreAuthnException.TOKEN_PARSE_ERROR.reason(e);
+            throw DcCoreAuthnException.TOKEN_PARSE_ERROR.realm(this.cell.getUrl()).reason(e);
         } catch (TokenDsigException e) {
             // 証明書検証に失敗したので
             DcCoreLog.Auth.TOKEN_DISG_ERROR.params(e.getMessage()).writeLog();
-            throw DcCoreAuthnException.TOKEN_DSIG_INVALID;
+            throw DcCoreAuthnException.TOKEN_DSIG_INVALID.realm(this.cell.getUrl());
         } catch (TokenRootCrtException e) {
             // ルートCA証明書の設定エラー
             DcCoreLog.Auth.ROOT_CA_CRT_SETTING_ERROR.params(e.getMessage()).writeLog();
@@ -482,7 +482,7 @@ public class TokenEndPointResource {
             URL url = new URL(cellUrl);
             return url.getPath();
         } catch (MalformedURLException e) {
-            throw DcCoreAuthnException.AUTHN_FAILED;
+            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
         }
     }
 
@@ -495,14 +495,14 @@ public class TokenEndPointResource {
 
         // パスワードのCheck処理
         if (username == null) {
-            throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.params(Key.USERNAME);
+            throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.USERNAME);
         } else if (password == null) {
-            throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.params(Key.PASSWORD);
+            throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.PASSWORD);
         }
 
         OEntityWrapper oew = cell.getAccount(username);
         if (oew == null) {
-            throw DcCoreAuthnException.AUTHN_FAILED;
+            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
         }
         // 最終ログイン時刻を更新するために、UUIDをクラス変数にひかえておく
         accountId = (String) oew.getUuid();
@@ -512,7 +512,7 @@ public class TokenEndPointResource {
         if (isLock) {
             // memcachedのロック時間を更新
             AuthResourceUtils.registAccountLock(accountId);
-            throw DcCoreAuthnException.ACCOUNT_LOCK_ERROR;
+            throw DcCoreAuthnException.ACCOUNT_LOCK_ERROR.realm(this.cell.getUrl());
         }
 
         boolean authSuccess = cell.authenticateAccount(oew, password);
@@ -520,7 +520,7 @@ public class TokenEndPointResource {
         if (!authSuccess) {
             // memcachedにロックを作成
             AuthResourceUtils.registAccountLock(accountId);
-            throw DcCoreAuthnException.AUTHN_FAILED;
+            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
         }
 
         long issuedAt = new Date().getTime();
@@ -528,11 +528,11 @@ public class TokenEndPointResource {
         if (Key.TRUE_STR.equals(owner)) {
             // ユニット昇格権限設定のチェック
             if (!this.davRsCmp.checkOwnerRepresentativeAccounts(username)) {
-                throw DcCoreAuthnException.NOT_ALLOWED_REPRESENT_OWNER;
+                throw DcCoreAuthnException.NOT_ALLOWED_REPRESENT_OWNER.realm(this.cell.getUrl());
             }
             // セルのオーナーが未設定のセルに対しては昇格させない。
             if (cell.getOwner() == null) {
-                throw DcCoreAuthnException.NO_CELL_OWNER;
+                throw DcCoreAuthnException.NO_CELL_OWNER.realm(this.cell.getUrl());
             }
 
             // uluut発行処理

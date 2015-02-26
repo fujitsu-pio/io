@@ -84,6 +84,10 @@ public final class BoxPrivilege extends Privilege {
      * サービス実行権限.ALL権限に含まれます.
      */
     public static final BoxPrivilege EXEC = new BoxPrivilege("exec", ALL);
+    /**
+     * スキーマ変更権限.ALL権限に含まれます.
+     */
+    public static final BoxPrivilege ALTER_SCHEMA = new BoxPrivilege("alter-schema", ALL);
 
     static Map<String, BoxPrivilege> map = new HashMap<String, BoxPrivilege>();
 
@@ -107,6 +111,7 @@ public final class BoxPrivilege extends Privilege {
         register(WRITE_CONTENT);
         register(WRITE_PROPERTIES);
         register(EXEC);
+        register(ALTER_SCHEMA);
     }
 
     private static void register(final BoxPrivilege p) {

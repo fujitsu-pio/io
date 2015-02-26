@@ -176,7 +176,7 @@ public class ServiceResourceSourceManager implements ISourceManager {
         }
 
         BinaryDataAccessor binaryAccessor = new BinaryDataAccessor(DcEngineConfig.getBlobStoreRoot(), this.index
-                .substring(DcEngineConfig.getUnitPrefix().length() + 1));
+                .substring(DcEngineConfig.getUnitPrefix().length() + 1), DcEngineConfig.getFsyncEnabled());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             binaryAccessor.copy(sourceNodeId, baos);
