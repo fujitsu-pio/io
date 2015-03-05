@@ -20,6 +20,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.cluster.block.ClusterBlockException;
+import org.elasticsearch.common.util.concurrent.UncategorizedExecutionException;
 import org.elasticsearch.transport.NodeDisconnectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,11 +99,18 @@ abstract class AbstractRetryableEsRequest<T> {
                     throw new EsClientException(description + " failed", e);
                 }
             }
+            // translogのRead時のポインタ位置不正による例外(ES1.2.1のバグ)の場合には、flushを実行しリトライする
+            // UncategorizedExecutionExceptionはtranslog読込以外の例外の場合にもスローされてくる可能性があるが、
+            // 判別できないため、それらの場合にも本ルートに乗せる
+            if (e instanceof UncategorizedExecutionException) {
+                flushTransLog();
+            }
             log.info(e.getClass().getName() + " : " + e.getMessage());
             // 以下の例外の場合はリトライをする。
             if (continueRetry
                     || e instanceof NodeDisconnectedException || e instanceof NoNodeAvailableException
-                    || e instanceof NoShardAvailableActionException || e instanceof ClusterBlockException) {
+                    || e instanceof NoShardAvailableActionException || e instanceof ClusterBlockException
+                    || e instanceof UncategorizedExecutionException) {
                 log.info("Proceed to retry loop.");
                 continueRetry = false; // 念のため
                 return retryRequest();
@@ -180,6 +188,12 @@ abstract class AbstractRetryableEsRequest<T> {
                         // EsClientExceptionラップして投げる.
                         throw new EsClientException(description + " failed", e);
                     }
+                } else if (e instanceof UncategorizedExecutionException) {
+                    // translogのRead時のポインタ位置不正による例外(ES1.2.1のバグ)の場合には、flushを実行しリトライする
+                    // UncategorizedExecutionExceptionはtranslog読込以外の例外の場合にもスローされてくる可能性があるが、
+                    // 判別できないため、それらの場合にも本ルートに乗せる
+                    flushTransLog();
+                    continue;
                 } else if (e instanceof NodeDisconnectedException || e instanceof NoNodeAvailableException
                         || e instanceof NoShardAvailableActionException || e instanceof ClusterBlockException) {
                     // これらの例外の場合、ESの状態が不正か通信エラー等の原因が考えられるため、リトライを継続。
@@ -194,5 +208,14 @@ abstract class AbstractRetryableEsRequest<T> {
         }
         // リトライ回数を超えた場合、最後のエラーを返却する。
         throw new EsClientException.EsNoResponseException(description + " failed", lastError);
+    }
+
+    abstract EsTranslogHandler getEsTranslogHandler();
+
+    /**
+     * translogをflushする.
+     */
+    protected void flushTransLog() {
+        getEsTranslogHandler().flushTranslog();
     }
 }

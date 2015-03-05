@@ -3,7 +3,7 @@
 	<groupId>com.fujitsu</groupId>
 	<artifactId>dc1-core</artifactId>
 	<packaging>war</packaging>
-	<version>1.3.21</version>
+	<version>1.3.22</version>
 	<name>dc1-core Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	<licenses>
@@ -28,17 +28,17 @@
 		<dependency>
 			<groupId>com.fujitsu.dc</groupId>
 			<artifactId>dc1-es-api-${esapi.version}</artifactId>
-			<version>1.3.21</version>
+			<version>1.3.22</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fujitsu.dc</groupId>
 			<artifactId>dc1-common</artifactId>
-			<version>1.3.21</version>
+			<version>1.3.22</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fujitsu.dc</groupId>
 			<artifactId>dc1-logback</artifactId>
-			<version>1.3.21</version>
+			<version>1.3.22</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

@@ -32,6 +32,8 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.flush.FlushRequest;
+import org.elasticsearch.action.admin.indices.flush.FlushResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -275,6 +277,19 @@ public class InternalEsClient {
     public ActionFuture<DeleteIndexResponse> deleteIndex(String index) {
         DeleteIndexRequest dir = new DeleteIndexRequest(index);
         return esTransportClient.admin().indices().delete(dir);
+    }
+
+    /**
+     * インデックスの設定を更新する.
+     * @param index インデックス名
+     * @param settings 更新するインデックス設定
+     * @return Void
+     */
+    public Void updateIndexSettings(String index, Map<String, String> settings) {
+        Settings settingsForUpdate = ImmutableSettings.settingsBuilder().put(settings).build();
+        esTransportClient.admin().indices().prepareUpdateSettings(index).setSettings(settingsForUpdate).execute()
+                .actionGet();
+        return null;
     }
 
     /**
@@ -671,5 +686,16 @@ public class InternalEsClient {
         DeleteByQueryResponse response = esTransportClient.prepareDeleteByQuery(index)
                 .setQuery(deleteQuery).execute().actionGet();
         return response;
+    }
+
+    /**
+     * flushを行う.
+     * @param index flush対象のindex名
+     * @return 非同期応答
+     */
+    public ActionFuture<FlushResponse> flushTransLog(String index) {
+        ActionFuture<FlushResponse> ret = esTransportClient.admin().indices().flush(new FlushRequest(index));
+        this.fireEvent(Event.afterRequest, index, null, null, null, "Flush");
+        return ret;
     }
 }

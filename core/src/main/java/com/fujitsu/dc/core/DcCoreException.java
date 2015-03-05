@@ -234,6 +234,36 @@ public class DcCoreException extends RuntimeException {
         public static final DcCoreException OPERATION_NOT_SUPPORTED = create("PR400-OD-0042");
 
         /**
+         * 未知の演算子が指定された場合.
+         */
+        public static final DcCoreException UNSUPPORTED_QUERY_OPERATOR = create("PR400-OD-0043");
+
+        /**
+         * 未知の関数が指定された場合.
+         */
+        public static final DcCoreException UNSUPPORTED_QUERY_FUNCTION = create("PR400-OD-0044");
+
+        /**
+         * 未知のプロパティを指定した場合.
+         */
+        public static final DcCoreException UNKNOWN_QUERY_KEY = create("PR400-OD-0045");
+
+        /**
+         * プロパティのデータ型とは異なる書式の値が指定された場合.
+         */
+        public static final DcCoreException OPERATOR_AND_OPERAND_TYPE_MISMATCHED = create("PR400-OD-0046");
+
+        /**
+         * プロパティのデータ型の範囲外の値が指定された場合.
+         */
+        public static final DcCoreException UNSUPPORTED_OPERAND_FORMAT = create("PR400-OD-0047");
+
+        /**
+         * 検索値のアンエスケープができなかった場合.
+         */
+        public static final DcCoreException OPERATOR_AND_OPERAND_UNABLE_TO_UNESCAPE = create("PR400-OD-0048");
+
+        /**
          * 該当EntitySetが存在しない.
          */
         public static final DcCoreException NO_SUCH_ENTITY_SET = create("PR404-OD-0001");

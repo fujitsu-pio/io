@@ -57,7 +57,7 @@ import com.fujitsu.dc.common.es.response.impl.DcSearchResponseImpl;
 /**
  * Index 操作用 Class.
  */
-public class EsIndexImpl implements EsIndex {
+public class EsIndexImpl extends EsTranslogHandler implements EsIndex {
     private InternalEsClient esClient;
 
     /**
@@ -73,6 +73,8 @@ public class EsIndexImpl implements EsIndex {
     String name;
     String category;
 
+    private EsTranslogHandler requestOwner;
+
     /**
      * インデックス名とカテゴリを指定してインスタンスを生成する.
      * @param name インデックス名
@@ -82,6 +84,7 @@ public class EsIndexImpl implements EsIndex {
      * @param client EsClientオブジェクト
      */
     public EsIndexImpl(final String name, final String category, int times, int interval, InternalEsClient client) {
+        super(times, interval, client, name);
         // バッチコマンド群から参照されているためpublicとしているが参照しないこと
         // （EsClientのファクトリメソッドを使用してインスタンス化すること）
         this.name = name;
@@ -89,6 +92,8 @@ public class EsIndexImpl implements EsIndex {
         this.retryCount = times;
         this.retryInterval = interval;
         this.esClient = client;
+
+        this.requestOwner = this;
     }
 
     @Override
@@ -182,6 +187,19 @@ public class EsIndexImpl implements EsIndex {
     }
 
     /**
+     * インデックスの設定を更新する.
+     * @param index インデックス名
+     * @param settings 更新するインデックス設定
+     * @return Void
+     */
+    public Void updateSettings(String index, Map<String, String> settings) {
+        UpdateSettingsRetryableRequest request = new UpdateSettingsRetryableRequest(retryCount, retryInterval, index,
+                settings);
+        // 必要な場合、メソッド内でリトライが行われる.
+        return request.doRequest();
+    }
+
+    /**
      * Elasticsearchへの index create処理実装.
      */
     class CreateRetryableRequest extends AbstractRetryableEsRequest<CreateIndexResponse> {
@@ -221,6 +239,10 @@ public class EsIndexImpl implements EsIndex {
             throw e;
         }
 
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
     }
 
     /**
@@ -250,6 +272,11 @@ public class EsIndexImpl implements EsIndex {
                 throw new EsClientException.EsIndexMissingException(e);
             }
             throw e;
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
         }
     }
 
@@ -377,6 +404,11 @@ public class EsIndexImpl implements EsIndex {
             }
             throw e;
         }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
     }
 
     /**
@@ -394,15 +426,15 @@ public class EsIndexImpl implements EsIndex {
         }
 
         @Override
-        SearchResponse doProcess() {
-            return asyncIndexSearch(routingId, query).actionGet();
-        }
-
-        @Override
         boolean isParticularError(ElasticsearchException e) {
             return e instanceof IndexMissingException
                     || e.getCause() instanceof IndexMissingException
                     || e instanceof SearchPhaseExecutionException;
+        }
+
+        @Override
+        SearchResponse doProcess() {
+            return asyncIndexSearch(routingId, query).actionGet();
         }
 
         @Override
@@ -414,6 +446,11 @@ public class EsIndexImpl implements EsIndex {
                 throw new EsClientException("unknown property was appointed.", e);
             }
             throw e;
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
         }
     }
 
@@ -448,6 +485,11 @@ public class EsIndexImpl implements EsIndex {
             }
             throw e;
         }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
     }
 
     /**
@@ -467,6 +509,36 @@ public class EsIndexImpl implements EsIndex {
         @Override
         DeleteByQueryResponse doProcess() {
             return esClient.deleteByQuery(name, deleteQuery);
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
+    }
+
+    /**
+     * Elasticsearchへの update index settings処理実装.
+     */
+    class UpdateSettingsRetryableRequest extends AbstractRetryableEsRequest<Void> {
+        String index;
+        Map<String, String> settings;
+
+        public UpdateSettingsRetryableRequest(int retryCount, long retryInterval,
+                String index, Map<String, String> settings) {
+            super(retryCount, retryInterval, "EsIndex updateSettings");
+            this.index = index;
+            this.settings = settings;
+        }
+
+        @Override
+        Void doProcess() {
+            return esClient.updateIndexSettings(index, settings);
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
         }
     }
 
@@ -521,6 +593,11 @@ public class EsIndexImpl implements EsIndex {
         @Override
         BulkResponse doProcess() {
             return esClient.bulkCreate(name, routingId, datas);
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
         }
     }
 }

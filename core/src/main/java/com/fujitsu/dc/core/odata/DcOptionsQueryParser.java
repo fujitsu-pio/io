@@ -41,8 +41,11 @@ import java.util.List;
 import org.odata4j.expression.BoolCommonExpression;
 import org.odata4j.expression.CommonExpression;
 import org.odata4j.expression.EntitySimpleProperty;
+import org.odata4j.expression.MethodCallExpression;
 import org.odata4j.expression.OrderByExpression;
 import org.odata4j.producer.resources.OptionsQueryParser;
+
+import com.fujitsu.dc.core.DcCoreException;
 
 /**
  * DcOptionsQueryParserクラス.
@@ -72,10 +75,14 @@ public final class DcOptionsQueryParser extends OptionsQueryParser {
             return null;
         }
         CommonExpression ce = DcExpressionParser.parse(filter);
-        if (!(ce instanceof BoolCommonExpression)) {
-            throw new RuntimeException("Bad filter");
+        if (ce instanceof BoolCommonExpression) {
+            return (BoolCommonExpression) ce;
         }
-        return (BoolCommonExpression) ce;
+        if (ce instanceof MethodCallExpression) {
+            throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION.params("");
+        } else {
+            throw DcCoreException.OData.UNSUPPORTED_QUERY_OPERATOR.params("");
+        }
     }
 
     /**

@@ -101,4 +101,12 @@ public interface EsIndex {
      * @return ES応答
      */
     DcBulkResponse bulkCreate(String routingId, List<EsBulkRequest> datas);
+
+    /**
+     * インデックスの設定を更新する.
+     * @param index インデックス名
+     * @param settings 更新するインデックス設定
+     * @return Void
+     */
+    Void updateSettings(String index, Map<String, String> settings);
 }

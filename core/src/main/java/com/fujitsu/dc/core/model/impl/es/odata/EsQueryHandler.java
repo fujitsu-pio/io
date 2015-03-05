@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.odata4j.edm.EdmEntityType;
 import org.odata4j.edm.EdmProperty;
-import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.expression.AddExpression;
 import org.odata4j.expression.AggregateAllFunction;
 import org.odata4j.expression.AggregateAnyFunction;
@@ -103,6 +103,7 @@ import com.fujitsu.dc.core.model.impl.es.doc.OEntityDocHandler;
  * 本クラスはここでVisitorとして振る舞うべくExpressionVisitorを実装している。
  * ひと通りVisitを終えたのち、本オブジェクトにgetSource()すると、
  * ESのSearchRequestに渡すべきJSONが取得できる。
+ * Personium.ioでサポートしていないクエリに関しては、例外をスローする。
  */
 public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
     private static final int DEFAULT_TOP_VALUE = DcCoreConfig.getTopQueryDefaultSize();
@@ -377,7 +378,7 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(AddExpression expr) {
-        log.debug("visit(AddExpression expr)");
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_OPERATOR;
     }
 
     @Override
@@ -414,28 +415,15 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
     public void visit(EqExpression expr) {
         log.debug("visit(EqExpression expr)");
 
-        // 左辺がプロパティ、右辺が文字列 int double boolean nullでない場合はパースエラーとする
-        if (!(expr.getLHS() instanceof EntitySimpleProperty)
-                || (!(expr.getRHS() instanceof StringLiteral)
-                        && !(expr.getRHS() instanceof IntegralLiteral)
-                        && !(expr.getRHS() instanceof Int64Literal)
-                        && !(expr.getRHS() instanceof DoubleLiteral)
-                        && !(expr.getRHS() instanceof BooleanLiteral)
-                        && !(expr.getRHS() instanceof NullLiteral))) {
+        // $filterに指定された検索条件のプロパティが単純型ではない場合は、パースエラーとする。
+        if (!(expr.getLHS() instanceof EntitySimpleProperty)) {
             throw DcCoreException.OData.FILTER_PARSE_ERROR;
         }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getLHS());
 
-        // プロパティの型がBoolean型の場合はBooleanまたはnullの検索のみ許可する
-        EntitySimpleProperty searchKey = (EntitySimpleProperty) expr.getLHS();
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
         CommonExpression searchValue = expr.getRHS();
-        String propertyName = searchKey.getPropertyName();
-        EdmProperty edmProperty = this.entityType.findProperty(propertyName);
-
-        if ((edmProperty != null)
-                && (EdmSimpleType.BOOLEAN.equals(edmProperty.getType()))
-                && (!(searchValue instanceof BooleanLiteral || searchValue instanceof NullLiteral))) {
-            throw DcCoreException.OData.UNKNOWN_PROPERTY_APPOINTED;
-        }
+        FilterConditionValidator.validateFilterEqCondition(edmProperty, searchValue);
 
         // 検索クエリを設定する
         // 検索対象がnullの場合、{"missing":{"field":"xxx"}}を作成する
@@ -454,6 +442,27 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
     }
 
     /**
+     * 検索条件に指定されたキーのスキーマ定義を取得する.
+     * 以下の場合はエラーとなる
+     * <ul>
+     * <li>__metadataが指定された場合</li>
+     * <li>未定義のPropertyが指定された場合</li>
+     * <li>Propretyの命名規約に従っていない名前が指定された場合 <br />
+     * (上記はPropertyとして登録できないため、スキーマ定義が取得できないことで書式エラーとみなす)</li>
+     * </ul>
+     * @param searchKey
+     * @return EdmProperty
+     */
+    private EdmProperty getEdmProprety(EntitySimpleProperty searchKey) {
+        String propertyName = searchKey.getPropertyName();
+        EdmProperty edmProperty = this.entityType.findProperty(propertyName);
+        if (null == edmProperty) {
+            throw DcCoreException.OData.UNKNOWN_QUERY_KEY.params(propertyName);
+        }
+        return edmProperty;
+    }
+
+    /**
      * elasticsearchの検索文字列を返却する.
      * @param expr CommonExpression
      * @return elasticsearchの検索文字列
@@ -468,7 +477,15 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
         } else if (expr instanceof BooleanLiteral) {
             return ((BooleanLiteral) expr).getValue();
         } else {
-            return ((StringLiteral) expr).getValue();
+            String value;
+            try {
+                value = StringEscapeUtils.unescapeJavaScript(((StringLiteral) expr).getValue());
+            } catch (Exception e) {
+                log.info("Failed to unescape searchValue.", e);
+                throw DcCoreException.OData.OPERATOR_AND_OPERAND_UNABLE_TO_UNESCAPE.params(((StringLiteral) expr)
+                        .getValue());
+            }
+            return value;
         }
     }
 
@@ -519,6 +536,7 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(ConcatMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
@@ -535,10 +553,12 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(DivExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_OPERATOR;
     }
 
     @Override
     public void visit(EndsWithMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     /**
@@ -553,14 +573,15 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
     public void visit(GeExpression expr) {
         log.debug("visit(GeExpression expr)");
 
-        // 左辺がプロパティ、右辺が文字列 int doubleでない場合はパースエラーとする
-        if (!(expr.getLHS() instanceof EntitySimpleProperty)
-                || (!(expr.getRHS() instanceof StringLiteral)
-                        && !(expr.getRHS() instanceof IntegralLiteral)
-                        && !(expr.getRHS() instanceof Int64Literal)
-                        && !(expr.getRHS() instanceof DoubleLiteral))) {
+        // $filterに指定された検索条件のプロパティが単純型ではない場合は、パースエラーとする。
+        if (!(expr.getLHS() instanceof EntitySimpleProperty)) {
             throw DcCoreException.OData.FILTER_PARSE_ERROR;
         }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getLHS());
+
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
+        CommonExpression searchValue = expr.getRHS();
+        FilterConditionValidator.validateFilterOpCondition(edmProperty, searchValue);
 
         // ESの Range filterを設定する
         Map<String, Object> ge = new HashMap<String, Object>();
@@ -575,16 +596,16 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
     public void visit(GtExpression expr) {
         log.debug("visit(GtExpression expr)");
 
-        // 左辺がプロパティ、右辺が文字列 int doubleでない場合はパースエラーとする
-        if (!(expr.getLHS() instanceof EntitySimpleProperty)
-                || (!(expr.getRHS() instanceof StringLiteral)
-                        && !(expr.getRHS() instanceof IntegralLiteral)
-                        && !(expr.getRHS() instanceof Int64Literal)
-                        && !(expr.getRHS() instanceof DoubleLiteral))) {
+        // $filterに指定された検索条件のプロパティが単純型ではない場合は、パースエラーとする。
+        if (!(expr.getLHS() instanceof EntitySimpleProperty)) {
             throw DcCoreException.OData.FILTER_PARSE_ERROR;
         }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getLHS());
 
-        // ESの Range filterを設定する
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
+        CommonExpression searchValue = expr.getRHS();
+        FilterConditionValidator.validateFilterOpCondition(edmProperty, searchValue);
+
         Map<String, Object> gt = new HashMap<String, Object>();
         Map<String, Object> property = new HashMap<String, Object>();
         gt.put("gt", getSearchValue(expr.getRHS()));
@@ -611,6 +632,7 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(IndexOfMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
@@ -632,20 +654,22 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(IsofExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(LeExpression expr) {
         log.debug("visit(LeExpression expr)");
 
-        // 左辺がプロパティ、右辺が文字列 int doubleでない場合はパースエラーとする
-        if (!(expr.getLHS() instanceof EntitySimpleProperty)
-                || (!(expr.getRHS() instanceof StringLiteral)
-                        && !(expr.getRHS() instanceof IntegralLiteral)
-                        && !(expr.getRHS() instanceof Int64Literal)
-                        && !(expr.getRHS() instanceof DoubleLiteral))) {
+        // $filterに指定された検索条件のプロパティが単純型ではない場合は、パースエラーとする。
+        if (!(expr.getLHS() instanceof EntitySimpleProperty)) {
             throw DcCoreException.OData.FILTER_PARSE_ERROR;
         }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getLHS());
+
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
+        CommonExpression searchValue = expr.getRHS();
+        FilterConditionValidator.validateFilterOpCondition(edmProperty, searchValue);
 
         // ESの Range filterを設定する
         Map<String, Object> le = new HashMap<String, Object>();
@@ -658,21 +682,22 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(LengthMethodCallExpression expr) {
-        log.debug("visit(LengthMethodCallExpression expr)");
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(LtExpression expr) {
         log.debug("visit(LtExpression expr)");
 
-        // 左辺がプロパティ、右辺が文字列 int doubleでない場合はパースエラーとする
-        if (!(expr.getLHS() instanceof EntitySimpleProperty)
-                || (!(expr.getRHS() instanceof StringLiteral)
-                        && !(expr.getRHS() instanceof IntegralLiteral)
-                        && !(expr.getRHS() instanceof Int64Literal)
-                        && !(expr.getRHS() instanceof DoubleLiteral))) {
+        // $filterに指定された検索条件のプロパティが単純型ではない場合は、パースエラーとする。
+        if (!(expr.getLHS() instanceof EntitySimpleProperty)) {
             throw DcCoreException.OData.FILTER_PARSE_ERROR;
         }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getLHS());
+
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
+        CommonExpression searchValue = expr.getRHS();
+        FilterConditionValidator.validateFilterOpCondition(edmProperty, searchValue);
 
         // ESの Range filterを設定する
         Map<String, Object> lt = new HashMap<String, Object>();
@@ -685,14 +710,49 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(ModExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_OPERATOR;
     }
 
     @Override
     public void visit(MulExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_OPERATOR;
     }
 
     @Override
     public void visit(NeExpression expr) {
+        // $filterに指定された検索条件のプロパティが単純型ではない場合は、パースエラーとする。
+        if (!(expr.getLHS() instanceof EntitySimpleProperty)) {
+            throw DcCoreException.OData.FILTER_PARSE_ERROR;
+        }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getLHS());
+
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
+        CommonExpression searchValue = expr.getRHS();
+        FilterConditionValidator.validateFilterEqCondition(edmProperty, searchValue);
+
+        // 検索クエリ(not filter)を設定する
+        // 検索対象がnullの場合、{"missing":{"field":"xxx"}}を作成する
+        if (expr.getRHS() instanceof NullLiteral) {
+            Map<String, Object> field = new HashMap<String, Object>();
+            Map<String, Object> missing = new HashMap<String, Object>();
+            Map<String, Object> filter = new HashMap<String, Object>();
+            field.put("field", getSearchKey(expr.getLHS(), true));
+            missing.put("missing", field);
+            filter.put("filter", missing);
+            this.current.put("not", filter);
+            this.current = stack.pop();
+        } else {
+            // 検索対象がnull以外の場合、termクエリを作成する
+            Map<String, Object> field = new HashMap<String, Object>();
+            Map<String, Object> term = new HashMap<String, Object>();
+            Map<String, Object> filter = new HashMap<String, Object>();
+            field.put(getSearchKey(expr.getLHS(), true), getSearchValue(expr.getRHS()));
+            term.put("term", field);
+            filter.put("filter", term);
+            this.current.put("not", filter);
+            this.current = stack.pop();
+        }
+
     }
 
     @Override
@@ -701,6 +761,7 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(NotExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_OPERATOR;
     }
 
     @Override
@@ -718,6 +779,7 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(ReplaceMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
@@ -725,10 +787,12 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
         log.debug("visit(StartsWithMethodCallExpression expr)");
 
         // 左辺辺がプロパティ、右辺が文字列でない場合はパースエラーとする
-        if (!(expr.getTarget() instanceof EntitySimpleProperty)
-                || !(expr.getValue() instanceof StringLiteral)) {
+        if (!(expr.getTarget() instanceof EntitySimpleProperty)) {
             throw DcCoreException.OData.FILTER_PARSE_ERROR;
         }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getTarget());
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
+        FilterConditionValidator.validateFilterFuncCondition(edmProperty, expr.getValue());
 
         // 検索クエリを設定する
         Map<String, Object> prefix = new HashMap<String, Object>();
@@ -749,10 +813,12 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(SubExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_OPERATOR;
     }
 
     @Override
     public void visit(SubstringMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
@@ -760,10 +826,12 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
         log.debug("visit(SubstringOfMethodCallExpression expr)");
 
         // 左辺が文字列、右辺がプロパティでない場合はパースエラーとする
-        if (!(expr.getTarget() instanceof EntitySimpleProperty)
-                || !(expr.getValue() instanceof StringLiteral)) {
+        if (!(expr.getTarget() instanceof EntitySimpleProperty)) {
             throw DcCoreException.OData.FILTER_PARSE_ERROR;
         }
+        EdmProperty edmProperty = getEdmProprety((EntitySimpleProperty) expr.getTarget());
+        // $filterに指定されたプロパティの型と検索条件の値として指定されたデータ型の検証
+        FilterConditionValidator.validateFilterFuncCondition(edmProperty, expr.getValue());
 
         // 検索クエリを設定する
         Map<String, Object> searchKey = new HashMap<String, Object>();
@@ -785,50 +853,62 @@ public class EsQueryHandler implements ExpressionVisitor, ODataQueryHandler {
 
     @Override
     public void visit(ToLowerMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(ToUpperMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(TrimMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(YearMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(MonthMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(DayMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(HourMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(MinuteMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(SecondMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(RoundMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(FloorMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override
     public void visit(CeilingMethodCallExpression expr) {
+        throw DcCoreException.OData.UNSUPPORTED_QUERY_FUNCTION;
     }
 
     @Override

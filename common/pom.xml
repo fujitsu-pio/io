@@ -3,7 +3,7 @@
 	<groupId>com.fujitsu.dc</groupId>
 	<artifactId>dc1-common</artifactId>
 	<packaging>jar</packaging>
-	<version>1.3.21</version>
+	<version>1.3.22</version>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -242,7 +242,7 @@
 		<repository>
 			<id>personium.io</id>
 			<name>personium.io</name>
-			<url>dav:http://personium.io/mvnrepo</url>
+			<url>http://personium.io/mvnrepo</url>
 		</repository>
 	</distributionManagement>
 	<dependencies>

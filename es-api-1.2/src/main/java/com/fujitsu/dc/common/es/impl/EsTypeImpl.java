@@ -62,7 +62,7 @@ import com.fujitsu.dc.common.es.response.impl.DcSearchResponseImpl;
 /**
  * Type 操作用 Class.
  */
-public class EsTypeImpl implements EsType {
+public class EsTypeImpl extends EsTranslogHandler implements EsType {
 
     /**
      * ログ.
@@ -82,6 +82,8 @@ public class EsTypeImpl implements EsType {
     // エラー発生時のリトライ間隔
     private int retryInterval;
 
+    private EsTranslogHandler requestOwner;
+
     /**
      * コンストラクタ.
      * @param index インデックス名
@@ -92,6 +94,7 @@ public class EsTypeImpl implements EsType {
      * @param client EsClientオブジェクト
      */
     public EsTypeImpl(String index, String name, String routingId, int times, int interval, InternalEsClient client) {
+        super(times, interval, client, index);
         // バッチコマンド群から参照されているためpublicとしているが参照しないこと
         // （EsClientのファクトリメソッドを使用してインスタンス化すること）
         this.indexName = index;
@@ -100,6 +103,8 @@ public class EsTypeImpl implements EsType {
         this.esClient = client;
         this.retryCount = times;
         this.retryInterval = interval;
+
+        this.requestOwner = this;
     }
 
     @Override
@@ -234,6 +239,11 @@ public class EsTypeImpl implements EsType {
             }
             throw e;
         }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
     }
 
     /**
@@ -291,6 +301,11 @@ public class EsTypeImpl implements EsType {
             // 例外が発生した場合でもドキュメントが登録されている可能性がある。
             // そのため、登録チェックを行い、データが登録済の場合は正常なレスポンスを返却する。
             return checkDocumentCreated(id, data, e);
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
         }
     }
 
@@ -363,6 +378,11 @@ public class EsTypeImpl implements EsType {
             }
             throw e;
         }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
     }
 
     /**
@@ -398,6 +418,11 @@ public class EsTypeImpl implements EsType {
             }
             throw e;
         }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
     }
 
     /**
@@ -427,6 +452,11 @@ public class EsTypeImpl implements EsType {
                 throw new EsClientException("unknown property was appointed.", e);
             }
             throw e;
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
         }
     }
 
@@ -465,6 +495,11 @@ public class EsTypeImpl implements EsType {
             }
             throw e;
         }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
+        }
     }
 
     /**
@@ -499,6 +534,11 @@ public class EsTypeImpl implements EsType {
                 throw new EsClientException.EsSchemaMismatchException(e);
             }
             throw e;
+        }
+
+        @Override
+        EsTranslogHandler getEsTranslogHandler() {
+            return requestOwner;
         }
     }
 
