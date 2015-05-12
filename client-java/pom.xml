@@ -19,11 +19,6 @@
 		<logback.version>1.0.13</logback.version>
 		<slf4j.version>1.7.6</slf4j.version>
 	</properties>
-	<scm>
-		<url>scm:svn:http://ooshima.vpdc.sg.soft.fujitsu.com/svn/pcs/dc1-client-java/tags/dc1-client-1.3.22</url>
-		<connection>scm:svn:http://ooshima.vpdc.sg.soft.fujitsu.com/svn/pcs/dc1-client-java/tags/dc1-client-1.3.22</connection>
-		<developerConnection>scm:svn:http://ooshima.vpdc.sg.soft.fujitsu.com/svn/pcs/dc1-client-java/branches/dc1-client-1.3.22</developerConnection>
-	</scm>
 
 	<build>
 		<resources>

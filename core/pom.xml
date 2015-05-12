@@ -16,13 +16,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<final.name>dc1-core</final.name>
-		<esapi.version>1_2</esapi.version>
-		<java.version>1.7</java.version>
-		<jvm.option>-Xms512m -Xmx1024m -XX:MaxPermSize=256m
-			-XX:-UseSplitVerifier</jvm.option>
-		<logback.version>1.0.12</logback.version>
-		<slf4j.version>1.7.4</slf4j.version>
-	</properties>
+				<esapi.version>1_2</esapi.version>
+				<java.version>1.7</java.version>
+				<jvm.option>-Xms512m -Xmx1024m -XX:MaxPermSize=256m
+					-XX:-UseSplitVerifier</jvm.option>
+				<logback.version>1.0.12</logback.version>
+				<slf4j.version>1.7.4</slf4j.version>
+			</properties>
 
 	<dependencies>
 		<dependency>

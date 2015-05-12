@@ -29,14 +29,11 @@ import com.fujitsu.dc.core.auth.OAuth2Helper.Error;
 import com.fujitsu.dc.core.auth.OAuth2Helper.Key;
 import com.fujitsu.dc.core.auth.OAuth2Helper.Scheme;
 
-
-
 /**
  * ログメッセージ作成クラス.
  */
 /**
  * @author naoki
- *
  */
 @SuppressWarnings("serial")
 public final class DcCoreAuthnException extends DcCoreException {
@@ -45,86 +42,86 @@ public final class DcCoreAuthnException extends DcCoreException {
      * Grant-Typeの値が異常.
      */
     public static final DcCoreAuthnException UNSUPPORTED_GRANT_TYPE =
-            create("PR401-AN-0001", Error.UNSUPPORTED_GRANT_TYPE);
+            create("PR400-AN-0001", Error.UNSUPPORTED_GRANT_TYPE);
     /**
      * dc_targetの値異常.
      */
-    public static final DcCoreAuthnException INVALID_TARGET = create("PR401-AN-0002", Error.INVALID_REQUEST);
+    public static final DcCoreAuthnException INVALID_TARGET = create("PR400-AN-0002", Error.INVALID_REQUEST);
     /**
      * Client Sercret パースエラー.
      */
-    public static final DcCoreAuthnException CLIENT_SERCRET_PARSE_ERROR = create("PR401-AN-0003", Error.INVALID_CLIENT);
+    public static final DcCoreAuthnException CLIENT_SERCRET_PARSE_ERROR = create("PR400-AN-0003", Error.INVALID_CLIENT);
     /**
      * Client Sercret 有効期限チェック.
      */
-    public static final DcCoreAuthnException CLIENT_SERCRET_EXPIRED  = create("PR401-AN-0004", Error.INVALID_CLIENT);
+    public static final DcCoreAuthnException CLIENT_SERCRET_EXPIRED = create("PR400-AN-0004", Error.INVALID_CLIENT);
     /**
      * Client Sercret 署名検証をエラー.
      */
     public static final DcCoreAuthnException CLIENT_SERCRET_DSIG_INVALID =
-            create("PR401-AN-0005", Error.INVALID_CLIENT);
+            create("PR400-AN-0005", Error.INVALID_CLIENT);
     /**
      * Client Sercret のIssuerがIDと等しくない.
      */
     public static final DcCoreAuthnException CLIENT_SERCRET_ISSUER_MISMATCH =
-            create("PR401-AN-0006", Error.INVALID_CLIENT);
+            create("PR400-AN-0006", Error.INVALID_CLIENT);
     /**
      * Client Sercret のターゲットが自分でない.
      */
     public static final DcCoreAuthnException CLIENT_SERCRET_TARGET_WRONG =
-            create("PR401-AN-0007", Error.INVALID_CLIENT);
+            create("PR400-AN-0007", Error.INVALID_CLIENT);
 
     /**
      * トランスセルトークン認証ではユニットユーザ昇格はできない.
      */
     public static final DcCoreAuthnException TC_ACCESS_REPRESENTING_OWNER =
-            create("PR401-AN-0008", Error.INVALID_GRANT);
+            create("PR400-AN-0008", Error.INVALID_GRANT);
     /**
      * トークンパースエラー.
      */
-    public static final DcCoreAuthnException TOKEN_PARSE_ERROR = create("PR401-AN-0009", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException TOKEN_PARSE_ERROR = create("PR400-AN-0009", Error.INVALID_GRANT);
     /**
      * 有効期限切れ.
      */
-    public static final DcCoreAuthnException TOKEN_EXPIRED = create("PR401-AN-0010", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException TOKEN_EXPIRED = create("PR400-AN-0010", Error.INVALID_GRANT);
     /**
      * 署名検証をエラー.
      */
-    public static final DcCoreAuthnException TOKEN_DSIG_INVALID = create("PR401-AN-0011", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException TOKEN_DSIG_INVALID = create("PR400-AN-0011", Error.INVALID_GRANT);
     /**
      * トークン のターゲットが自分でない.
      * {0}:トークンのターゲットURL
      */
-    public static final DcCoreAuthnException TOKEN_TARGET_WRONG = create("PR401-AN-0012", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException TOKEN_TARGET_WRONG = create("PR400-AN-0012", Error.INVALID_GRANT);
     /**
      * リフレッシュトークンでない.
      */
-    public static final DcCoreAuthnException NOT_REFRESH_TOKEN = create("PR401-AN-0013", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException NOT_REFRESH_TOKEN = create("PR400-AN-0013", Error.INVALID_GRANT);
     /**
      * 権限がないから昇格できない.
      */
-    public static final DcCoreAuthnException NOT_ALLOWED_REPRESENT_OWNER = create("PR401-AN-0014", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException NOT_ALLOWED_REPRESENT_OWNER = create("PR400-AN-0014", Error.INVALID_GRANT);
     /**
      * オーナーがいないセルは昇格できない.
      */
-    public static final DcCoreAuthnException NO_CELL_OWNER = create("PR401-AN-0015", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException NO_CELL_OWNER = create("PR400-AN-0015", Error.INVALID_GRANT);
     /**
      * 必須パラメータが無い.
      * {0}:パラメータキー名
      */
-    public static final DcCoreAuthnException REQUIRED_PARAM_MISSING = create("PR401-AN-0016", Error.INVALID_REQUEST);
+    public static final DcCoreAuthnException REQUIRED_PARAM_MISSING = create("PR400-AN-0016", Error.INVALID_REQUEST);
     /**
      * 認証エラー.
      */
-    public static final DcCoreAuthnException AUTHN_FAILED = create("PR401-AN-0017", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException AUTHN_FAILED = create("PR400-AN-0017", Error.INVALID_GRANT);
     /**
      * 認証ヘッダの指定誤り.
      */
-    public static final DcCoreAuthnException AUTH_HEADER_IS_INVALID = create("PR401-AN-0018", Error.INVALID_CLIENT);
+    public static final DcCoreAuthnException AUTH_HEADER_IS_INVALID = create("PR400-AN-0018", Error.INVALID_CLIENT);
     /**
      * Accountロック中.
      */
-    public static final DcCoreAuthnException ACCOUNT_LOCK_ERROR = create("PR401-AN-0019", Error.INVALID_GRANT);
+    public static final DcCoreAuthnException ACCOUNT_LOCK_ERROR = create("PR400-AN-0019", Error.INVALID_GRANT);
 
     /**
      * インナークラスを強制的にロードする.
@@ -165,7 +162,6 @@ public final class DcCoreAuthnException extends DcCoreException {
         return new DcCoreAuthnException(this.code, this.severity, this.message, this.status, this.error, realm2set);
     }
 
-
     @SuppressWarnings("unchecked")
     @Override
     public Response createResponse() {
@@ -176,13 +172,14 @@ public final class DcCoreAuthnException extends DcCoreException {
         String errDesc = String.format("[%s] - %s", this.code, this.message);
         errorJson.put(Key.ERROR_DESCRIPTION, errDesc);
 
-        ResponseBuilder rb = Response.status(HttpStatus.SC_UNAUTHORIZED)
+        int statusCode = parseCode(this.code);
+        ResponseBuilder rb = Response.status(statusCode)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .entity(errorJson.toJSONString());
 
         // レルム値が設定されていれば、WWW-Authenticateヘッダーを返却する。
         // __authエンドポイントでは、認証失敗時(401返却時)には、同ヘッダーに Auth SchemeがBasicの値を返却するため、ここでは固定値とする。
-        if (this.realm != null) {
+        if (this.realm != null && statusCode == HttpStatus.SC_UNAUTHORIZED) {
             rb = rb.header(HttpHeaders.WWW_AUTHENTICATE, Scheme.BASIC + " realm=\"" + this.realm + "\"");
         }
         return rb.build();

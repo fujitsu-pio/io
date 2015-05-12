@@ -1,3 +1,25 @@
+## 1.3.22a
+
+BACKWARD INCOMPATIBILITIES:
+
+  - core *[DcCoreAuthnException.java]*:
+     Response code for authentication failure with OAuth 2.0 (__auth endpoint) has been changed as follows.
+
+    | Versions         | Response code & header      |
+    | :-----------     | :-------------------------- |
+    | Prior to V1.3.22 | 401 with/without authentication header depending on authentication type. |
+    | V1.3.22          | 401 with header "WWW-Authenticate: xxxxx" |
+    | From V1.3.22a    | Basic authentication: 400 with header "WWW-Authenticate: Basic".  Client authentication: See KNOWN ISSUES below. |
+
+
+KNOWN ISSUES:
+
+  - core :
+    Response code for client authentication failure with OAuth 2.0 (__auth endpoint) should be 401 and include 
+    "WWW-Authenticate" response header. However current version of personium.io returns response code 400 without 
+    authenticate header due to compatibility for existing applications.
+
+
 ## 1.3.22
 
 IMPROVEMENTS:
@@ -38,22 +60,22 @@ BACKWARD INCOMPATIBILITIES:
 
     || When undefined property is specified as query operand. |
     |:--- |:----|
-    | Prior to V1.3.21 | Nothing is Returned. |
+    | Prior to V1.3.22 | Nothing is Returned. |
     | From V1.3.22     | Bad Request(400) |
  
     || When the format of operand value is different from the type of property. |
     |:--- |:----|
-    | Prior to V1.3.21 | If the operand value is castable to the type of assocaiated property, the operand is treated as valid.<br/>If not castable, retunrs Bad Request(400).  |
+    | Prior to V1.3.22 | If the operand value is castable to the type of assocaiated property, the operand is treated as valid.<br/>If not castable, retunrs Bad Request(400).  |
     | From V1.3.22     | Bad Request(400) |
 
     || When operand value is out of range for the type of property.|
     |:--- |:---- |
-    | Prior to V1.3.21 | The operand value is treated as a valid operand, but may cause either unexpected result or error.|
+    | Prior to V1.3.22 | The operand value is treated as a valid operand, but may cause either unexpected result or error.|
     | From V1.3.22     | Bad Request(400) |
 
     || To search data including \\ (back-slash) |
     |:--- |:---- |
-    | Prior to V1.3.21 | No escaping is required in query value.. |
+    | Prior to V1.3.22 | No escaping is required in query value.. |
     | From V1.3.22     | Escaping '\' (back-slash) required, such as '\\\\' |
 
 
@@ -89,3 +111,4 @@ BUG FIXES:
 
   - core *[AccessContext.java, DcCoreAuthzException.java, etc.]*:
     Authentication and authorization behavior is corrected to comply with HTTP RFC.
+
