@@ -14,12 +14,12 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<final.name>dc1-es-api-1_2</final.name>
-		<java.version>1.7</java.version>
-		<jvm.option>-Xms512m -Xmx512m -XX:MaxPermSize=256m
-			-XX:-UseSplitVerifier</jvm.option>
-		<es.version>1.3.4</es.version>
-		<java.exclude.name>**/v1_2/*.java</java.exclude.name>
-	</properties>
+				<java.version>1.7</java.version>
+				<jvm.option>-Xms512m -Xmx512m -XX:MaxPermSize=256m
+					-XX:-UseSplitVerifier</jvm.option>
+				<es.version>1.3.4</es.version>
+				<java.exclude.name>**/v1_2/*.java</java.exclude.name>
+			</properties>
 	<build>
 		<resources>
 				<resource>

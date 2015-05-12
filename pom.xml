@@ -19,6 +19,7 @@
     <module>es-api-1.2</module>
     <module>client-java</module>
     <module>logback</module>
+    <module>errorpage</module>
   </modules>
   <build>
     <plugins>

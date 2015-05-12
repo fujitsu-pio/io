@@ -358,13 +358,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <com.fujitsu.dc.engine.jerseyTest.baseUrl>http://localhost:9998/test/</com.fujitsu.dc.engine.jerseyTest.baseUrl>
         <com.fujitsu.dc.engine.jerseyTest.useCouchdb>false</com.fujitsu.dc.engine.jerseyTest.useCouchdb>
-        <java.version>1.7</java.version>
-        <jvm.option>-Xms512m -Xmx1024m -XX:MaxPermSize=256m -XX:-UseSplitVerifier</jvm.option>
-        <logback.version>1.0.13</logback.version>
-        <slf4j.version>1.7.6</slf4j.version>
-        <esapi.version>1_2</esapi.version>
-        <logback.version>1.0.13</logback.version>
-    </properties>
+                <java.version>1.7</java.version>
+                <jvm.option>-Xms512m -Xmx1024m -XX:MaxPermSize=256m -XX:-UseSplitVerifier</jvm.option>
+                <logback.version>1.0.13</logback.version>
+                <slf4j.version>1.7.6</slf4j.version>
+                <esapi.version>1_2</esapi.version>
+                <logback.version>1.0.13</logback.version>
+            </properties>
     <repositories>
         <repository>
           <id>personium.io</id>
