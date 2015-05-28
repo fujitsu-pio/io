@@ -24,17 +24,17 @@ http://personium.io/docs/
 
 ## Note
 
-	This project started as a proprietary service platform development 
-	to accelerate Fujitsu's social innovations business. 
+	This project started as a proprietary service platform development
+	to accelerate Fujitsu's social innovations business.
 
-	As of Dec. 2014, this project is still on the way from properietary 
-	to open source, and thus this product is not ready to be comfortably 
+	As of Dec. 2014, this project is still on the way from properietary
+	to open source, and thus this product is not ready to be comfortably
 	used by everyone yet.
-	
-	We are going to prepare missing parts, e.g. documents, tools, etc., 
+
+	We are going to prepare missing parts, e.g. documents, tools, etc.,
 	to resolve this situation as soon as possible.
 
-## Set up 
+## Set up
 
 1. Try personium.io  on your machine !
 
@@ -46,7 +46,7 @@ http://personium.io/docs/
 
 	Now preparing
 
-## Licence
+## License
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -61,4 +61,3 @@ http://personium.io/docs/
 	limitations under the License.
 
 	Copyright 2014 FUJITSU LIMITED
-
