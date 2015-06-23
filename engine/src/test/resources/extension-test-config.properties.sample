@@ -1,0 +1,7 @@
+AccessKeyId={AWSの認証情報(key)}
+SecretAccessKey={AWSの認証情報(secret)}
+ProxyHost={Proxyのホスト名}
+ProxyPort={Proxyのポート番号}
+ProxyUser={認証ProxyのUser名}
+ProxyPassword={認証Proxyのパスワード}
+
