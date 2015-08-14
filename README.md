@@ -36,7 +36,7 @@ http://personium.io/docs/
 
 ## Set up
 
-1. Try personium.io on your machine !
+1. Try personium.io on your machine
 
 	Please refer __io-vagrant-ansible__ page. ([io-vagrant-ansible](https://github.com/personium/io-vagrant-ansible))
 
