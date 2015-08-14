@@ -1,8 +1,6 @@
 !!!
 personium.io
 ====
-!!!
-
 
 An interconnectable open source BaaS(Backend as a Service) / PDS (Personal Data Store) server.
 
