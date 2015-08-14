@@ -1,3 +1,6 @@
+
+
+
 personium.io
 ====
 
@@ -36,7 +39,7 @@ http://personium.io/docs/
 
 ## Set up
 
-1. Try personium.io on your machine
+1. Try personium.io  on your machine !
 
 	Please refer __io-vagrant-ansible__ page. ([io-vagrant-ansible](https://github.com/personium/io-vagrant-ansible))
 
@@ -44,7 +47,7 @@ http://personium.io/docs/
 
 	**On AWS**
 
-	Now preparing..
+	Now preparing
 
 ## License
 
@@ -60,4 +63,4 @@ http://personium.io/docs/
 	See the License for the specific language governing permissions and
 	limitations under the License.
 
-	Copyright 2015 FUJITSU LIMITED--
+	Copyright 2015 FUJITSU LIMITED-
