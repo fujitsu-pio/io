@@ -1,6 +1,4 @@
 
-
-
 personium.io
 ====
 
@@ -24,6 +22,7 @@ http://personium.io/
 ## Documentation
 
 http://personium.io/docs/
+https://github.com/personium/io/wiki
 
 ## Note
 
