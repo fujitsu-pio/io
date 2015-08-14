@@ -64,3 +64,4 @@ http://personium.io/docs/
 	limitations under the License.
 
 	Copyright 2015 FUJITSU LIMITED
+
