@@ -1,5 +1,6 @@
-personium.io!!
-====!!
+
+personium.io
+====
 
 An interconnectable open source BaaS(Backend as a Service) / PDS (Personal Data Store) server.
 
@@ -21,6 +22,9 @@ http://personium.io/
 ## Documentation
 
 http://personium.io/docs/
+
+Wiki pages are also available.
+https://github.com/personium/io/wiki
 
 ## Note
 
@@ -60,4 +64,4 @@ http://personium.io/docs/
 	See the License for the specific language governing permissions and
 	limitations under the License.
 
-	Copyright 2015 FUJITSU LIMITED--
+	Copyright 2015 FUJITSU LIMITED----+++++
