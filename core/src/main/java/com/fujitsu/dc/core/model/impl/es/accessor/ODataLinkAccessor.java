@@ -86,7 +86,7 @@ public class ODataLinkAccessor extends DataSourceAccessor {
                 AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                         this.getIndex().getName(), EsModel.TYPE_CTL_LINK, lockKey,
                         docHandler.getCellId(), docHandler.getId(),
-                        AdsWriteFailureLogInfo.OPERATION_KIND.CREATE, 1, docHandler.getUpdated());
+                        AdsWriteFailureLogInfo.OperationKind.CREATE, 1, docHandler.getUpdated());
                 recordAdsWriteFailureLog(loginfo);
             }
         }
@@ -136,7 +136,7 @@ public class ODataLinkAccessor extends DataSourceAccessor {
                 AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                         this.getIndex().getName(), EsModel.TYPE_CTL_LINK, lockKey,
                         docHandler.getCellId(), docHandler.getId(),
-                        AdsWriteFailureLogInfo.OPERATION_KIND.UPDATE, version, docHandler.getUpdated());
+                        AdsWriteFailureLogInfo.OperationKind.UPDATE, version, docHandler.getUpdated());
                 recordAdsWriteFailureLog(loginfo);
             }
         }
@@ -188,7 +188,7 @@ public class ODataLinkAccessor extends DataSourceAccessor {
                 AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                         this.getIndex().getName(), EsModel.TYPE_CTL_LINK, lockKey,
                         docHandler.getCellId(), docHandler.getId(),
-                        AdsWriteFailureLogInfo.OPERATION_KIND.DELETE, version, docHandler.getUpdated());
+                        AdsWriteFailureLogInfo.OperationKind.DELETE, version, docHandler.getUpdated());
                 recordAdsWriteFailureLog(loginfo);
             }
         }

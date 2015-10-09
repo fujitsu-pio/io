@@ -373,7 +373,7 @@ public class DataSourceAccessor {
                     AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                             this.getIndex().getName(), docHandler.getType(), lockKey,
                             docHandler.getCellId(), docHandler.getId(),
-                            AdsWriteFailureLogInfo.OPERATION_KIND.CREATE, 1, docHandler.getUpdated());
+                            AdsWriteFailureLogInfo.OperationKind.CREATE, 1, docHandler.getUpdated());
                     recordAdsWriteFailureLog(loginfo);
                 }
             }
@@ -428,7 +428,7 @@ public class DataSourceAccessor {
                     AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                             this.getIndex().getName(), docHandler.getType(), lockKey,
                             docHandler.getCellId(), docHandler.getId(),
-                            AdsWriteFailureLogInfo.OPERATION_KIND.UPDATE, itemResponse.version(),
+                            AdsWriteFailureLogInfo.OperationKind.UPDATE, itemResponse.version(),
                             docHandler.getUpdated());
                     recordAdsWriteFailureLog(loginfo);
                 }
@@ -448,7 +448,7 @@ public class DataSourceAccessor {
                     AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                             this.getIndex().getName(), EsModel.TYPE_CTL_LINK, lockKey,
                             docHandler.getCellId(), docHandler.getId(),
-                            AdsWriteFailureLogInfo.OPERATION_KIND.CREATE, 1, docHandler.getUpdated());
+                            AdsWriteFailureLogInfo.OperationKind.CREATE, 1, docHandler.getUpdated());
                     recordAdsWriteFailureLog(loginfo);
                 }
             }
