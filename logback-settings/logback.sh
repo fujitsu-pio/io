@@ -23,7 +23,7 @@ PATH=$JAVA_HOME/bin:$PATH
 export PATH  
 LOGBACK_HOME=/opt/logback/logback-1.0.3
 
-java -cp  /fj/logback/dc1-logback.jar:$LOGBACK_HOME/logback-core-1.0.3.jar:$LOGBACK_HOME/logback-classic-1.0.3.jar:$LOGBACK_HOME/logback-access-1.0.3.jar:/opt/logback/slf4j-1.6.4/slf4j-api-1.6.4.jar ch.qos.logback.classic.net.SimpleSocketServer 6000 /opt/logback/logback.xml &
+java -cp  /personium/logback/dc1-logback.jar:$LOGBACK_HOME/logback-core-1.0.3.jar:$LOGBACK_HOME/logback-classic-1.0.3.jar:$LOGBACK_HOME/logback-access-1.0.3.jar:/opt/logback/slf4j-1.6.4/slf4j-api-1.6.4.jar ch.qos.logback.classic.net.SimpleSocketServer 6000 /opt/logback/logback.xml &
 echo $! > /var/run/logback/logback.pid 
 
 exit 0
