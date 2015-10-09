@@ -75,10 +75,10 @@
 	</appender>
 
 	<appender name="FILE_LOGBACK" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>/fj/logback/log/logback.log</file>
+		<file>/personium/logback/log/logback.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
-			<fileNamePattern>/fj/logback/log/logback.log.%d{yyyyMMdd}.gz</fileNamePattern>
+			<fileNamePattern>/personium/logback/log/logback.log.%d{yyyyMMdd}.gz</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]  %logger{0} %msg%n</pattern>

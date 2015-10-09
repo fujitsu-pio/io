@@ -620,7 +620,7 @@ public class DcCoreConfig {
          * RepairAdsを起動するか否かを示すファイルのパス. ファイルが存在する場合のみ、RepairAdsが起動する。
          */
         public static final String REPAIR_ADS_INVOCATION_FILE_PATH = KEY_ROOT + "es.ads.repair.invocationFlagFile";
-        static final String DEFAULT_REPAIR_ADS_INVOCATION_FILE_PATH = "/fj/dc-core/invokeRepair";
+        static final String DEFAULT_REPAIR_ADS_INVOCATION_FILE_PATH = "/personium/dc-core/invokeRepair";
     }
 
     /**
