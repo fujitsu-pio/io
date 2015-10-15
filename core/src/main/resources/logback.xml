@@ -58,9 +58,9 @@
 		</discriminator>
 		<sift>
 			<appender name="FILE-${eventlog_path}" class="ch.qos.logback.core.rolling.RollingFileAppender">
-				<file>/fjnfs/dc-core/eventlog/${eventlog_path}/current/default.log</file>
+				<file>/personium_nfs/dc-core/eventlog/${eventlog_path}/current/default.log</file>
 				<rollingPolicy class="com.fujitsu.dc.logging.rolling.DcFixedWindowRollingPolicy">
-					<fileNamePattern>/fjnfs/dc-core/eventlog/${eventlog_path}/archive/default.log.%i.zip</fileNamePattern>
+					<fileNamePattern>/personium_nfs/dc-core/eventlog/${eventlog_path}/archive/default.log.%i.zip</fileNamePattern>
 					<minIndex>1</minIndex>
 					<maxIndex>12</maxIndex>
 				</rollingPolicy>

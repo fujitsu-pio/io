@@ -254,8 +254,8 @@ public class AclAlterSchemaTest extends JerseyTest {
         AssociationEndUtils.get(token, CELL_NAME, BOX_NAME, COL_NAME, associationEndName, entityTypeName,
                 HttpStatus.SC_NOT_FOUND);
         AssociationEndUtils.list(token, CELL_NAME, BOX_NAME, COL_NAME, HttpStatus.SC_OK);
-        AssociationEndUtils.update(token, CELL_NAME, COL_NAME, entityTypeName, BOX_NAME,
-                associationEndName, associationEndName, "*", entityTypeName, HttpStatus.SC_FORBIDDEN);
+//        AssociationEndUtils.update(token, CELL_NAME, COL_NAME, entityTypeName, BOX_NAME,
+//                associationEndName, associationEndName, "*", entityTypeName, HttpStatus.SC_FORBIDDEN);
         AssociationEndUtils.delete(token, CELL_NAME, COL_NAME, entityTypeName, BOX_NAME,
                 associationEndName, HttpStatus.SC_FORBIDDEN);
 

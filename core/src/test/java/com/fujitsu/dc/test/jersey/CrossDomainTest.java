@@ -860,7 +860,7 @@ public class CrossDomainTest extends JerseyTest {
                             .returns()
                             .statusCode(HttpStatus.SC_OK)
                             .debug();
-            checkXHR2Header(response, "OPTIONS, DELETE, MOVE, PROPFIND, PROPPATCH, ACL");
+            checkXHR2Header(response, "OPTIONS, DELETE, PROPFIND, PROPPATCH, ACL");
         } finally {
             // コレクションの削除
             deleteServiceCollection();
@@ -956,7 +956,7 @@ public class CrossDomainTest extends JerseyTest {
                             .returns()
                             .statusCode(HttpStatus.SC_OK)
                             .debug();
-            checkXHR2Header(response, "OPTIONS, GET, PUT, DELETE, MKCOL, MOVE, PROPFIND, PROPPATCH, ACL");
+            checkXHR2Header(response, "OPTIONS, GET, PUT, DELETE, MKCOL, PROPFIND, PROPPATCH, ACL");
         } finally {
             // コレクションの削除
             deleteDavCollection();
@@ -1048,7 +1048,7 @@ public class CrossDomainTest extends JerseyTest {
                             .returns()
                             .statusCode(HttpStatus.SC_OK)
                             .debug();
-            checkXHR2Header(response, "OPTIONS, GET, DELETE, MOVE, PROPFIND, PROPPATCH, ACL");
+            checkXHR2Header(response, "OPTIONS, GET, DELETE, PROPFIND, PROPPATCH, ACL");
         } finally {
             // コレクションの削除
             deleteODataCollection();
