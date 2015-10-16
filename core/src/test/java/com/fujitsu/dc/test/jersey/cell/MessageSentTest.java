@@ -164,7 +164,7 @@ public class MessageSentTest extends ODataCommon {
             expectedResult.put("To", UrlUtils.cellRoot(targetCell));
             // TODO 本来は"code":"404","Reason":"Cell not found."を期待
             expectedResult.put("Code", Integer.toString(HttpStatus.SC_FORBIDDEN));
-            expectedResult.put("Reason", "Unit user access required.");
+            expectedResult.put("Reason", "Unit User access required.");
             JSONArray expectedResults = new JSONArray();
             expectedResults.add(expectedResult);
             JSONObject expected = new JSONObject();
@@ -661,7 +661,7 @@ public class MessageSentTest extends ODataCommon {
             JSONObject expectedResultNotFound = new JSONObject();
             expectedResultNotFound.put("To", UrlUtils.cellRoot("testcell999"));
             expectedResultNotFound.put("Code", Integer.toString(HttpStatus.SC_FORBIDDEN));
-            expectedResultNotFound.put("Reason", "Unit user access required.");
+            expectedResultNotFound.put("Reason", "Unit User access required.");
             JSONArray expectedResults = new JSONArray();
             expectedResults.add(expectedResult);
             expectedResults.add(expectedResultNotFound);

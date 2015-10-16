@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -261,6 +262,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動元の親コレクションに権限がないアカウントでファイルの移動を行い403になること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -287,6 +289,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動元の親コレクションにwrite権限があるアカウントでファイルの移動ができること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -313,6 +316,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動元の親コレクションに権限がないアカウントでファイルの上書き移動を行い403になること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -343,6 +347,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動元の親コレクションにwrite権限があるアカウントでファイルの上書き移動ができること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -374,6 +379,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動先の親コレクションに権限がなし_かつ_上書き対象ファイルに権限がないアカウントでファイルの上書き移動を行い403になること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -406,6 +412,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動先の親コレクションに権限がない_かつ_上書き対象ファイルにwrite権限があるアカウントでファイルの上書き移動を行い403になること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -441,6 +448,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動先の親コレクションにwrite権限がある_かつ_上書き対象ファイルに権限がないアカウントでファイルの上書き移動ができること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -474,6 +482,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動先の親コレクションにwrite権限がある_かつ_上書き対象ファイルにwrite権限があるアカウントでファイルの上書き移動ができること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -508,6 +517,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動先の親コレクションに権限がないアカウントでファイルの移動を行い403になること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
@@ -536,6 +546,7 @@ public class ServiceSourceAccessControlTest extends JerseyTest {
      * @throws JAXBException ACLのパース失敗
      */
     @Test
+    @Ignore
     public void 移動先の親コレクションにwrite権限があるアカウントでファイルの移動ができること() throws JAXBException {
         String token;
         String path = String.format("%s/%s", PARENT_COL_NAME, TARGET_SOURCE_FILE_PATH);
