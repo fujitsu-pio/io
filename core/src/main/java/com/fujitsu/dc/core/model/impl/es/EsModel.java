@@ -19,10 +19,10 @@ package com.fujitsu.dc.core.model.impl.es;
 import java.util.Map;
 
 import com.fujitsu.dc.common.es.EsClient;
+import com.fujitsu.dc.common.es.EsClient.Event;
 import com.fujitsu.dc.common.es.EsIndex;
 import com.fujitsu.dc.common.es.EsRequestLogInfo;
 import com.fujitsu.dc.common.es.EsType;
-import com.fujitsu.dc.common.es.EsClient.Event;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreLog;
 import com.fujitsu.dc.core.model.Box;
@@ -123,6 +123,17 @@ public class EsModel {
     public static EsIndex idxUser(String userUri) {
         return esClient.idxUser(DcCoreConfig.getEsUnitPrefix(),
                 userUri,
+                Integer.valueOf(DcCoreConfig.getESRetryTimes()),
+                Integer.valueOf(DcCoreConfig.getESRetryInterval()));
+    }
+
+    /**
+     * ESのインデックス名から、UnitUser用のIndex操作オブジェクトを返します.
+     * @param indexName ESのインデックス名
+     * @return Indexオブジェクト
+     */
+    public static EsIndex idxUserWithUnitPrefix(String indexName) {
+        return esClient.idxUser(indexName,
                 Integer.valueOf(DcCoreConfig.getESRetryTimes()),
                 Integer.valueOf(DcCoreConfig.getESRetryInterval()));
     }
@@ -243,5 +254,14 @@ public class EsModel {
      */
     public static DataSourceAccessor dsa(final String unitUserName) {
         return new DataSourceAccessor(idxUser(unitUserName));
+    }
+
+    /**
+     * 指定ESインデックス名のDataSourceAccessorを返します.
+     * @param indexName ESのインデックス名
+     * @return DataSourceAccessor
+     */
+    public static DataSourceAccessor getDataSourceAccessorFromIndexName(final String indexName) {
+        return new DataSourceAccessor(idxUserWithUnitPrefix(indexName));
     }
 }

@@ -325,6 +325,29 @@ public class DataSourceAccessor {
     }
 
     /**
+     * ESのインデックスに対してドキュメントを検索する.
+     * @param query クエリ情報
+     * @return ES応答
+     */
+    public DcSearchResponse indexSearch(final Map<String, Object> query) {
+        Map<String, Object> requestQuery = null;
+        if (query == null) {
+            requestQuery = new HashMap<String, Object>();
+        } else {
+            requestQuery = new HashMap<String, Object>(query);
+        }
+
+        if (!requestQuery.containsKey("size")) {
+            requestQuery.put("size", this.count(query));
+        }
+        try {
+            return this.index.search(null, requestQuery);
+        } catch (EsClientException.EsNoResponseException e) {
+            throw DcCoreException.Server.ES_RETRY_OVER.params(e.getMessage());
+        }
+    }
+
+    /**
      * Delete a document.
      * @param docId Document id to delete
      * @param version The version of the document to delete

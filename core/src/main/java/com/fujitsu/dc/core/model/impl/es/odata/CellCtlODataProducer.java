@@ -82,6 +82,11 @@ public class CellCtlODataProducer extends EsODataProducer {
     private static EdmDataServices.Builder edmDataServices = CtlSchema.getEdmDataServicesForCellCtl();
 
     @Override
+    public DataSourceAccessor getAccessorForIndex(final String entitySetName) {
+        return null; // 必要時に実装すること
+    }
+
+    @Override
     public EntitySetAccessor getAccessorForEntitySet(final String entitySetName) {
         return EsModel.cellCtl(this.cell, entitySetName);
     }

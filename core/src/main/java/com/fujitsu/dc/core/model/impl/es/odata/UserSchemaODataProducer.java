@@ -46,6 +46,7 @@ import org.odata4j.producer.QueryInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fujitsu.dc.common.es.EsIndex;
 import com.fujitsu.dc.common.es.response.DcSearchHit;
 import com.fujitsu.dc.common.es.response.DcSearchResponse;
 import com.fujitsu.dc.core.DcCoreConfig;
@@ -61,8 +62,10 @@ import com.fujitsu.dc.core.model.ctl.EntityType;
 import com.fujitsu.dc.core.model.ctl.Property;
 import com.fujitsu.dc.core.model.impl.es.EsModel;
 import com.fujitsu.dc.core.model.impl.es.QueryMapFactory;
+import com.fujitsu.dc.core.model.impl.es.accessor.CellAccessor;
 import com.fujitsu.dc.core.model.impl.es.accessor.DataSourceAccessor;
 import com.fujitsu.dc.core.model.impl.es.accessor.EntitySetAccessor;
+import com.fujitsu.dc.core.model.impl.es.accessor.ODataEntityAccessor;
 import com.fujitsu.dc.core.model.impl.es.accessor.ODataLinkAccessor;
 import com.fujitsu.dc.core.model.impl.es.cache.UserDataSchemaCache;
 import com.fujitsu.dc.core.model.impl.es.doc.ComplexTypePropertyDocHandler;
@@ -99,6 +102,18 @@ public class UserSchemaODataProducer extends EsODataProducer {
 
     // スキーマ情報
     private static EdmDataServices.Builder edmDataServices = CtlSchema.getEdmDataServicesForODataSvcSchema();
+
+    @Override
+    public DataSourceAccessor getAccessorForIndex(final String entitySetName) {
+        EntitySetAccessor esType = this.getAccessorForEntitySet(entitySetName);
+        EsIndex index;
+        if (esType instanceof CellAccessor) {
+            index = ((CellAccessor) esType).getIndex();
+        } else { // ODataEntityAccessor
+            index = ((ODataEntityAccessor) esType).getIndex();
+        }
+        return EsModel.getDataSourceAccessorFromIndexName(index.getName());
+    }
 
     @Override
     public EntitySetAccessor getAccessorForEntitySet(final String entitySetName) {
@@ -234,21 +249,6 @@ public class UserSchemaODataProducer extends EsODataProducer {
                 // 幾つかの EntityTypeで何らかのエラーが発生
                 throw DcCoreException.OData.ENTITYTYPE_STRUCTUAL_LIMITATION_EXCEEDED;
             }
-        }
-    }
-
-    @Override
-    public void beforeUpdate(final String entitySetName,
-            final OEntityKey oEntityKey,
-            final EntitySetDocHandler docHandler) {
-        // AssociationEndの更新は400
-        if (AssociationEnd.EDM_TYPE_NAME.equals(entitySetName)) {
-            throw DcCoreException.OData.NOT_PUT_ASSOCIATIONEND;
-        }
-        // entitySet配下のユーザデータが1件でもあれば、409
-        if (EntityType.EDM_TYPE_NAME.equals(entitySetName)
-                && !isEmpty((String) oEntityKey.asSingleValue())) {
-            throw DcCoreException.OData.CONFLICT_HAS_RELATED;
         }
     }
 
@@ -660,21 +660,19 @@ public class UserSchemaODataProducer extends EsODataProducer {
             EntitySetDocHandler oedhExisting,
             Map<String, Object> originalManeToNoelinkId,
             EntitySetDocHandler oedhNew) {
-        if (!Property.EDM_TYPE_NAME.equals(entitySetName) && !ComplexTypeProperty.EDM_TYPE_NAME.equals(entitySetName)) {
-            return;
+
+        if (Property.EDM_TYPE_NAME.equals(entitySetName) || ComplexTypeProperty.EDM_TYPE_NAME.equals(entitySetName)) {
+            // Propertyの更新前TypeがInt32、更新後TypeがDouble以外は未サポート
+            String existingType = (String) oedhExisting.getStaticFields().get(Property.P_TYPE.getName());
+            String requestType = (String) oedhNew.getStaticFields().get(Property.P_TYPE.getName());
+            String message = String.format("%s 'Type' change from [%s] to [%s]", entitySetName, existingType,
+                    requestType);
+
+            if (!isAcceptableTypeModify(existingType, requestType)) {
+                throw DcCoreException.OData.OPERATION_NOT_SUPPORTED.params(message);
+            }
         }
 
-        // Propertyの更新前TypeがInt32、更新後TypeがDouble以外は未サポート
-        String existingType = (String) oedhExisting.getStaticFields().get(Property.P_TYPE.getName());
-        String requestType = (String) oedhNew.getStaticFields().get(Property.P_TYPE.getName());
-        String message = String.format("%s 'Type' change from [%s] to [%s]", entitySetName, existingType, requestType);
-
-        if (!EdmSimpleType.INT32.getFullyQualifiedTypeName().equals(existingType)
-                || !EdmSimpleType.DOUBLE.getFullyQualifiedTypeName().equals(requestType)) {
-            throw DcCoreException.OData.OPERATION_NOT_SUPPORTED.params(message);
-        }
-
-        // Type以外のフィールドを変更するようなリクエストは未サポート
         // lフィールドの値が更新されていないかのチェック
         for (Entry<String, Object> entry : originalManeToNoelinkId.entrySet()) {
             String requestKey = entry.getKey();
@@ -691,8 +689,8 @@ public class UserSchemaODataProducer extends EsODataProducer {
             String requestKey = entry.getKey();
             Object requestValue = entry.getValue();
             Object existingValue = oedhExisting.getStaticFields().get(requestKey);
-            if (isPropertyValueChanged(requestKey, requestValue, existingValue)) {
-                message = String.format("%s '%s' change from [%s] to [%s]",
+            if (isStaticFieldValueChanged(requestKey, requestValue, existingValue)) {
+                String message = String.format("%s '%s' change from [%s] to [%s]",
                         entitySetName, requestKey, existingValue, requestValue);
                 throw DcCoreException.OData.OPERATION_NOT_SUPPORTED.params(message);
             }
@@ -700,16 +698,64 @@ public class UserSchemaODataProducer extends EsODataProducer {
     }
 
     /**
-     * Propertyのsフィールドの各フィールドが更新しようとしているかをチェック.
+     * Typeの値の変更が許容してよい内容かどうかをチェックする.
+     * @param existingType 変更前のType値
+     * @param requestType 変更後のType値
+     * @return true:許容できる false:許容できない
+     */
+    private boolean isAcceptableTypeModify(String existingType, String requestType) {
+        // Typeプロパティは以下の場合のみ許容する
+        // - INT32からDoubleへの変更
+        // - 値の変更なし
+        return (EdmSimpleType.INT32.getFullyQualifiedTypeName().equals(existingType)
+                && EdmSimpleType.DOUBLE.getFullyQualifiedTypeName().equals(requestType))
+                || (null != requestType && requestType.equals(existingType));
+    }
+
+    /**
+     * sフィールドの各フィールドが更新しようとしているかをチェック. < br/>
+     * - Type,Name以外の更新は許可しない。
      * @param requestKey リクエストで指定されたフィールドのキー
      * @param requestValue リクエストで指定されたフィールドの値
      * @param existingValue 現在のフィールドの値
      * @return true or false
      */
-    private boolean isPropertyValueChanged(String requestKey, Object requestValue, Object existingValue) {
+    private boolean isStaticFieldValueChanged(String requestKey, Object requestValue, Object existingValue) {
         return (null == requestValue && null != existingValue)
                 || (null != requestValue && !requestKey.equals(Property.P_TYPE.getName())
+                        && !requestKey.equals(Property.P_NAME.getName())
                 && !requestValue.equals(existingValue));
     }
 
+    /**
+     * 引数で渡されたEntitySetのキー名を参照しているドキュメントがあるかどうかを確認する.
+     * <p>
+     * 更新対象のドキュメントを名前（EntitySetのキー名）で参照している場合が考えられる。<br />
+     * このような場合、ドキュメント更新前に参照元のドキュメントが存在しているかどうかを確認する必要がある。
+     * </p>
+     * @param entitySetName リクエストURLに指定された処理対象のEntitySet名
+     * @param entityKey リクエストURLに指定された処理対象EntitySetのキー名
+     */
+    protected void hasRelatedEntities(String entitySetName, OEntityKey entityKey) {
+
+        if (!ComplexType.EDM_TYPE_NAME.equals(entitySetName)) {
+            return;
+        }
+        // 検索クエリの生成
+        String[] searchTypes = {Property.EDM_TYPE_NAME, ComplexTypeProperty.EDM_TYPE_NAME };
+        Map<String, Object> shouldQuery = QueryMapFactory.shouldQuery(QueryMapFactory.multiTypeTerms(searchTypes));
+        List<Map<String, Object>> queries = getImplicitFilters(Property.EDM_TYPE_NAME);
+        queries.add(0, shouldQuery);
+        Map<String, Object> query = QueryMapFactory.termQuery("s.Type.untouched", entityKey.asSingleValue());
+        Map<String, Object> filteredQuery = QueryMapFactory.filteredQuery(query, QueryMapFactory.mustQuery(queries));
+        Map<String, Object> filter = new HashMap<String, Object>();
+        filter.put("size", 0); // 件数取得
+        filter.put("query", filteredQuery);
+
+        DataSourceAccessor accessor = getAccessorForIndex(entitySetName);
+        DcSearchResponse response = accessor.indexSearch(filter);
+        if (0 < response.getHits().allPages()) {
+            throw DcCoreException.OData.CONFLICT_HAS_RELATED;
+        }
+    }
 }

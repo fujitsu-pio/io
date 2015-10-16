@@ -111,6 +111,13 @@ public abstract class EsODataProducer implements DcODataProducer {
     private Map<String, PropertyAlias> propertyAliasMap = new HashMap<String, PropertyAlias>();
 
     /**
+     * entitySet名が属するESインデックスに対応したアクセサオブジェクトを返すようサブクラスで実装します.
+     * @param entitySetName entitySet名
+     * @return アクセサオブジェクト
+     */
+    public abstract DataSourceAccessor getAccessorForIndex(String entitySetName);
+
+    /**
      * entitySet名に対応したアクセサオブジェクトを返すようサブクラスで実装します.
      * @param entitySetName entitySet名
      * @return アクセサオブジェクト
@@ -2549,6 +2556,7 @@ public abstract class EsODataProducer implements DcODataProducer {
         // ロック取得
         Lock lock = this.lock();
         try {
+            hasRelatedEntities(entitySetName, originalKey);
             updateAndMergeEntity(entitySetName, originalKey, oEntityWrapper, false);
         } finally {
             log.debug("unlock");
@@ -3356,5 +3364,17 @@ public abstract class EsODataProducer implements DcODataProducer {
             EntitySetDocHandler oedhExisting,
             Map<String, Object> originalManeToNoelinkId,
             EntitySetDocHandler oedhNew) {
+    }
+
+
+    /**
+     * 引数で渡されたEntitySetのキー名を参照しているドキュメントがあるかどうかを確認する.
+     * <p>
+     * 更新対象のドキュメントを名前（EntitySetのキー名）で参照している場合が考えられる。 このような場合、ドキュメント更新前に参照元のドキュメントが存在しているかどうかを確認する必要がある。
+     * </p>
+     * @param entitySetName リクエストURLに指定された処理対象のEntitySet名
+     * @param entityKey リクエストURLに指定された処理対象EntitySetのキー名
+     */
+    protected void hasRelatedEntities(String entitySetName, OEntityKey entityKey) {
     }
 }
