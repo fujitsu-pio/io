@@ -116,7 +116,9 @@ public final class DcEngineSvcCollectionResource {
     @DELETE
     public Response delete() {
         // アクセス制御
-        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        // DavEngineSvcCollectionResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             throw DcCoreException.Dav.HAS_CHILDREN;
         }

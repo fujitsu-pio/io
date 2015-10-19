@@ -100,7 +100,8 @@ public class DavFileResource {
     public Response delete(@HeaderParam(HttpHeaders.IF_MATCH) final String ifMatch) {
 
         // アクセス制御
-        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        // DavFileResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
 
         ResponseBuilder rb = this.davRsCmp.getDavCmp().delete(ifMatch);
         return rb.build();

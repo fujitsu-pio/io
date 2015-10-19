@@ -110,7 +110,8 @@ public final class ODataSvcCollectionResource extends ODataResource {
     @DELETE
     public Response delete() {
         // アクセス制御
-        this.checkAccessContext(this.getAccessContext(), BoxPrivilege.WRITE);
+        // ODataSvcCollectionResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.getAccessContext(), BoxPrivilege.WRITE);
         // ODataのスキーマ・データがすでにある場合、処理を失敗させる。
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             throw DcCoreException.Dav.HAS_CHILDREN;

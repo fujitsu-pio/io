@@ -86,8 +86,9 @@ public final class DavCollectionResource {
      */
     @DELETE
     public Response delete() {
-        // アクセス制御
-        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        // アクセス制御(親の権限をチェックする)
+        // DavCollectionResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
 
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             return Response.status(HttpStatus.SC_CONFLICT).entity("delete children first").build();

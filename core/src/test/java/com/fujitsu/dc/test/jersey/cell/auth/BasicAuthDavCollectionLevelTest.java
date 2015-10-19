@@ -173,9 +173,9 @@ public class BasicAuthDavCollectionLevelTest extends JerseyTest {
             // スキーマなしのBox直下のファイルを変名(Basic認証-成功)
             String dstFileName = "dstFileName";
             String destinationPath = UrlUtils.box(cellName, boxName, dstFileName);
-            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + fileName,
-                    destinationPath,
-                    HttpStatus.SC_CREATED);
+//            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + fileName,
+//                    destinationPath,
+//                    HttpStatus.SC_CREATED);
             String originalPath = UrlUtils.box(cellName, boxName, fileName);
             DavResourceUtils.moveWebDav(AbstractCase.MASTER_TOKEN_NAME, cellName, boxName + "/" + dstFileName,
                     originalPath, -1);
@@ -471,8 +471,8 @@ public class BasicAuthDavCollectionLevelTest extends JerseyTest {
             String destinationPath = UrlUtils.box(cellName, boxName, dstColName, fileName);
             DavResourceUtils.createWebDavCollection(AbstractCase.MASTER_TOKEN_NAME, HttpStatus.SC_CREATED, cellName,
                     boxName, dstColName);
-            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + colName + "/" + fileName,
-                    destinationPath, HttpStatus.SC_CREATED);
+//            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + colName + "/" + fileName,
+//                    destinationPath, HttpStatus.SC_CREATED);
             String originalPath = UrlUtils.box(cellName, boxName, colName, fileName);
             DavResourceUtils.moveWebDav(AbstractCase.MASTER_TOKEN_NAME, cellName, boxName + "/" + dstColName + "/"
                     + fileName, originalPath, -1);
