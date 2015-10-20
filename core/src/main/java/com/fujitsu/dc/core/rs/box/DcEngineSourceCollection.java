@@ -88,7 +88,7 @@ public class DcEngineSourceCollection {
         return this.davRsCmp.doPropfind(requestBodyXml, depth, contentLength, transferEncoding,
                 BoxPrivilege.READ_PROPERTIES, BoxPrivilege.READ_ACL);
     }
-	
+
     /**
      * OPTIONSメソッドの処理.
      * @return JAX-RS応答オブジェクト

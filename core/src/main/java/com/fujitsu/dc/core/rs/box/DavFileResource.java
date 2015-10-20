@@ -169,5 +169,5 @@ public class DavFileResource {
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL
                 ).build();
-    }	
+    }
 }
