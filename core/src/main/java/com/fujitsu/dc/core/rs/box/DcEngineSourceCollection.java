@@ -20,6 +20,7 @@ import java.io.Reader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -87,4 +88,18 @@ public class DcEngineSourceCollection {
         return this.davRsCmp.doPropfind(requestBodyXml, depth, contentLength, transferEncoding,
                 BoxPrivilege.READ_PROPERTIES, BoxPrivilege.READ_ACL);
     }
+	
+    /**
+     * OPTIONSメソッドの処理.
+     * @return JAX-RS応答オブジェクト
+     */
+    @OPTIONS
+    public Response options() {
+        // 移動元に対するアクセス制御
+        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.READ);
+        return DcCoreUtils.responseBuilderForOptions(
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND
+                ).build();
+    }
+
 }

@@ -22,6 +22,8 @@ import java.io.Reader;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -149,4 +151,23 @@ public class DavFileResource {
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE_ACL);
         return this.davRsCmp.doAcl(reader);
     }
+
+
+    /**
+     * OPTIONSメソッドの処理.
+     * @return JAX-RS応答オブジェクト
+     */
+    @OPTIONS
+    public Response options() {
+        // 移動元に対するアクセス制御
+        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.READ);
+        return DcCoreUtils.responseBuilderForOptions(
+                HttpMethod.GET,
+                HttpMethod.PUT,
+                HttpMethod.DELETE,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL
+                ).build();
+    }	
 }

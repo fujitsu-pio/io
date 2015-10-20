@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -156,6 +157,17 @@ public final class DavCollectionResource {
      */
     @OPTIONS
     public Response options() {
-        return this.davRsCmp.options();
+        // アクセス制御
+        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.READ);
+
+        return DcCoreUtils.responseBuilderForOptions(
+                HttpMethod.GET,
+                HttpMethod.PUT,
+                HttpMethod.DELETE,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MKCOL,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL
+                ).build();
     }
 }
