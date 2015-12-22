@@ -94,6 +94,33 @@ public final class DcCoreLog {
          */
         public static final DcCoreLog ACCOUNT_ALREADY_DELETED = create("PL-AU-0004");
     }
+    
+    /**
+     * OIDC認証関連.
+     */
+    public static class OIDC {
+        /**
+         * 対応するアカウントが存在しない.
+         * {0}：詳細メッセージ
+         */
+        public static final DcCoreLog NO_SUCH_ACCOUNT = create("PL-OI-0001");
+        /**
+         * 対応するアカウントが存在したが、指定されたGrantTypeに対応していない.
+         * {0}：詳細メッセージ
+         */
+        public static final DcCoreLog UNSUPPORTED_ACCOUNT_GRANT_TYPE = create("PL-OI-0002");
+        /**
+         * リクエストユーザーとIDTokenのユーザーが一致しない.
+         * {0}：詳細メッセージ
+         */
+        public static final DcCoreLog INVALID_ACCOUNT = create("PL-OI-0003");
+        /**
+         * IssuerがGoogleではない
+         * {0}：詳細メッセージ
+         */
+        public static final DcCoreLog INVALID_ISSUER = create("PL-OI-0004");
+    }
+    
 
     /**
      * サーバ内部エラー.

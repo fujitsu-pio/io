@@ -390,6 +390,51 @@ public final class DcCoreUtils {
         }
     }
 
+    /**
+     * InputStreamをすべて読み、String型で返す.
+     * @param is InputStream
+     * @return 文字列
+     */
+    public static String readInputStreamAsString(InputStream is) {
+
+        InputStreamReader isr = null;
+        BufferedReader reader = null;
+        String bodyString = null;
+        try {
+
+            isr = new InputStreamReader(is, "UTF-8");
+            reader = new BufferedReader(isr);
+            StringBuffer sb = new StringBuffer();
+            int chr;
+            while ((chr = is.read()) != -1) {
+                sb.append((char) chr);
+            }
+            bodyString = sb.toString();
+        } catch (IllegalStateException e) {
+            log.info(e.getMessage());
+        } catch (IOException e) {
+            log.info(e.getMessage());
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (isr != null) {
+                    isr.close();
+                }
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                log.info(e.getMessage());
+            }
+        }
+
+        return bodyString;
+    }
+
+
+
     private static final String AUTHZ_BASIC = "Basic ";
 
     /**
