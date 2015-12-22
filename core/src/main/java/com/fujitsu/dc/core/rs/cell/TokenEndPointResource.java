@@ -16,7 +16,7 @@
  */
 package com.fujitsu.dc.core.rs.cell;
 
-import static com.fujitsu.dc.common.auth.token.AbstractOAuth2Token.MILLISECS_IN_AN_HOUR;
+import static com.fujitsu.dc.common.auth.token.AbstractOAuth2Token.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -65,6 +65,7 @@ import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.DcCoreLog;
 import com.fujitsu.dc.core.auth.AccessContext;
+import com.fujitsu.dc.core.auth.IdToken;
 import com.fujitsu.dc.core.auth.OAuth2Helper;
 import com.fujitsu.dc.core.auth.OAuth2Helper.Key;
 import com.fujitsu.dc.core.model.Box;
@@ -136,6 +137,7 @@ public class TokenEndPointResource {
             @FormParam(Key.CLIENT_ID) final String clientId,
             @FormParam(Key.CLIENT_SECRET) final String clientSecret,
             @FormParam("dc_cookie") final String dcCookie,
+            @FormParam(Key.ID_TOKEN) final String idToken,
             @HeaderParam(HttpHeaders.HOST) final String host) {
 
         // dc_target がURLでない場合はヘッダInjectionの脆弱性を産んでしまう。(改行コードが入っているなど)
@@ -174,12 +176,14 @@ public class TokenEndPointResource {
             return this.receiveSaml2(target, dcOwner, schema, assertion);
         } else if (OAuth2Helper.GrantType.REFRESH_TOKEN.equals(grantType)) {
             return this.receiveRefresh(target, dcOwner, host, refreshToken);
+        } else if (OAuth2Helper.GrantType.DC1_OIDC_GOOGLE.equals(grantType)) {
+            return this.receiveIdTokenGoogle(target, dcOwner, schema, idToken, host);
         } else {
             throw DcCoreAuthnException.UNSUPPORTED_GRANT_TYPE.realm(this.cell.getUrl());
         }
     }
 
-    private String checkDcTarget(final String dcTarget) {
+	private String checkDcTarget(final String dcTarget) {
         String target = dcTarget;
         if (target != null) {
             try {
@@ -523,7 +527,12 @@ public class TokenEndPointResource {
             throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
         }
 
-        long issuedAt = new Date().getTime();
+        return issueToken(target, owner, host, schema, username);
+    }
+
+	private Response issueToken(final String target, final String owner,
+			final String host, final String schema, final String username) {
+		long issuedAt = new Date().getTime();
 
         if (Key.TRUE_STR.equals(owner)) {
             // ユニット昇格権限設定のチェック
@@ -562,7 +571,7 @@ public class TokenEndPointResource {
                     target, roleList, schema);
             return this.responseAuthSuccess(tcToken, rToken);
         }
-    }
+	}
 
     /**
      * OPTIONSメソッド.
@@ -572,4 +581,27 @@ public class TokenEndPointResource {
     public Response options() {
         return DcCoreUtils.responseBuilderForOptions(HttpMethod.POST).build();
     }
+
+    /**
+     * Google認証連携処理.
+     * @param target
+     * @param owner
+     * @param host
+     * @param refreshToken
+     * @return
+     */
+
+    private Response receiveIdTokenGoogle(String target, String dcOwner,
+			String schema, String idToken, String host) {
+
+    	// id_tokenのCheck処理
+        if (idToken == null) {
+            throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.ID_TOKEN);
+        }
+        //TODO id_tokenの検証をする
+        IdToken idt = IdToken.validateGoogle(idToken);
+    	String username = idt.email;
+        return this.issueToken(target, dcOwner, host, schema, username);
+	}
+
 }

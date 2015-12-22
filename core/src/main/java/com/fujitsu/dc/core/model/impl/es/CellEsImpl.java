@@ -332,7 +332,8 @@ public final class CellEsImpl implements Cell {
         }
         String hCred = AuthUtils.hashPassword(password);
         if (hCred.equals(cred)) {
-            return true;
+        	//タイプがbasicであれば、認証成功
+            return AuthUtils.isAccountTypeBasic(oew);
         }
 
         return false;
