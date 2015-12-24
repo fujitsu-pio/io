@@ -35,6 +35,11 @@ public class IdToken {
 		return null;
 	}
 
+    /**
+     * Google Identity Platform OpenID Connect  https://developers.google.com/identity/protocols/OpenIDConnect
+     * @param String idTokenStr
+     * @return IdToken idToken
+     */
 	public static IdToken validateGoogle(String idTokenStr) {
         HttpClient client = new DefaultHttpClient();
 		HttpGet get = new HttpGet("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token="
@@ -54,16 +59,15 @@ public class IdToken {
 			}
 		} catch (ParseException e) {
 			// GoogleがJSONでないものを返してきた
-			// TODO 適切なエラーメッセージに
-			throw DcCoreException.Auth.REQUEST_PARAM_INVALID.reason(e);
+			throw new RuntimeException("Google responded with non JSON", e);
 		} catch (ClientProtocolException e) {
 			// ？？
 			// TODO 適切なエラーメッセージに
-			throw DcCoreException.Auth.REQUEST_PARAM_INVALID.reason(e);
+			throw new RuntimeException(e);
 		} catch (IOException e) {
 			// Googleのサーバーに接続できない場合に発生
 			// TODO 適切なエラーメッセージに
-			throw DcCoreException.Auth.REQUEST_PARAM_INVALID.reason(e);
+			throw new RuntimeException(e);
 		}
 		return null;
 	}

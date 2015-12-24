@@ -21,13 +21,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 /**
  * 設定情報を保持するクラス. このクラスからクラスパス上にある dc-config.propertiesの内容にアクセスできます。
@@ -640,6 +639,17 @@ public class DcCoreConfig {
          */
         public static final String COUNT_ITERATION = KEY_ROOT + "es.ads.log.count.iteration";
     }
+
+    /**
+     * OpenID Connect用の設定.
+     */
+    public static final class OIDC {
+        /**
+         * Google OpenID Connectを利用するためのclient idを設定.
+         */
+        public static final String OIDC_GOOGLE_CLIENTID = KEY_ROOT + "oidc.google.clientId";
+    }
+
 
     static {
         // 各種メッセージ出力クラスを強制的にロードする

@@ -62,9 +62,11 @@ import com.fujitsu.dc.common.auth.token.UnitLocalUnitUserToken;
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreAuthnException;
 import com.fujitsu.dc.core.DcCoreConfig;
+import com.fujitsu.dc.core.DcCoreConfig.OIDC;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.DcCoreLog;
 import com.fujitsu.dc.core.auth.AccessContext;
+import com.fujitsu.dc.core.auth.AuthUtils;
 import com.fujitsu.dc.core.auth.IdToken;
 import com.fujitsu.dc.core.auth.OAuth2Helper;
 import com.fujitsu.dc.core.auth.OAuth2Helper.Key;
@@ -598,9 +600,30 @@ public class TokenEndPointResource {
         if (idToken == null) {
             throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.ID_TOKEN);
         }
-        //TODO id_tokenの検証をする
+        //id_tokenの検証をする
         IdToken idt = IdToken.validateGoogle(idToken);
     	String username = idt.email;
+    	String aud      = idt.audience;
+
+    	// Googleに登録したサービス/アプリのClientIDかを確認
+    	if (OIDC.OIDC_GOOGLE_CLIENTID .equals(aud)) {
+            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
+    	}
+
+    	// このユーザー名がアカウント登録されているかを確認
+        OEntityWrapper oew = this.cell.getAccount(username);
+        if (oew == null) {
+        	//TODO エラーレスポンスAUTHN_FAILEDが正しいかを確認
+            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
+        }
+
+    	//アカウントタイプがoidc:googleになっているかを確認。
+        if (!AuthUtils.isAccountTypeOidcGoogle(oew)) {
+        	//TODO エラーレスポンスAUTHN_FAILEDが正しいかを確認
+            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
+        }
+
+    	//トークンを発行
         return this.issueToken(target, dcOwner, host, schema, username);
 	}
 
