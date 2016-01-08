@@ -179,7 +179,7 @@ public class TokenEndPointResource {
         } else if (OAuth2Helper.GrantType.REFRESH_TOKEN.equals(grantType)) {
             return this.receiveRefresh(target, dcOwner, host, refreshToken);
         } else if (OAuth2Helper.GrantType.DC1_OIDC_GOOGLE.equals(grantType)) {
-            return this.receiveIdTokenGoogle(target, dcOwner, schema, idToken, host);
+            return this.receiveIdTokenGoogle(target, dcOwner, schema, username, idToken, host);
         } else {
             throw DcCoreAuthnException.UNSUPPORTED_GRANT_TYPE.realm(this.cell.getUrl());
         }
@@ -587,44 +587,64 @@ public class TokenEndPointResource {
     /**
      * Google認証連携処理.
      * @param target
-     * @param owner
+     * @param dcOwner
+     * @param schema
+     * @param username
+     * @param idToken
      * @param host
-     * @param refreshToken
      * @return
      */
 
     private Response receiveIdTokenGoogle(String target, String dcOwner,
-			String schema, String idToken, String host) {
+			String schema, String username, String idToken, String host) {
 
+    	// usernameのCheck処理
+    	//　暫定的にインターフェースとしてusernameを無視する仕様とした
+        /*if (username == null) {
+            throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.USERNAME);
+        }*/
     	// id_tokenのCheck処理
         if (idToken == null) {
             throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.ID_TOKEN);
         }
-        //id_tokenの検証をする
+        // id_tokenの検証をする
         IdToken idt = IdToken.validateGoogle(idToken);
-    	String username = idt.email;
-    	String aud      = idt.audience;
+    	String mail = idt.email;
+    	String aud  = idt.audience;
 
     	// Googleに登録したサービス/アプリのClientIDかを確認
-    	if (OIDC.OIDC_GOOGLE_CLIENTID .equals(aud)) {
-            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
+    	// DcConfigPropatiesに登録したClientIdに一致していればOK
+    	if (!OIDC.isGoogleClientIdTrusted(aud)) {
+        	throw DcCoreAuthnException.OIDC_WRONG_AUDIENCE.params(aud);    		
     	}
 
     	// このユーザー名がアカウント登録されているかを確認
-        OEntityWrapper oew = this.cell.getAccount(username);
-        if (oew == null) {
-        	//TODO エラーレスポンスAUTHN_FAILEDが正しいかを確認
-            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
+    	// IDtokenの中に示されているAccountが存在しない場合
+        OEntityWrapper idTokenUserOew = this.cell.getAccount(mail);
+        if (idTokenUserOew == null) {
+        	//アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
+        	DcCoreLog.OIDC.NO_SUCH_ACCOUNT.params(mail).writeLog();
+            throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
+        }
+        
+    	// 認証リクエストしているusernameとIdToken内のemailが一致しているか確認 
+        // 同様にusernameは無視する暫定仕様
+        /*OEntityWrapper ReqUserOew = this.cell.getAccount(username);
+        if (!ReqUserOew.equals(idTokenUserOew)) {
+        	DcCoreLog.OIDC.INVALID_ACCOUNT.params(username).writeLog();
+            throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
+        }*/
+        
+    	// アカウントタイプがoidc:googleになっているかを確認。
+        // Account があるけどTypeにOidCが含まれていない
+        if (!AuthUtils.isAccountTypeOidcGoogle(idTokenUserOew)) {
+        	//アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
+           	DcCoreLog.OIDC.UNSUPPORTED_ACCOUNT_GRANT_TYPE.params(Account.TYPE_VALUE_OIDC_GOOGLE, mail).writeLog();
+            throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
         }
 
-    	//アカウントタイプがoidc:googleになっているかを確認。
-        if (!AuthUtils.isAccountTypeOidcGoogle(oew)) {
-        	//TODO エラーレスポンスAUTHN_FAILEDが正しいかを確認
-            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
-        }
-
-    	//トークンを発行
-        return this.issueToken(target, dcOwner, host, schema, username);
+    	// トークンを発行
+        return this.issueToken(target, dcOwner, host, schema, mail);
 	}
 
 }

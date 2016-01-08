@@ -645,9 +645,20 @@ public class DcCoreConfig {
      */
     public static final class OIDC {
         /**
-         * Google OpenID Connectを利用するためのclient idを設定.
+         * Google OpenID Connectにおいて、このユニットが信頼するClientIDを指定するためのキー.
          */
-        public static final String OIDC_GOOGLE_CLIENTID = KEY_ROOT + "oidc.google.clientId";
+        public static final String OIDC_GOOGLE_TRUSTED_CLIENTIDS = KEY_ROOT + "oidc.google.trustedClientIds";
+        
+        /**
+         * 引数のGoogleClientIDがこのユニットが信頼するリストに含まれるかどうか判定する.
+         * @param clientId ClientID
+         * @return boolean 含まれる場合：True
+         */
+        public static boolean isGoogleClientIdTrusted(String clientId) {
+        	String val = get(OIDC_GOOGLE_TRUSTED_CLIENTIDS);
+        	//アスタリスクが指定されていたら無条件にtrue 
+            return isAstarisk(val) || isSpaceSeparatedValueIncluded(val, clientId);
+        }
     }
 
 
@@ -719,6 +730,27 @@ public class DcCoreConfig {
         }
     }
 
+    private static boolean isSpaceSeparatedValueIncluded(String spaceSeparatedValue, String testValue) {
+    	if (testValue == null || spaceSeparatedValue == null) {
+            return false;
+        }
+        String[] values = spaceSeparatedValue.split(" ");
+        for (String val : values) {
+            if (testValue.equals(val)) {
+                return true;
+            }
+        }
+        return false;	
+    }
+    
+    private static boolean isAstarisk(String val) {
+    	if (val == null) {
+            return false;
+        }else if ("*".equals(val)) {
+                return true;   
+        }
+        return false;	
+    }
     /**
      * dc-config-default.propertiesファイルを読み込む.
      * @return dc-config-default.properties
@@ -1483,18 +1515,9 @@ public class DcCoreConfig {
      * @return boolean 含まれる場合：True
      */
     public static boolean checkUnitUserIssuers(String url) {
-        if (url == null || getUnitUserIssuers() == null) {
-            return false;
-        }
-        String[] unitUserIssuers = getUnitUserIssuers().split(" ");
-        for (String unitUserIssuer : unitUserIssuers) {
-            if (url.equals(unitUserIssuer)) {
-                return true;
-            }
-        }
-        return false;
+    	return isSpaceSeparatedValueIncluded(getUnitUserIssuers(), url);    	
     }
-
+    
     /**
      * EntityTypeの最大制限数を取得.
      * @return EntityTypeの最大数

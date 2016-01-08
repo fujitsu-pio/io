@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.common.utils.DcCoreUtils;
+import com.fujitsu.dc.core.DcCoreAuthnException;
 import com.fujitsu.dc.core.DcCoreException;
 
 public class IdToken {
@@ -55,7 +56,7 @@ public class IdToken {
 			if (status == 200) {
 				return new IdToken(jsonObj);
 			} else if (status == 400) {
-				throw DcCoreException.Auth.REQUEST_PARAM_INVALID;
+				throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN;
 			}
 		} catch (ParseException e) {
 			// GoogleがJSONでないものを返してきた

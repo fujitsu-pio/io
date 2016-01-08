@@ -122,7 +122,22 @@ public final class DcCoreAuthnException extends DcCoreException {
      * Accountロック中.
      */
     public static final DcCoreAuthnException ACCOUNT_LOCK_ERROR = create("PR400-AN-0019", Error.INVALID_GRANT);
-
+    /**
+     * IDTokenの検証の中で、受け取ったIdTokenのAudienceが信頼するClientIDのリストに無かった.
+     */
+    public static final DcCoreAuthnException OIDC_WRONG_AUDIENCE = create("PR400-AN-0030", Error.INVALID_GRANT);
+    /**
+     * OIDCの認証エラー.
+     */
+    public static final DcCoreAuthnException OIDC_AUTHN_FAILED = create("PR400-AN-0031", Error.INVALID_GRANT);
+    /**
+     * 無効なIDToken.
+     */
+    public static final DcCoreAuthnException OIDC_INVALID_ID_TOKEN = create("PR400-AN-0032", Error.INVALID_GRANT);
+  
+    
+    
+    
     /**
      * インナークラスを強制的にロードする.
      */

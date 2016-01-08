@@ -104,11 +104,11 @@ public final class AuthUtils {
     }
 
     public static boolean isAccountTypeBasic(OEntityWrapper oew) {
-        return getAccountType(oew).contains("basic");
+        return getAccountType(oew).contains(Account.TYPE_VALUE_BASIC);
     }
 
     public static boolean isAccountTypeOidcGoogle(OEntityWrapper oew) {
-    	return getAccountType(oew).contains("oidc:google");
+    	return getAccountType(oew).contains(Account.TYPE_VALUE_OIDC_GOOGLE);
     }
 
 
