@@ -608,10 +608,20 @@ public class TokenEndPointResource {
             throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.ID_TOKEN);
         }
         // id_tokenの検証をする
-        IdToken idt = IdToken.validateGoogle(idToken);
+        IdToken idt = IdToken.parse(idToken);
+        if (!idt.isValid()) {
+        	throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN;
+        }
     	String mail = idt.email;
     	String aud  = idt.audience;
+    	String issuer = idt.issuer;
 
+    	// issuerがGoogleが認めたものであるかどうか
+    	if (!issuer.equals("accounts.google.com") && !issuer.equals("https://accounts.google.com")) {
+        	DcCoreLog.OIDC.INVALID_ISSUER.params(issuer).writeLog();
+    		throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
+    	}
+    	
     	// Googleに登録したサービス/アプリのClientIDかを確認
     	// DcConfigPropatiesに登録したClientIdに一致していればOK
     	if (!OIDC.isGoogleClientIdTrusted(aud)) {
