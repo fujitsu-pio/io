@@ -26,7 +26,12 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
         DavFileTest.class,
-        FileAccessControlTest.class,
+        MoveFileHeaderValidateTest.class,
+        MoveFileTest.class,
+        MoveFileAccessControlTest.class,
+        MoveServiceSourceTest.class,
+        MoveServiceSourceAccessControlTest.class,
+        MoveServiceSourceHeaderValidateTest.class,
         ServiceSourceAccessControlTest.class
 })
 public class AllTests {

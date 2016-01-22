@@ -17,7 +17,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.cache.CachingHttpClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -27,204 +27,206 @@ import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreAuthnException;
+import com.fujitsu.dc.core.DcCoreException;
 
 public class IdToken {
 
-    static Logger log = LoggerFactory.getLogger(IdToken.class);
+	static Logger log = LoggerFactory.getLogger(IdToken.class);
 
-	public String header;	
-	public String payload;	
+	public String header;
+	public String payload;
 	public String signature;
-	
+
 	public String kid;
-	
+
 	public String email;
 	public String issuer;
 	public String audience;
 	public Long exp;
-	
-	private static String GOOGLE_DISCOVERY_DOCUMENT_URL = "https://accounts.google.com/.well-known/openid-configuration";
-	private static String ALG = "SHA256withRSA";
-	
+
+	private static final String GOOGLE_DISCOV_DOC_URL = "https://accounts.google.com/.well-known/openid-configuration";
+	private final String ALG = "SHA256withRSA";
+
+	private static final String KID = "kid";
+
+	private final String KTY = "kty";
+
+	private static final String ISS = "iss";
+	private static final String EML = "email";
+	private static final String AUD = "aud";
+	private static final String EXP = "exp";
+
+	private final String N = "n";
+	private final String E = "e";
+
 	public IdToken() {
 	}
-	
+
 	public IdToken(JSONObject json) {
 		this.email = (String) json.get("email");
 		this.issuer = (String) json.get("issuer");
 		this.audience = (String) json.get("audience");
 		this.exp = (Long) json.get("exp");
 	}
-	
+
 	/**
-     * 最終検証結果を返す
-     * @param null
-     * @return boolean 
-     */
-	public boolean isValid() {	
-		boolean ret = true;
+	 * 最終検証結果を返す
+	 * 
+	 * @param null
+	 * @return boolean
+	 */
+	public void verify() throws DcCoreAuthnException {
 		// expireしていないかチェック(60秒くらいは過ぎても良い)
-		ret = ret & ( exp + 60 ) * 1000 > System.currentTimeMillis() ;
-		// 署名検証
-		ret = ret & verifySignature();
-		return ret;
-	}
-	
-	/**
-     * 署名検証
-     * @param null
-     * @return boolean 
-     */
-	private boolean verifySignature() {	
-		RSAPublicKey rsaPubKey = this.getKey();
-		//null チェック
-		if (!(rsaPubKey == null)) {
-			try {
-				Signature sig = Signature.getInstance(ALG);
-				sig.initVerify(rsaPubKey);
-				sig.update((this.header + "." + this.payload).getBytes());
-				return sig.verify(DcCoreUtils.decodeBase64Url(this.signature));
-			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvalidKeyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SignatureException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
+		boolean expired = (exp + 60) * 1000 < System.currentTimeMillis();
+		if (expired) {
+			throw DcCoreAuthnException.OIDC_EXPIRED_ID_TOKEN.params(exp);
 		}
-		return false;
+		// 署名検証
+		verifySignature();
 	}
-	
+
 	/**
-     * 公開鍵情報から、IDTokenのkidにマッチする方で公開鍵を生成
-     * @param null
-     * @return RSAPublicKey 公開鍵
-     */
+	 * 署名検証
+	 * 
+	 * @param null
+	 * @return boolean
+	 */
+	private void verifySignature() {
+		RSAPublicKey rsaPubKey = this.getKey();
+		try {
+			Signature sig = Signature.getInstance(ALG);
+			sig.initVerify(rsaPubKey);
+			sig.update((this.header + "." + this.payload).getBytes());
+			boolean verified = sig.verify(DcCoreUtils.decodeBase64Url(this.signature));
+			if (!verified) {
+				// 署名検証結果、署名が不正であると認定
+				throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
+			}
+		} catch (NoSuchAlgorithmException e) {
+			// 環境がおかしい以外でここには来ない
+			throw new RuntimeException(ALG + " not supported.", e);
+		} catch (InvalidKeyException e) {
+			// バグ以外でここには来ない
+			throw new RuntimeException(e);
+		} catch (SignatureException e) {
+			// IdTokenのSignatureがおかしい
+			// the passed-in signature is improperly encoded or of the wrong
+			// type,
+			// if this signature algorithm is unable to process the input data
+			// provided, etc.
+			throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN.params("ID Token sig value is invalid.");
+		}
+	}
+
+	/**
+	 * 公開鍵情報から、IDTokenのkidにマッチする方で公開鍵を生成.
+	 * 
+	 * @return RSAPublicKey 公開鍵
+	 */
 	private RSAPublicKey getKey() {
 		JSONArray jsonAry = getKeys();
 		for (int i = 0; i < jsonAry.size(); i++) {
 			JSONObject k = (JSONObject) jsonAry.get(i);
-			String kid = (String) k.get("kid");
+			String kid = (String) k.get(KID);
 			if (kid.equals(this.kid)) {
-			 	BigInteger n = new BigInteger(1, DcCoreUtils.decodeBase64Url((String) k.get("n")));
-			 	BigInteger e = new BigInteger(1, DcCoreUtils.decodeBase64Url((String) k.get("e")));			 	
-				RSAPublicKeySpec rsaPubKey = new RSAPublicKeySpec(n,e);
+				BigInteger n = new BigInteger(1, DcCoreUtils.decodeBase64Url((String) k.get(N)));
+				BigInteger e = new BigInteger(1, DcCoreUtils.decodeBase64Url((String) k.get(E)));
+				RSAPublicKeySpec rsaPubKey = new RSAPublicKeySpec(n, e);
 				try {
-					KeyFactory kf = KeyFactory.getInstance((String) k.get("kty"));
+					KeyFactory kf = KeyFactory.getInstance((String) k.get(KTY));
 					return (RSAPublicKey) kf.generatePublic(rsaPubKey);
-				} catch (NoSuchAlgorithmException | InvalidKeySpecException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} catch (NoSuchAlgorithmException e1) {
+					// ktyの値がRSA以外はサポートしない
+					throw DcCoreException.NetWork.UNEXPECTED_VALUE.params(KTY, "RSA").reason(e1);
+				} catch (InvalidKeySpecException e1) {
+					// バグ以外でここには来ない
+					throw new RuntimeException(e1);
 				}
 			}
 		}
-		return null;
+		// 該当するkidを持つ鍵情報が取れなかった場合
+		throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN.params("ID Token header value is invalid.");
 	}
 
 	/**
-     * IdToken の検証のためのパース処理
-     * @param String idTokenStr
-     * @return IdToken idToken
-     */
+	 * IdToken の検証のためのパース処理.
+	 * 
+	 * @param String
+	 *            idTokenStr
+	 * @return IdToken idToken
+	 */
 	public static IdToken parse(String idTokenStr) {
-	 	IdToken ret = new IdToken();
+		IdToken ret = new IdToken();
 		String[] splitIdToken = idTokenStr.split("\\.");
-	 	ret.header = splitIdToken[0]; 
-	 	ret.payload = splitIdToken[1]; 	
-	 	ret.signature = splitIdToken[2]; 	
-		
-	 	String headerDecoded = new String(DcCoreUtils.decodeBase64Url(ret.header), StandardCharsets.UTF_8);
-	 	String payloadDecoded = new String(DcCoreUtils.decodeBase64Url(ret.payload), StandardCharsets.UTF_8);
-	 	try {
+		if (splitIdToken.length != 3) {
+			throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN.params("2 periods required.");
+		}
+		ret.header = splitIdToken[0];
+		ret.payload = splitIdToken[1];
+		ret.signature = splitIdToken[2];
+
+		try {
+			String headerDecoded = new String(DcCoreUtils.decodeBase64Url(ret.header), StandardCharsets.UTF_8);
+			String payloadDecoded = new String(DcCoreUtils.decodeBase64Url(ret.payload), StandardCharsets.UTF_8);
+
 			JSONObject header = (JSONObject) new JSONParser().parse(headerDecoded);
 			JSONObject payload = (JSONObject) new JSONParser().parse(payloadDecoded);
-		 	ret.kid = (String) header.get("kid");
-		 	ret.issuer = (String) payload.get("iss");
-		 	ret.email = (String) payload.get("email");
-		 	ret.audience = (String) payload.get("aud");
-		 	ret.exp = (Long) payload.get("exp");
+			ret.kid = (String) header.get(KID);
+			ret.issuer = (String) payload.get(ISS);
+			ret.email = (String) payload.get(EML);
+			ret.audience = (String) payload.get(AUD);
+			ret.exp = (Long) payload.get(EXP);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// BASE64はOk.JSONのパースに失敗.
+			throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN
+					.params("Header and payload should be Base64 encoded JSON.");
+		} catch (Exception e) {
+			// BASE64が失敗.
+			throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN.params("Header and payload should be Base64 encoded.");
 		}
 		return ret;
 	}
-	
+
 	private static String getJwksUri(String endpoint) {
-		return (String) getHttpJSON(endpoint).get("jwks_uri");	
+		return (String) getHttpJSON(endpoint).get("jwks_uri");
 	}
-	
+
 	private static JSONArray getKeys() {
-		//TODO キャッシュ
-		return (JSONArray) getHttpJSON(getJwksUri(GOOGLE_DISCOVERY_DOCUMENT_URL)).get("keys");
+		return (JSONArray) getHttpJSON(getJwksUri(GOOGLE_DISCOV_DOC_URL)).get("keys");
 	}
-	
+
 	/**
-     * HTTPでJSONオブジェクトを取得する処理
-     * @param String URL
-     * @return JSONObject
-     */
+	 * Cacheを聞かせるため、ClientをStaticとする. たかだか限定されたURLのbodyを保存するのみであり、
+	 * 最大キャッシュサイズはCacheConfigクラスで定義された16kbyte程度である. そのため、Staticで持つこととした.
+	 */
+	private static HttpClient httpClient = new CachingHttpClient();
+
+	/**
+	 * HTTPでJSONオブジェクトを取得する処理. Cacheが利用可能であればその値を用いる.
+	 * 
+	 * @param String
+	 *            URL
+	 * @return JSONObject
+	 */
 	public static JSONObject getHttpJSON(String url) {
-        HttpClient client = new DefaultHttpClient();
 		HttpGet get = new HttpGet(url);
+		int status = 0;
 		try {
-			HttpResponse res = client.execute(get);
-			int status = res.getStatusLine().getStatusCode();
+			HttpResponse res = httpClient.execute(get);
 			InputStream is = res.getEntity().getContent();
-			String resString = DcCoreUtils.readInputStreamAsString(is);
-			JSONObject jsonObj = (JSONObject) new JSONParser().parse(resString);
+			status = res.getStatusLine().getStatusCode();
+			String body = DcCoreUtils.readInputStreamAsString(is);
+			JSONObject jsonObj = (JSONObject) new JSONParser().parse(body);
 			return jsonObj;
+		} catch (ClientProtocolException e) {
+			// HTTPのプロトコル違反
+			throw DcCoreException.NetWork.UNEXPECTED_RESPONSE.params(url, "proper HTTP response", status).reason(e);
+		} catch (IOException e) {
+			// サーバーに接続できない場合に発生
+			throw DcCoreException.NetWork.HTTP_REQUEST_FAILED.params(HttpGet.METHOD_NAME, url).reason(e);
 		} catch (ParseException e) {
 			// JSONでないものを返してきた
-			throw new RuntimeException("Responded with non JSON", e);
-		} catch (ClientProtocolException e) {
-			// ？？
-			// TODO 適切なエラーメッセージに
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			// Googleのサーバーに接続できない場合に発生
-			// TODO 適切なエラーメッセージに
-			throw new RuntimeException(e);
+			throw DcCoreException.NetWork.UNEXPECTED_RESPONSE.params(url, "JSON", status).reason(e);
 		}
-	}
-	
-    /**
-     * Google Identity Platform OpenID Connect  https://developers.google.com/identity/protocols/OpenIDConnect
-     * @param String idTokenStr
-     * @return IdToken idToken
-     */
-	public static IdToken validateGoogle(String idTokenStr) {
-        HttpClient client = new DefaultHttpClient();
-		HttpGet get = new HttpGet("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token="
-			+ DcCoreUtils.encodeUrlComp(idTokenStr)) ;
-
-		try {
-			HttpResponse res = client.execute(get);
-			int status = res.getStatusLine().getStatusCode();
-			InputStream is = res.getEntity().getContent();
-			String resString = DcCoreUtils.readInputStreamAsString(is);
-			JSONObject jsonObj = (JSONObject) new JSONParser().parse(resString);
-
-			if (status == 200) {
-				return new IdToken(jsonObj);
-			} else if (status == 400) {
-				throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN;
-			}
-		} catch (ParseException e) {
-			// GoogleがJSONでないものを返してきた
-			throw new RuntimeException("Google responded with non JSON", e);
-		} catch (ClientProtocolException e) {
-			// ？？
-			// TODO 適切なエラーメッセージに
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			// Googleのサーバーに接続できない場合に発生
-			// TODO 適切なエラーメッセージに
-			throw new RuntimeException(e);
-		}
-		return null;
 	}
 }

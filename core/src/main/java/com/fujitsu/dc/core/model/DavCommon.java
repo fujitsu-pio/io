@@ -32,6 +32,14 @@ public class DavCommon {
     /** リソース最大長. */
     private static final int MAX_RESOURCE_LENGTH = 256;
 
+    /** Depthヘッダのデフォルト値. */
+    public static final String DEPTH_INFINITY = "infinity";
+
+    /** Overwriteヘッダの上書きを許可する場合の値. */
+    public static final String OVERWRITE_TRUE = "T";
+    /** Overwriteヘッダの上書きを許可しない場合の値. */
+    public static final String OVERWRITE_FALSE = "F";
+
     /**
      * 不正な名前のチェック.
      * @param name チェック対象のリソース名

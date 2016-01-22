@@ -139,6 +139,7 @@ public class OptionsMethodTest extends JerseyTest {
             masterMethods.put(HttpMethod.HEAD, "");
             masterMethods.put(com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MERGE, "");
             masterMethods.put(com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MKCOL, "");
+            masterMethods.put(com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MOVE, "");
             masterMethods.put(com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND, "");
             masterMethods.put(com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH, "");
             masterMethods.put(com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL, "");
@@ -215,7 +216,7 @@ public class OptionsMethodTest extends JerseyTest {
     public void 認証ありのユーザODATAレベルOPTIONSメソッドがpersoniumで受け付けているメソッドが返却されること() {
         // Collection
         assertTrue(checkResponse(
-                optionsRequest("/testcell1/box1/setodata"), "OPTIONS,GET,DELETE,PROPFIND,PROPPATCH,ACL"));
+                optionsRequest("/testcell1/box1/setodata"), "OPTIONS,GET,DELETE,MOVE,PROPFIND,PROPPATCH,ACL"));
         // ユーザスキーマ
         assertTrue(checkResponse(optionsRequest("/testcell1/box1/setodata/\\$metadata"), "OPTIONS,GET"));
         // TODO 204が返却される
@@ -254,9 +255,9 @@ public class OptionsMethodTest extends JerseyTest {
         // Collection(WebDAV/Service)
         assertTrue(checkResponse(
                 optionsRequest("/testcell1/box1/setdavcol"),
-                "OPTIONS,GET,PUT,DELETE,MKCOL,PROPFIND,PROPPATCH,ACL"));
+                "OPTIONS,GET,PUT,DELETE,MKCOL,MOVE,PROPFIND,PROPPATCH,ACL"));
         assertTrue(checkResponse(
-                optionsRequest("/testcell1/box1/service_relay"), "OPTIONS,DELETE,PROPFIND,PROPPATCH,ACL"));
+                optionsRequest("/testcell1/box1/service_relay"), "OPTIONS,DELETE,MOVE,PROPFIND,PROPPATCH,ACL"));
 
         // Serviceソースコレクション
         assertTrue(checkResponse(
@@ -265,7 +266,7 @@ public class OptionsMethodTest extends JerseyTest {
         // WebDAVファイル
         assertTrue(checkResponse(optionsRequest(
                 "/testcell1/box1/setdavcol/dav.txt"),
-                "OPTIONS,GET,PUT,DELETE,PROPFIND,PROPPATCH,ACL"));
+                "OPTIONS,GET,PUT,DELETE,MOVE,PROPFIND,PROPPATCH,ACL"));
 
         // TODO サービスソース 204が返却される
         // assertTrue(checkResponse(optionsRequest("/testcell1/box1/service_relay/svc"),
@@ -278,7 +279,7 @@ public class OptionsMethodTest extends JerseyTest {
                     path, "hello", "text/javascript", HttpStatus.SC_CREATED);
             assertTrue(checkResponse(
                     optionsRequest("/testcell1/box1/service_relay/__src/test.js"),
-                    "OPTIONS,GET,PUT,DELETE,PROPFIND,PROPPATCH,ACL"));
+                    "OPTIONS,GET,PUT,DELETE,MOVE,PROPFIND,PROPPATCH,ACL"));
         } finally {
             DavResourceUtils.deleteWebDavFile(Setup.TEST_CELL1, AbstractCase.MASTER_TOKEN_NAME, Setup.TEST_BOX1,
                     "service_relay/__src/test.js");

@@ -20,6 +20,7 @@ import org.apache.wink.webdav.model.ObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.BoxCmp;
 import com.fujitsu.dc.core.model.DavCmp;
@@ -48,12 +49,14 @@ public class BoxCmpEsImpl extends DavCmpEsImpl implements BoxCmp {
         this.esCol = EsModel.col(box.getCell());
         this.nodeId = this.box.getId();
         try {
+            // nodeIDを元に管理データをDBからロードする
             this.load();
         } catch (Exception e) {
             log.debug("Exception occured. Maybe Dav index is not present so creating..");
         }
 
         if (this.davNode == null) {
+            // 管理データのロードに失敗した場合（col.boxが存在しない場合）はcol.box情報を作成する
             this.createRootDoc();
         }
     }
@@ -63,9 +66,18 @@ public class BoxCmpEsImpl extends DavCmpEsImpl implements BoxCmp {
         return this.esCol;
     }
 
+    @Override
+    public String getUrl() {
+        return this.cell.getUrl() + this.box.getName();
+    }
+
     private void createRootDoc() {
         this.davNode = new DavNode(this.cell.getId(), this.box.getId(), DavCmp.TYPE_COL_BOX);
         this.esCol.create(this.box.getId(), this.davNode);
     }
 
+    @Override
+    public DcCoreException getNotFoundException() {
+        return DcCoreException.Dav.BOX_NOT_FOUND;
+    }
 }

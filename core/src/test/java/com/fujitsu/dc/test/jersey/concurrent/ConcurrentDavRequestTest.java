@@ -26,7 +26,6 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -147,9 +146,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
         // カウンタを準備
         final Counters counters = new Counters();
 
-        // 前準備のため一回dummynのリクエストを投入
-        CellUtils.list(AbstractCase.MASTER_TOKEN_NAME, HttpStatus.SC_OK);
-
         // 同時リクエスト用スレッドの準備
         List<Thread> listThread = new ArrayList<Thread>();
         for (int i = 0; i < NUM_CONCURRENCY; i++) {
@@ -204,9 +200,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
     public final void 同一名称ファイル同時作成がすべて成功する() throws InterruptedException {
         // カウンタを準備
         final Counters counters = new Counters();
-
-        // 前準備のため一回dummynのリクエストを投入
-        CellUtils.list(AbstractCase.MASTER_TOKEN_NAME, HttpStatus.SC_OK);
 
         // 同時リクエスト用スレッドの準備
         List<Thread> listThread = new ArrayList<Thread>();
@@ -317,7 +310,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称コレクションから同一名称コレクションへの同時移動がひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> moveCounters = new HashMap<Integer, Integer>();
@@ -371,7 +363,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 複数のファイルから同一名称ファイルへの同時移動がすべて成功する() throws InterruptedException {
         // カウンタを準備
         final Counters counters = new Counters();
@@ -438,7 +429,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへのPROPFIND中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> counters = new HashMap<Integer, Integer>();
@@ -571,7 +561,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称コレクションへのACL中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> counters = new HashMap<Integer, Integer>();
@@ -624,7 +613,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへのPROPPATCH中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> counters = new HashMap<Integer, Integer>();
@@ -679,7 +667,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへのPUT中のDELETEリクエストが204もしくは404になること() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> counters = new HashMap<Integer, Integer>();
@@ -732,7 +719,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへのPUT中のMOVEリクエストが201もしくは404になること() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> putCounters = new HashMap<Integer, Integer>();
@@ -804,7 +790,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへのGET中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> getCounters = new HashMap<Integer, Integer>();
@@ -869,7 +854,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへのGET中にMOVEリクエストが1回だけ201になること() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> getCounters = new HashMap<Integer, Integer>();
@@ -938,7 +922,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへのDELETE中のMOVEリクエストが201もしくは404になること() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> deleteCounters = new HashMap<Integer, Integer>();
@@ -1005,7 +988,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称ファイルへの複数のMOVEリクエストが201もしくは204になること() throws InterruptedException {
         // カウンタを準備
         final Map<Integer, Integer> moveCounters = new HashMap<Integer, Integer>();
@@ -1063,7 +1045,6 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * @throws InterruptedException InterruptedException
      */
     @Test
-    @Ignore
     public final void 同一名称コレクションの作成時に親コレクションが存在しない場合に409になること() throws InterruptedException {
         final String cell = "concurrencyTestCell";
         final String box = "box1";

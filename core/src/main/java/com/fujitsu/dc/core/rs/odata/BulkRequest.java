@@ -133,4 +133,9 @@ public class BulkRequest implements EsBulkRequest {
         this.error = error;
     }
 
+    @Override
+    public BULK_REQUEST_TYPE getRequestType() {
+        return BULK_REQUEST_TYPE.INDEX;
+    }
+
 }

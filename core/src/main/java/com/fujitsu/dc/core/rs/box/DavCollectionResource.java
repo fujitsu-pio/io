@@ -38,6 +38,7 @@ import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.annotations.ACL;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.model.DavCmp;
+import com.fujitsu.dc.core.model.DavMoveResource;
 import com.fujitsu.dc.core.model.DavRsCmp;
 
 /**
@@ -46,6 +47,7 @@ import com.fujitsu.dc.core.model.DavRsCmp;
 public final class DavCollectionResource {
 
     DavRsCmp davRsCmp;
+
     /**
      * コンストラクタ.
      * @param parent 親
@@ -165,9 +167,24 @@ public final class DavCollectionResource {
                 HttpMethod.PUT,
                 HttpMethod.DELETE,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MKCOL,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MOVE,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL
                 ).build();
+    }
+
+    /**
+     * MOVEメソッドの処理.
+     * @param headers ヘッダ情報
+     * @return JAX-RS応答オブジェクト
+     */
+    @WebDAVMethod.MOVE
+    public Response move(
+            @Context HttpHeaders headers) {
+        // 移動元に対するアクセス制御(親の権限をチェックする)
+        // DavCollectionResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        return new DavMoveResource(this.davRsCmp.getParent(), this.davRsCmp.getDavCmp(), headers).doMove();
     }
 }

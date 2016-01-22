@@ -16,13 +16,14 @@
  */
 package com.fujitsu.dc.test.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.http.HttpStatus;
 
+import com.fujitsu.dc.test.jersey.AbstractCase;
 import com.fujitsu.dc.test.unit.core.UrlUtils;
 
 /**
@@ -131,7 +132,7 @@ public class AccountUtils {
             final String userName, final String roleName, int code) {
         // アカウント・ロールの$link
         return Http.request("link-account-role.txt")
-                .with("token", token)
+                .with("token", AbstractCase.MASTER_TOKEN_NAME)
                 .with("cellPath", cellName)
                 .with("username", userName)
                 .with("roleUrl", UrlUtils.roleUrl(cellName, boxName, roleName))

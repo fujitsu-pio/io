@@ -133,6 +133,18 @@ public class JdbcAds implements Ads {
         ip.bulkUpdateEntityLink(bulkRequestList);
     }
 
+    /**
+     * Dav Document一括更新に伴い、Adsの対応レコード一括更新を行う.
+     * @param index index
+     * @param bulkRequestList 一括更新データ
+     * @throws AdsException 処理失敗時発生
+     */
+    @Override
+    public void bulkUpdateDav(String index, List<DavNode> bulkRequestList) throws AdsException {
+        IndexPeer ip = this.getIndexPeer(index);
+        ip.bulkUpdateDav(bulkRequestList);
+    }
+
     @Override
     public void createCell(String index, EntitySetDocHandler docHandler) throws AdsException {
         IndexPeer ip = this.getIndexPeer(index);
@@ -413,6 +425,7 @@ public class JdbcAds implements Ads {
         String sqlDavNodeInsert;
         String sqlDavNodeUpdate;
         String sqlDavNodeDelete;
+        String sqlDavBulkInsert;
         String sqlDeleteCellResourceFromEntity;
         String sqlDeleteCellResourceFromDavNode;
         String sqlDeleteCellResourceFromLink;
@@ -478,6 +491,7 @@ public class JdbcAds implements Ads {
             this.sqlDavNodeInsert = Sql.insertDavNode.replace(SCHEMA_NAME_REPLACING_KEY, this.index);
             this.sqlDavNodeUpdate = Sql.updateDavNode.replace(SCHEMA_NAME_REPLACING_KEY, this.index);
             this.sqlDavNodeDelete = Sql.deleteDavNode.replace(SCHEMA_NAME_REPLACING_KEY, this.index);
+            this.sqlDavBulkInsert = Sql.bulkInsertDav.replace(SCHEMA_NAME_REPLACING_KEY, this.index);
             this.sqlDeleteCellResourceFromEntity = Sql.deleteCellResourceFromEntity
                     .replace(SCHEMA_NAME_REPLACING_KEY, this.index);
             this.sqlDeleteCellResourceFromDavNode = Sql.deleteCellResourceFromDavNode
@@ -557,6 +571,35 @@ public class JdbcAds implements Ads {
 
             int expectedUpdateCount = bulkRequestList.size() * 2;
             this.executeUpdateSql(sql.toString(), new StatementHandlerForBulkEntity(bulkRequestList),
+                    expectedUpdateCount);
+
+        }
+
+        void bulkUpdateDav(List<DavNode> bulkRequestList) throws AdsException {
+            // 一括更新のSQLを生成する
+            StringBuilder sql = new StringBuilder(this.sqlDavBulkInsert);
+            for (int i = 0; i < bulkRequestList.size(); i++) {
+                sql.append("(?,?,?,?,?,?,?,?,?,?,?)");
+                if (i != bulkRequestList.size() - 1) {
+                    sql.append(",");
+                }
+            }
+
+            sql.append(" on duplicate key update ");
+            sql.append("cell_id=values(cell_id)");
+            sql.append(",box_id=values(box_id)");
+            sql.append(",parent_id=values(parent_id)");
+            sql.append(",children=values(children)");
+            sql.append(",node_type=values(node_type)");
+            sql.append(",acl=values(acl)");
+            sql.append(",properties=values(properties)");
+            sql.append(",file=values(file)");
+            sql.append(",published=values(published)");
+            sql.append(",updated=values(updated)");
+            sql.append(",id=values(id)");
+
+            int expectedUpdateCount = bulkRequestList.size() * 2;
+            this.executeUpdateSql(sql.toString(), new StatementHandlerForBulkDav(bulkRequestList),
                     expectedUpdateCount);
 
         }
@@ -731,6 +774,7 @@ public class JdbcAds implements Ads {
                         throw new AdsException(e);
                     }
                 }
+
                 @Override
                 public Object handleQueryIsEmpty() throws AdsException {
                     return new ArrayList<JSONObject>();
@@ -798,6 +842,7 @@ public class JdbcAds implements Ads {
                         throw new AdsException(e);
                     }
                 }
+
                 @Override
                 public Object handleQueryIsEmpty() throws AdsException {
                     return new ArrayList<JSONObject>();
@@ -865,6 +910,7 @@ public class JdbcAds implements Ads {
                         throw new AdsException(e);
                     }
                 }
+
                 @Override
                 public Object handleQueryIsEmpty() throws AdsException {
                     return new ArrayList<JSONObject>();
@@ -944,6 +990,7 @@ public class JdbcAds implements Ads {
                         throw new AdsException(e);
                     }
                 }
+
                 @Override
                 public Object handleQueryIsEmpty() throws AdsException {
                     return new ArrayList<JSONObject>();
@@ -1041,6 +1088,7 @@ public class JdbcAds implements Ads {
                                 throw new AdsException(e);
                             }
                         }
+
                         @Override
                         public Object handleQueryIsEmpty() throws AdsException {
                             return new ArrayList<JSONObject>();
@@ -1376,6 +1424,39 @@ public class JdbcAds implements Ads {
         }
 
         /**
+         * BulkDavを扱うためのStatementHandler.
+         */
+        static class StatementHandlerForBulkDav extends StatementHandler {
+            List<DavNode> bulkRequestList;
+
+            StatementHandlerForBulkDav(List<DavNode> bulkRequestList) {
+                this.bulkRequestList = bulkRequestList;
+            }
+
+            @Override
+            public void handle(PreparedStatement stmt) throws SQLException {
+                int index = 1;
+                for (DavNode docHandler : bulkRequestList) {
+                    stmt.setString(index++, docHandler.getCellId());
+                    stmt.setString(index++, docHandler.getBoxId());
+                    stmt.setString(index++, docHandler.getParentId());
+                    stmt.setString(index++, JSONObject.toJSONString(docHandler.getChildren()));
+                    stmt.setString(index++, docHandler.getNodeType());
+                    stmt.setString(index++, JSONObject.toJSONString(docHandler.getAcl()));
+                    stmt.setString(index++, JSONObject.toJSONString(docHandler.getProperties()));
+                    String file = null;
+                    if (docHandler.getFile() != null) {
+                        file = JSONObject.toJSONString(docHandler.getFile());
+                    }
+                    stmt.setString(index++, file);
+                    stmt.setLong(index++, docHandler.getPublished());
+                    stmt.setLong(index++, docHandler.getUpdated());
+                    stmt.setString(index++, docHandler.getId());
+                }
+            }
+        }
+
+        /**
          * セル削除管理を扱うためのStatementHandler.
          */
         static class StatementHandlerForCellDelete extends StatementHandler {
@@ -1478,6 +1559,8 @@ public class JdbcAds implements Ads {
                 DcCoreUtils.readStringResource("es/ads/dav-update.sql", CharEncoding.UTF_8);
         static String deleteDavNode =
                 DcCoreUtils.readStringResource("es/ads/dav-delete.sql", CharEncoding.UTF_8);
+        static String bulkInsertDav =
+                DcCoreUtils.readStringResource("es/ads/dav-bulk-insert.sql", CharEncoding.UTF_8);
 
         static String deleteCellResourceFromEntity =
                 DcCoreUtils.readStringResource("es/ads/delete-cellresource-from-entity.sql", CharEncoding.UTF_8);
@@ -1585,4 +1668,5 @@ public class JdbcAds implements Ads {
         static final int IDX_CELL_DELETE_TABLE_NAME = 2;
         static final int IDX_CELL_DELETE_CELL_ID = 3;
     }
+
 }
