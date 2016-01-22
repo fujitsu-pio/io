@@ -77,20 +77,23 @@ public class IdToken {
      */
 	private boolean verifySignature() {	
 		RSAPublicKey rsaPubKey = this.getKey();
-		try {
-			Signature sig = Signature.getInstance(ALG);
-			sig.initVerify(rsaPubKey);
-			sig.update((this.header + "." + this.payload).getBytes());
-			return sig.verify(DcCoreUtils.decodeBase64Url(this.signature));
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SignatureException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		//null チェック
+		if (!(rsaPubKey == null)) {
+			try {
+				Signature sig = Signature.getInstance(ALG);
+				sig.initVerify(rsaPubKey);
+				sig.update((this.header + "." + this.payload).getBytes());
+				return sig.verify(DcCoreUtils.decodeBase64Url(this.signature));
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SignatureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
 		}
 		return false;
 	}
