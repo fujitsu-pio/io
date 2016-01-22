@@ -2,28 +2,22 @@ package com.fujitsu.dc.core.auth;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
-import org.apache.commons.lang.CharSet;
-import org.apache.commons.lang.CharSetUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.eclipse.jetty.util.ajax.JSON;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreAuthnException;
-import com.fujitsu.dc.core.DcCoreException;
 
 public class IdToken {
 
@@ -182,8 +175,8 @@ public class IdToken {
 			JSONObject jsonObj = (JSONObject) new JSONParser().parse(resString);
 			return jsonObj;
 		} catch (ParseException e) {
-			// GoogleがJSONでないものを返してきた
-			throw new RuntimeException("Google responded with non JSON", e);
+			// JSONでないものを返してきた
+			throw new RuntimeException("Responded with non JSON", e);
 		} catch (ClientProtocolException e) {
 			// ？？
 			// TODO 適切なエラーメッセージに
