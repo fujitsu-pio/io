@@ -78,6 +78,14 @@ public interface Ads {
     void bulkUpdateEntity(String index, List<EntitySetDocHandler> bulkRequestList) throws AdsException;
 
     /**
+     * Dav Document一括更新に伴い、Adsの対応レコード一括更新を行う.
+     * @param index index
+     * @param bulkRequestList 一括更新データ
+     * @throws AdsException 処理失敗時発生
+     */
+    void bulkUpdateDav(String index, List<DavNode> bulkRequestList) throws AdsException;
+
+    /**
      * リカバリ用に、ADS内の特定indexに対応するEntityのリストを取得する。
      * @param index index
      * @param offset 取得開始レコード(最初から取るときは0)

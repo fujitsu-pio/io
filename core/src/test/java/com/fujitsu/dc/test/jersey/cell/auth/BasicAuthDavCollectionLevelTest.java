@@ -173,18 +173,18 @@ public class BasicAuthDavCollectionLevelTest extends JerseyTest {
             // スキーマなしのBox直下のファイルを変名(Basic認証-成功)
             String dstFileName = "dstFileName";
             String destinationPath = UrlUtils.box(cellName, boxName, dstFileName);
-//            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + fileName,
-//                    destinationPath,
-//                    HttpStatus.SC_CREATED);
+            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + fileName,
+                    destinationPath,
+                    HttpStatus.SC_CREATED);
             String originalPath = UrlUtils.box(cellName, boxName, fileName);
             DavResourceUtils.moveWebDav(AbstractCase.MASTER_TOKEN_NAME, cellName, boxName + "/" + dstFileName,
                     originalPath, -1);
             // スキーマなしのBox直下のファイルをMOVE(Basic認証-失敗)
-//            DavResourceUtils.moveWebDavWithAnyAuthSchema(invalidToken, cellName, boxName + "/" + fileName,
-//                    destinationPath,
-//                    HttpStatus.SC_UNAUTHORIZED);
+            DavResourceUtils.moveWebDavWithAnyAuthSchema(invalidToken, cellName, boxName + "/" + fileName,
+                    destinationPath,
+                    HttpStatus.SC_UNAUTHORIZED);
             // 認証失敗のアカウントロックが解除されるのを待ち合わせる
-//            AuthTestCommon.waitForAccountLock();
+            AuthTestCommon.waitForAccountLock();
 
             // スキーマなしのBox直下のファイルを削除(Basic認証-成功)
             DavResourceUtils.deleteWebDavFile("box/dav-delete-anyAuthSchema.txt", cellName, token,
@@ -287,18 +287,18 @@ public class BasicAuthDavCollectionLevelTest extends JerseyTest {
             AuthTestCommon.waitForAccountLock();
 
             // メインボックス直下のファイルを変名(Basic認証-成功)
-//            String dstFileName = "dstFileName";
-//            String destinationPath = UrlUtils.box(cellName, Role.DEFAULT_BOX_NAME, dstFileName);
-//            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, Role.DEFAULT_BOX_NAME + "/" + fileName,
-//                    destinationPath, HttpStatus.SC_CREATED);
-//            String originalPath = UrlUtils.box(cellName, Role.DEFAULT_BOX_NAME, fileName);
-//            DavResourceUtils.moveWebDav(AbstractCase.MASTER_TOKEN_NAME, cellName, Role.DEFAULT_BOX_NAME + "/"
-//                    + dstFileName, originalPath, -1);
-//            // メインボックス直下のファイルをMOVE(Basic認証-失敗)
-//            DavResourceUtils.moveWebDavWithAnyAuthSchema(invalidToken, cellName, Role.DEFAULT_BOX_NAME + "/"
-//                    + fileName, destinationPath, HttpStatus.SC_UNAUTHORIZED);
-//            // 認証失敗のアカウントロックが解除されるのを待ち合わせる
-//            AuthTestCommon.waitForAccountLock();
+            String dstFileName = "dstFileName";
+            String destinationPath = UrlUtils.box(cellName, Role.DEFAULT_BOX_NAME, dstFileName);
+            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, Role.DEFAULT_BOX_NAME + "/" + fileName,
+                    destinationPath, HttpStatus.SC_CREATED);
+            String originalPath = UrlUtils.box(cellName, Role.DEFAULT_BOX_NAME, fileName);
+            DavResourceUtils.moveWebDav(AbstractCase.MASTER_TOKEN_NAME, cellName, Role.DEFAULT_BOX_NAME + "/"
+                    + dstFileName, originalPath, -1);
+            // メインボックス直下のファイルをMOVE(Basic認証-失敗)
+            DavResourceUtils.moveWebDavWithAnyAuthSchema(invalidToken, cellName, Role.DEFAULT_BOX_NAME + "/"
+                    + fileName, destinationPath, HttpStatus.SC_UNAUTHORIZED);
+            // 認証失敗のアカウントロックが解除されるのを待ち合わせる
+            AuthTestCommon.waitForAccountLock();
 
             // メインボックス直下のファイルを削除(Basic認証-成功)
             DavResourceUtils.deleteWebDavFile("box/dav-delete-anyAuthSchema.txt", cellName, token,
@@ -467,20 +467,20 @@ public class BasicAuthDavCollectionLevelTest extends JerseyTest {
             // 認証失敗のアカウントロックが解除されるのを待ち合わせる
             AuthTestCommon.waitForAccountLock();
 
-//            // ファイルをMOVE(Basic認証-成功)
-//            String destinationPath = UrlUtils.box(cellName, boxName, dstColName, fileName);
-//            DavResourceUtils.createWebDavCollection(AbstractCase.MASTER_TOKEN_NAME, HttpStatus.SC_CREATED, cellName,
-//                    boxName, dstColName);
-////            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + colName + "/" + fileName,
-////                    destinationPath, HttpStatus.SC_CREATED);
-//            String originalPath = UrlUtils.box(cellName, boxName, colName, fileName);
-//            DavResourceUtils.moveWebDav(AbstractCase.MASTER_TOKEN_NAME, cellName, boxName + "/" + dstColName + "/"
-//                    + fileName, originalPath, -1);
-//            // ファイルをMOVE(Basic認証-失敗)
-//            DavResourceUtils.moveWebDavWithAnyAuthSchema(invalidToken, cellName, boxName + "/" + colName + "/"
-//                    + fileName, destinationPath, HttpStatus.SC_UNAUTHORIZED);
-//            // 認証失敗のアカウントロックが解除されるのを待ち合わせる
-//            AuthTestCommon.waitForAccountLock();
+            // ファイルをMOVE(Basic認証-成功)
+            String destinationPath = UrlUtils.box(cellName, boxName, dstColName, fileName);
+            DavResourceUtils.createWebDavCollection(AbstractCase.MASTER_TOKEN_NAME, HttpStatus.SC_CREATED, cellName,
+                    boxName, dstColName);
+            DavResourceUtils.moveWebDavWithAnyAuthSchema(token, cellName, boxName + "/" + colName + "/" + fileName,
+                    destinationPath, HttpStatus.SC_CREATED);
+            String originalPath = UrlUtils.box(cellName, boxName, colName, fileName);
+            DavResourceUtils.moveWebDav(AbstractCase.MASTER_TOKEN_NAME, cellName, boxName + "/" + dstColName + "/"
+                    + fileName, originalPath, -1);
+            // ファイルをMOVE(Basic認証-失敗)
+            DavResourceUtils.moveWebDavWithAnyAuthSchema(invalidToken, cellName, boxName + "/" + colName + "/"
+                    + fileName, destinationPath, HttpStatus.SC_UNAUTHORIZED);
+            // 認証失敗のアカウントロックが解除されるのを待ち合わせる
+            AuthTestCommon.waitForAccountLock();
 
             // ファイルを削除(Basic認証-成功)
             DavResourceUtils.deleteWebDavFile("box/dav-delete-anyAuthSchema.txt", cellName, token,
@@ -493,7 +493,7 @@ public class BasicAuthDavCollectionLevelTest extends JerseyTest {
             AuthTestCommon.waitForAccountLock();
         } finally {
             // MOVEで使用したcollectionの削除
-//            DavResourceUtils.deleteCollection(cellName, boxName, dstColName, AbstractCase.MASTER_TOKEN_NAME, -1);
+            DavResourceUtils.deleteCollection(cellName, boxName, dstColName, AbstractCase.MASTER_TOKEN_NAME, -1);
             DavResourceUtils.deleteWebDavFile("box/dav-delete.txt", cellName, AbstractCase.MASTER_TOKEN_NAME,
                     colName + "/" + fileName, -1, boxName);
         }
