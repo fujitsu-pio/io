@@ -607,11 +607,13 @@ public class TokenEndPointResource {
         if (idToken == null) {
             throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.ID_TOKEN);
         }
-        // id_tokenの検証をする
+        // id_tokenをパースする
         IdToken idt = IdToken.parse(idToken);
-        if (!idt.isValid()) {
-        	throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN;
-        }
+        
+        // Tokenの検証。検証失敗したらDcCoreAuthnExceptionが投げられる
+        idt.verify();
+        
+        // Token検証成功時
     	String mail = idt.email;
     	String aud  = idt.audience;
     	String issuer = idt.issuer;

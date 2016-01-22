@@ -569,6 +569,28 @@ public class DcCoreException extends RuntimeException {
          */
         public static final DcCoreException ADS_CONNECTION_ERROR = create("PR503-SV-0006");
     }
+    
+    /**
+     * NetWork関連エラー.
+     */
+    public static class NetWork {
+    	/**
+         * NetWork関連エラー.
+         */
+    	public static final DcCoreException NETWORK_ERROR = create("PR500-NW-0000");
+    	/**
+         * HTTPリクエストに失敗.
+         */
+    	public static final DcCoreException HTTP_REQUEST_FAILED = create("PR500-NW-0001");
+       	/**
+         * 接続先が想定外の応答を返却.
+         */
+    	public static final DcCoreException UNEXPECTED_RESPONSE = create("PR500-NW-0002");
+       	/**
+         * 接続先が想定外の値を返却.
+         */
+    	public static final DcCoreException UNEXPECTED_VALUE = create("PR500-NW-0003");
+    }
 
     /**
      * 認証系エラー.
