@@ -70,8 +70,8 @@ public class IdToken {
      */
 	public boolean isValid() {	
 		boolean ret = true;
-		// expireしていないかチェック
-		ret = ret & exp * 1000 > System.currentTimeMillis();
+		// expireしていないかチェック(60秒くらいは過ぎても良い)
+		ret = ret & ( exp + 60 ) * 1000 > System.currentTimeMillis() ;
 		// 署名検証
 		ret = ret & verifySignature();
 		return ret;
