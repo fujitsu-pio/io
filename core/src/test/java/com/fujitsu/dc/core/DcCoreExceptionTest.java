@@ -41,7 +41,7 @@ public final class DcCoreExceptionTest {
         try {
             throw DcCoreException.OData.JSON_PARSE_ERROR;
         } catch (DcCoreException e) {
-            Assert.assertEquals("JSON Parse Error.", e.getMessage());
+            Assert.assertEquals("JSON parse error.", e.getMessage());
         }
     }
 

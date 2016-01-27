@@ -26,6 +26,12 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
         WebDAVCollectionAccessControlTest.class,
+        MoveCollectionAccessControlTest.class,
+        MoveCollectionHeaderValidateTest.class,
+        MoveCollectionMethodNotAllowedTest.class,
+        MoveCollectionTest.class,
+        MoveODataCollectionAclTest.class,
+        MoveServiceCollectionAclTest.class,
         ODataCollectionAccessControlTest.class,
         ServiceCollectionAccessControlTest.class
 })

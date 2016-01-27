@@ -67,6 +67,11 @@ public final class DcCoreLog {
          * Rangeヘッダ指定のファイル読み飛ばし失敗.
          */
         public static final DcCoreLog FILE_TOO_SHORT = create("PL-DV-0003");
+        /**
+         * バイナリデータの削除に失敗.
+         * {0}:バイナリデータのUUID
+         */
+        public static final DcCoreLog FILE_DELETE_FAIL = create("PL-DV-0004");
     }
 
     /**

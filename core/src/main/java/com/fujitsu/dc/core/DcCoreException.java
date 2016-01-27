@@ -369,6 +369,50 @@ public class DcCoreException extends RuntimeException {
          * コレクションの階層が深すぎる場合.
          */
         public static final DcCoreException COLLECTION_DEPTH_ERROR = create("PR400-DV-0008");
+        /**
+         * ヘッダに不正な値が設定されている場合.
+         * {0}:ヘッダのキー
+         * {1}:ヘッダの値
+         */
+        public static final DcCoreException INVALID_REQUEST_HEADER = create("PR400-DV-0009");
+        /**
+         * 必須ヘッダの指定が無い場合.
+         * {0}:ヘッダのキー
+         */
+        public static final DcCoreException REQUIRED_REQUEST_HEADER_NOT_EXIST = create("PR400-DV-0010");
+        /**
+         * 移動元のリソースとして__srcが指定された場合.
+         */
+        public static final DcCoreException SERVICE_SOURCE_COLLECTION_PROHIBITED_TO_MOVE = create("PR400-DV-0011");
+        /**
+         * 移動先のリソースとして、既存のリソースが指定された場合.
+         */
+        public static final DcCoreException RESOURCE_PROHIBITED_TO_OVERWRITE = create("PR400-DV-0012");
+        /**
+         * 移動先のリソースとして、ODataコレクション配下のパスが指定された場合.
+         */
+        public static final DcCoreException RESOURCE_PROHIBITED_TO_MOVE_ODATA_COLLECTION = create("PR400-DV-0013");
+        /**
+         * 移動先のリソースとして、ファイル配下のパスが指定された場合.
+         */
+        public static final DcCoreException RESOURCE_PROHIBITED_TO_MOVE_FILE = create("PR400-DV-0014");
+        /**
+         * BoxはMOVEメソッドでの移動対象とはできない.
+         */
+        public static final DcCoreException RESOURCE_PROHIBITED_TO_MOVE_BOX = create("PR400-DV-0015");
+        /**
+         * 移動先のリソースとして、Serviceコレクション配下のパスが指定された場合.
+         */
+        public static final DcCoreException RESOURCE_PROHIBITED_TO_MOVE_SERVICE_COLLECTION = create("PR400-DV-0016");
+        /**
+         * 移動先のリソースとして__srcが指定された場合.
+         */
+        public static final DcCoreException SERVICE_SOURCE_COLLECTION_PROHIBITED_TO_OVERWRITE = create("PR400-DV-0017");
+        /**
+         * 移動元がコレクションで、移動先のリソースとしてサービスソースコレクションが指定された場合.
+         */
+        public static final DcCoreException SERVICE_SOURCE_COLLECTION_PROHIBITED_TO_CONTAIN_COLLECTION =
+                create("PR400-DV-0018");
 
         /**
          * リソースが存在しないとき.
@@ -400,13 +444,23 @@ public class DcCoreException extends RuntimeException {
          */
         public static final DcCoreException RESOURCE_NAME_INVALID = create("PR403-DV-0004");
         /**
-         * コレクション・ファイルのPUT・MKCOL時に親リソースが存在しない時.
+         * 移動元と移動先が同じ場合.
+         * {0}:Destination ヘッダの値
+         */
+        public static final DcCoreException DESTINATION_EQUALS_SOURCE_URL = create("PR403-DV-0005");
+
+        /**
+         * コレクション・ファイルのPUT・MKCOL・MOVE時に親リソースが存在しない時.
          */
         public static final DcCoreException HAS_NOT_PARENT = create("PR409-DV-0001");
         /**
          * 該当リソースのEtagがマッチしない.
          */
         public static final DcCoreException ETAG_NOT_MATCH = create("PR412-DV-0001");
+        /**
+         * Overwriteヘッダで"F"が指定されたが移動先のリソースが既に存在する時.
+         */
+        public static final DcCoreException DESTINATION_ALREADY_EXISTS = create("PR412-DV-0002");
         /**
          * Rangeヘッダ指定誤り.
          */
@@ -548,6 +602,15 @@ public class DcCoreException extends RuntimeException {
          * データストアの検索に失敗.
          */
         public static final DcCoreException DATA_STORE_SEARCH_ERROR = create("PR500-SV-0005");
+        /**
+         * データストアの更新に失敗し、ロールバックにも失敗した.
+         */
+        public static final DcCoreException DATA_STORE_UPDATE_ROLLBACK_ERROR = create("PR500-SV-0006");
+        /**
+         * データストアの更新に失敗し、ロールバックが成功した.
+         */
+        public static final DcCoreException DATA_STORE_UPDATE_ERROR_ROLLBACKED = create("PR500-SV-0007");
+
         /**
          * memcachedへの接続に失敗したとき.
          */

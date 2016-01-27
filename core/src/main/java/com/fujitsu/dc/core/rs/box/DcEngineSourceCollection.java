@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import org.apache.wink.webdav.WebDAVMethod;
 
 import com.fujitsu.dc.common.utils.DcCoreUtils;
+import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavRsCmp;
@@ -90,6 +91,18 @@ public class DcEngineSourceCollection {
     }
 
     /**
+     * MOVEの処理. <br />
+     * __srcのMOVEは行えないため、一律400エラーとしている。
+     */
+    @WebDAVMethod.MOVE
+    public void move() {
+        // アクセス制御
+        this.davRsCmp.checkAccessContext(
+                this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        throw DcCoreException.Dav.SERVICE_SOURCE_COLLECTION_PROHIBITED_TO_MOVE;
+    }
+
+    /**
      * OPTIONSメソッドの処理.
      * @return JAX-RS応答オブジェクト
      */
@@ -101,5 +114,4 @@ public class DcEngineSourceCollection {
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND
                 ).build();
     }
-
 }

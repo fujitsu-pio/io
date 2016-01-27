@@ -25,6 +25,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -36,6 +37,7 @@ import com.fujitsu.dc.core.annotations.ACL;
 import com.fujitsu.dc.core.annotations.RequirePrivilege;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.model.DavCmp;
+import com.fujitsu.dc.core.model.DavMoveResource;
 import com.fujitsu.dc.core.model.DavRsCmp;
 
 /**
@@ -44,6 +46,7 @@ import com.fujitsu.dc.core.model.DavRsCmp;
 public class DavFileResource {
 
     DavRsCmp davRsCmp;
+
     /**
      * コンストラクタ.
      * @param parent 親
@@ -121,6 +124,7 @@ public class DavFileResource {
                 this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE_PROPERTIES);
         return this.davRsCmp.doProppatch(requestBodyXml);
     }
+
     /**
      * PROPFINDの処理.
      * @param requestBodyXml リクエストボディ
@@ -152,6 +156,19 @@ public class DavFileResource {
         return this.davRsCmp.doAcl(reader);
     }
 
+    /**
+     * MOVEメソッドの処理.
+     * @param headers ヘッダ情報
+     * @return JAX-RS応答オブジェクト
+     */
+    @WebDAVMethod.MOVE
+    public Response move(
+            @Context HttpHeaders headers) {
+        // 移動元に対するアクセス制御
+        // DavFileResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        return new DavMoveResource(this.davRsCmp.getParent(), this.davRsCmp.getDavCmp(), headers).doMove();
+    }
 
     /**
      * OPTIONSメソッドの処理.
@@ -165,6 +182,7 @@ public class DavFileResource {
                 HttpMethod.GET,
                 HttpMethod.PUT,
                 HttpMethod.DELETE,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MOVE,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL

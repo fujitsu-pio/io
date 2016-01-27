@@ -179,9 +179,9 @@ public class EsIndexImpl extends EsTranslogHandler implements EsIndex {
     }
 
     @Override
-    public DcBulkResponse bulkCreate(final String routingId, final List<EsBulkRequest> datas) {
-        BulkCreateRetryableRequest request = new BulkCreateRetryableRequest(retryCount, retryInterval,
-                this.name, routingId, datas);
+    public DcBulkResponse bulkRequest(final String routingId, final List<EsBulkRequest> datas, boolean isWriteLog) {
+        BulkRetryableRequest request = new BulkRetryableRequest(retryCount, retryInterval,
+                this.name, routingId, datas, isWriteLog);
         // 必要な場合、メソッド内でリトライが行われる.
         return DcBulkResponseImpl.getInstance(request.doRequest());
     }
@@ -577,22 +577,24 @@ public class EsIndexImpl extends EsTranslogHandler implements EsIndex {
     /**
      * Elasticsearchへの bulk create処理実装.
      */
-    class BulkCreateRetryableRequest extends AbstractRetryableEsRequest<BulkResponse> {
+    class BulkRetryableRequest extends AbstractRetryableEsRequest<BulkResponse> {
         String name;
         String routingId;
         List<EsBulkRequest> datas;
+        boolean isWriteLog;
 
-        public BulkCreateRetryableRequest(int retryCount, long retryInterval,
-                String argName, String argRoutingId, List<EsBulkRequest> argDatas) {
+        public BulkRetryableRequest(int retryCount, long retryInterval,
+                String argName, String argRoutingId, List<EsBulkRequest> argDatas, boolean isWriteLog) {
             super(retryCount, retryInterval, "EsIndex bulkCreate");
-            name = argName;
-            routingId = argRoutingId;
-            datas = argDatas;
+            this.name = argName;
+            this.routingId = argRoutingId;
+            this.datas = argDatas;
+            this.isWriteLog = isWriteLog;
         }
 
         @Override
         BulkResponse doProcess() {
-            return esClient.bulkCreate(name, routingId, datas);
+            return esClient.bulkRequest(name, routingId, datas, isWriteLog);
         }
 
         @Override
