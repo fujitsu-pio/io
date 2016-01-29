@@ -63,6 +63,7 @@ import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.annotations.ACL;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.model.DavCmp;
+import com.fujitsu.dc.core.model.DavMoveResource;
 import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
 
@@ -116,7 +117,9 @@ public final class DcEngineSvcCollectionResource {
     @DELETE
     public Response delete() {
         // アクセス制御
-        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        // DavEngineSvcCollectionResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             throw DcCoreException.Dav.HAS_CHILDREN;
         }
@@ -158,6 +161,7 @@ public final class DcEngineSvcCollectionResource {
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.READ);
         return DcCoreUtils.responseBuilderForOptions(
                 HttpMethod.DELETE,
+                com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MOVE,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH,
                 com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL
@@ -171,7 +175,12 @@ public final class DcEngineSvcCollectionResource {
     @Path("__src")
     public DcEngineSourceCollection src() {
         DavCmp nextCmp = this.davCmp.getChild(DavCmp.SERVICE_SRC_COLLECTION);
-        return new DcEngineSourceCollection(this.davRsCmp, nextCmp);
+        if (nextCmp.isExists()) {
+            return new DcEngineSourceCollection(this.davRsCmp, nextCmp);
+        } else {
+            // サービスソースコレクションが存在しないため404エラーとする
+            throw DcCoreException.Dav.RESOURCE_NOT_FOUND;
+        }
     }
 
     /**
@@ -389,5 +398,18 @@ public final class DcEngineSvcCollectionResource {
 
         // レスポンス返却
         return res.build();
+    }
+
+    /**
+     * MOVEメソッドの処理.
+     * @param headers ヘッダ情報
+     * @return JAX-RS応答オブジェクト
+     */
+    @WebDAVMethod.MOVE
+    public Response move(
+            @Context HttpHeaders headers) {
+        // 移動元に対するアクセス制御(親の権限をチェックする)
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        return new DavMoveResource(this.davRsCmp.getParent(), this.davRsCmp.getDavCmp(), headers).doMove();
     }
 }

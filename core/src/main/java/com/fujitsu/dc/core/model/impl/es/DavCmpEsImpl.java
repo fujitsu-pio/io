@@ -66,6 +66,8 @@ import org.w3c.dom.NodeList;
 
 import com.fujitsu.dc.common.auth.token.Role;
 import com.fujitsu.dc.common.es.response.DcActionResponse;
+import com.fujitsu.dc.common.es.response.DcBulkItemResponse;
+import com.fujitsu.dc.common.es.response.DcBulkResponse;
 import com.fujitsu.dc.common.es.response.DcGetResponse;
 import com.fujitsu.dc.common.es.response.DcIndexResponse;
 import com.fujitsu.dc.common.es.response.DcSearchHit;
@@ -78,12 +80,14 @@ import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.DcCoreLog;
 import com.fujitsu.dc.core.auth.AccessContext;
+import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.auth.OAuth2Helper.Key;
 import com.fujitsu.dc.core.http.header.ByteRangeSpec;
 import com.fujitsu.dc.core.http.header.RangeHeaderHandler;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.Cell;
 import com.fujitsu.dc.core.model.DavCmp;
+import com.fujitsu.dc.core.model.DavDestination;
 import com.fujitsu.dc.core.model.DavNode;
 import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.ComplexType;
@@ -93,6 +97,7 @@ import com.fujitsu.dc.core.model.file.BinaryDataAccessor;
 import com.fujitsu.dc.core.model.file.BinaryDataNotFoundException;
 import com.fujitsu.dc.core.model.file.StreamingOutputForDavFile;
 import com.fujitsu.dc.core.model.file.StreamingOutputForDavFileWithRange;
+import com.fujitsu.dc.core.model.impl.es.accessor.DavMoveAccessor;
 import com.fujitsu.dc.core.model.impl.es.accessor.DavNodeAccessor;
 import com.fujitsu.dc.core.model.impl.es.accessor.EntitySetAccessor;
 import com.fujitsu.dc.core.model.impl.es.doc.EsDocHandler;
@@ -100,6 +105,7 @@ import com.fujitsu.dc.core.model.impl.es.odata.UserSchemaODataProducer;
 import com.fujitsu.dc.core.model.jaxb.Acl;
 import com.fujitsu.dc.core.model.jaxb.ObjectIo;
 import com.fujitsu.dc.core.model.lock.Lock;
+import com.fujitsu.dc.core.model.lock.LockKeyComposer;
 import com.fujitsu.dc.core.model.lock.LockManager;
 import com.fujitsu.dc.core.odata.DcODataProducer;
 
@@ -137,6 +143,7 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
      * @return 自ノードのロック
      */
     public Lock lock() {
+        log.debug("lock:" + LockKeyComposer.fullKeyFromCategoryAndKey(Lock.CATEGORY_DAV, null, this.box.getId(), null));
         return LockManager.getLock(Lock.CATEGORY_DAV, null, this.box.getId(), null);
     }
 
@@ -151,6 +158,31 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         sb.append(this.davNode.getUpdated());
         sb.append("\"");
         return sb.toString();
+    }
+
+    /**
+     * コンストラクタ.
+     * @param name 担当パスコンポーネント名
+     * @param parent 親部品
+     * @param cell Cell
+     * @param box Box
+     * @param nodeId ノードID
+     * @param davNode DavNode情報
+     */
+    public DavCmpEsImpl(final String name,
+            final DavCmpEsImpl parent,
+            final Cell cell,
+            final Box box,
+            final String nodeId,
+            final DavNode davNode) {
+        this.cell = cell;
+        this.box = box;
+        this.name = name;
+        this.parent = parent;
+        this.nodeId = nodeId;
+        this.of = new ObjectFactory();
+        this.davNode = davNode;
+        setMetadata(davNode.getSource());
     }
 
     /**
@@ -200,7 +232,13 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
             cr = producer.getEntitiesCount(ComplexType.EDM_TYPE_NAME, null);
             return cr.getCount() < 1;
         } else if (DavCmp.TYPE_COL_SVC.equals(type)) {
-            return !(this.getChild(SERVICE_SRC_COLLECTION).getChildrenCount() > 0);
+            DavCmp svcSourceCol = this.getChild(SERVICE_SRC_COLLECTION);
+            if (!svcSourceCol.isExists()) {
+                // クリティカルなタイミングでServiceコレクションが削除された場合
+                // ServiceSourceコレクションが存在しないため空とみなす
+                return true;
+            }
+            return !(svcSourceCol.getChildrenCount() > 0);
         }
         DcCoreLog.Misc.UNREACHABLE_CODE_ERROR.writeLog();
         throw DcCoreException.Server.UNKNOWN_ERROR;
@@ -247,66 +285,94 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
     }
 
     /**
-     * 再読み込み.
+     * DavNodeがDB上に存在するかどうか.<br />
+     * 本メソッドを使用する際は、事前にload()を呼出し情報を最新にすること
+     * @return 存在する場合はtrue
      */
-    @SuppressWarnings("unchecked")
+    public final boolean isExists() {
+        return !(this.davNode == null);
+    }
+
+    /**
+     * Davの管理データ情報を最新化する.
+     */
     public final void load() {
         DcGetResponse res = getNode();
         if (res == null) {
-            // Boxから辿ってidで検索して、Davデータに不整合があった場合
-            throw DcCoreException.Dav.DAV_INCONSISTENCY_FOUND;
+            this.davNode = null;
+            return;
         }
         this.version = res.version();
         this.davNode = DavNode.createFromJsonString(res.getId(), res.sourceAsString());
-        if (this.davNode != null) {
-            // Map<String, Object> aclObj = (Map<String, Object>) json.get("acl");
-            // TODO JSONParseを２回やっていて効率悪い. JSON Parseの方式は何かに一本化すべき.
+        if (this.davNode == null) {
+            return;
+        }
+        try {
             String jsonStr = res.sourceAsString();
             JSONParser parser = new JSONParser();
-            try {
-                JSONObject jo = (JSONObject) parser.parse(jsonStr);
-                JSONObject aclObj = (JSONObject) jo.get(DavNode.KEY_ACL);
-                if (aclObj != null) {
-                    log.debug(aclObj.toJSONString());
-                    // principalのhref の値を ロールID（__id）からロールリソースURLに変換する。
-                    // base:xml値の設定
-                    String baseUrlStr = createBaseUrlStr();
-                    roleIdToName(aclObj.get(KEY_ACE), baseUrlStr);
+            JSONObject source = (JSONObject) parser.parse(jsonStr);
+            setMetadata(source);
+        } catch (ParseException e) {
+            // ESのJSONが壊れている状態。
+            throw DcCoreException.Dav.FS_INCONSISTENCY_FOUND.reason(e);
+        }
+    }
 
-                    // ConfidentialLevelの取り出し
-                    this.confidentialLevel = (String) aclObj.get(KEY_REQUIRE_SCHEMA_AUTHZ);
+    /**
+     * JSONオブジェクトを解析し、ACLなどのメタデータをセットする.
+     * @param source 解析対象のJSONオブジェクト
+     */
+    @SuppressWarnings("unchecked")
+    private void setMetadata(JSONObject source) {
+        JSONObject aclObj = (JSONObject) source.get(DavNode.KEY_ACL);
+        if (aclObj != null) {
+            log.debug(aclObj.toJSONString());
+            // principalのhref の値を ロールID（__id）からロールリソースURLに変換する。
+            // base:xml値の設定
+            String baseUrlStr = createBaseUrlStr();
+            roleIdToName(aclObj.get(KEY_ACE), baseUrlStr);
 
-                    this.acl = Acl.fromJson(aclObj.toJSONString());
-                    this.acl.setBase(baseUrlStr);
-                    log.debug(this.acl.toJSON());
-                }
+            // ConfidentialLevelの取り出し
+            this.confidentialLevel = (String) aclObj.get(KEY_REQUIRE_SCHEMA_AUTHZ);
 
-                Map<String, String> props = (Map<String, String>) jo.get(DavNode.KEY_PROPS);
-                if (props != null) {
-                    for (Map.Entry<String, String> entry : props.entrySet()) {
-                        String key = entry.getKey();
-                        String val = entry.getValue();
-                        int idx = key.indexOf("@");
-                        String elementName = key.substring(0, idx);
-                        String namespace = key.substring(idx + 1);
-                        QName keyQName = new QName(namespace, elementName);
+            this.acl = Acl.fromJson(aclObj.toJSONString());
+            this.acl.setBase(baseUrlStr);
+            log.debug(this.acl.toJSON());
+        }
 
-                        Element element = parseProp(val);
-                        String elementNameSpace = element.getNamespaceURI();
-                        // ownerRepresentativeAccountsの取り出し
-                        if (Key.PROP_KEY_OWNER_REPRESENTIVE_ACCOUNTS.equals(keyQName)) {
-                            NodeList accountNodeList = element.getElementsByTagNameNS(elementNameSpace,
-                                    Key.PROP_KEY_OWNER_REPRESENTIVE_ACCOUNT.getLocalPart());
-                            for (int i = 0; i < accountNodeList.getLength(); i++) {
-                                this.ownerRepresentativeAccounts.add(accountNodeList.item(i).getTextContent().trim());
-                            }
-                        }
+        Map<String, String> props = (Map<String, String>) source.get(DavNode.KEY_PROPS);
+        if (props != null) {
+            for (Map.Entry<String, String> entry : props.entrySet()) {
+                String key = entry.getKey();
+                String val = entry.getValue();
+                int idx = key.indexOf("@");
+                String elementName = key.substring(0, idx);
+                String namespace = key.substring(idx + 1);
+                QName keyQName = new QName(namespace, elementName);
+
+                Element element = parseProp(val);
+                String elementNameSpace = element.getNamespaceURI();
+                // ownerRepresentativeAccountsの取り出し
+                if (Key.PROP_KEY_OWNER_REPRESENTIVE_ACCOUNTS.equals(keyQName)) {
+                    NodeList accountNodeList = element.getElementsByTagNameNS(elementNameSpace,
+                            Key.PROP_KEY_OWNER_REPRESENTIVE_ACCOUNT.getLocalPart());
+                    for (int i = 0; i < accountNodeList.getLength(); i++) {
+                        this.ownerRepresentativeAccounts.add(accountNodeList.item(i).getTextContent().trim());
                     }
                 }
-            } catch (ParseException e) {
-                // ESのJSONが壊れている状態。
-                throw DcCoreException.Dav.FS_INCONSISTENCY_FOUND.reason(e);
             }
+        }
+    }
+
+    /**
+     * Davの管理データ情報を最新化する.<br />
+     * 管理データが存在しない場合はエラーとする.
+     */
+    public final void loadAndCheckDavInconsistency() {
+        load();
+        if (this.davNode == null) {
+            // Boxから辿ってidで検索して、Davデータに不整合があった場合
+            throw DcCoreException.Dav.DAV_INCONSISTENCY_FOUND;
         }
     }
 
@@ -416,11 +482,16 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         }
 
         // Responseを追加
+        // クリティカルなタイミングで子要素が追加/削除された場合はレスポンスに含めない
+        // DavRsCmpの生成時にロードした情報を使用するため、ロード以降に更新された情報については無視する
         Iterator<String> itr = this.davNode.getChildren().keySet().iterator();
         while (itr.hasNext()) {
             String childName = itr.next();
             String childNodeId = this.davNode.getChildren().get(childName);
             Map<String, Object> childJson = mapJson.get(childNodeId);
+            if (null == childJson) {
+                continue;
+            }
 
             try {
                 childName = URLEncoder.encode(childName, "UTF-8");
@@ -479,6 +550,12 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         // 更新処理
         try {
             this.load(); // ロック後の最新情報取得
+
+            if (!this.isExists()) {
+                // クリティカルなタイミング(初回ロード～ロック取得)で削除された場合は404エラーとする
+                throw getNotFoundException().params(this.getUrl());
+            }
+
             Map<String, Object> propsJson = (Map<String, Object>) this.davNode.getProperties();
 
             List<Prop> propsToSet = propUpdate.getPropsToSet();
@@ -582,6 +659,12 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         // ロック
         Lock lock = this.lock();
         try {
+            // リソースのリロード
+            this.load();
+            if (!this.isExists()) {
+                throw getNotFoundException().params(this.getUrl());
+            }
+
             // ACLのxml:baseの値を取得する
             Object objAclBase = aclJson.get(KEY_ACL_BASE);
             String aclBase = null;
@@ -643,67 +726,32 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
 
     @Override
     public final ResponseBuilder putForCreate(final String contentType, final InputStream inputStream) {
-        // ファイル追加処理。
-
-        long now = new Date().getTime();
-        // creating node Document
-        DavNode fileNode = new DavNode(this.cell.getId(), this.box.getId(), DavCmp.TYPE_DAV_FILE);
-        fileNode.setParentId(this.parent.nodeId);
-
-        // ファイルの情報
-        Map<String, Object> data = new HashMap<String, Object>();
-        fileNode.setFile(data);
-        data.put(KEY_CONTENT_TYPE, contentType);
-
-        BufferedInputStream bufferedInput = new BufferedInputStream(inputStream);
-
         // ロック
         Lock lock = this.lock();
         try {
-            // ここで改めて存在確認が必要。
-            // 親をロードしなおして、自身へのパスがないことの確認
+            // 新規作成時には、作成対象のDavNodeは存在しないため、親DavNodeをリロードして存在確認する。
+            // 親DavNodeが存在しない場合：他のリクエストによって削除されたたため、404を返却
+            // 親DavNodeが存在するが、作成対象のDavNodeが存在する場合：他のリクエストによって作成されたたｔめ、更新処理を実行
             this.parent.load();
+            if (!this.parent.isExists()) {
+                throw DcCoreException.Dav.HAS_NOT_PARENT.params(this.parent.getUrl());
+            }
+
             this.nodeId = this.parent.davNode.getChildren().get(this.name);
             if (this.nodeId != null) {
                 this.load();
-                // 更新処理にまわる。
-                return this.doPutForUpdate(contentType, inputStream, null);
+                // 作成対象のDavNodeが存在する場合は更新処理
+                if (this.davNode != null) {
+                    return this.doPutForUpdate(contentType, inputStream, null);
+                }
             }
-
-            // 親コレクション内のコレクション・ファイル数のチェック
-            checkChildResourceCount();
-
-            String newId = DcUUID.randomUUID();
-            try {
-                BinaryDataAccessor accessor = getBinaryDataAccessor();
-                long writtenBytes = accessor.create(bufferedInput, newId);
-                data.put(KEY_CONTENT_LENGTH, writtenBytes);
-            } catch (BinaryDataNotFoundException nex) {
-                throw DcCoreException.Dav.RESOURCE_NOT_FOUND.reason(nex);
-            } catch (BinaryDataAccessException ex) {
-                throw DcCoreException.Dav.FS_INCONSISTENCY_FOUND.reason(ex);
-            }
-
-            // メタデータの保存処理.
-            this.davNode = fileNode;
-            DcActionResponse res = createNodeWithId(newId);
-            if (res instanceof DcIndexResponse) {
-                this.nodeId = ((DcIndexResponse) res).getId();
-                this.version = ((DcIndexResponse) res).version();
-            } else if (res instanceof DcGetResponse) {
-                this.nodeId = ((DcGetResponse) res).getId();
-                this.version = ((DcGetResponse) res).version();
-            }
-
-            // adding newNode to this nodeDocument;
-            this.parent.linkChild(this.name, this.nodeId, now);
+            // 作成対象のDavNodeが存在しない場合は新規作成処理
+            return this.doPutForCreate(contentType, inputStream);
         } finally {
             // ★UNLOCK
             lock.release();
             log.debug("unlock1");
         }
-
-        return javax.ws.rs.core.Response.ok().status(HttpStatus.SC_CREATED).header(HttpHeaders.ETAG, this.getEtag());
     }
 
     /**
@@ -733,6 +781,19 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         // ロック
         Lock lock = this.lock();
         try {
+            // 更新には、更新対象のDavNodeが存在するため、更新対象のDavNodeをリロードして存在確認する。
+            // 更新対象のDavNodeが存在しない場合：
+            // ・更新対象の親DavNodeが存在しない場合：親ごと消えているため404を返却
+            // ・更新対象の親DavNodeが存在する場合：他のリクエストによって削除されたたため、作成処理を実行
+            // 更新対象のDavNodeが存在する場合：更新処理を実行
+            this.load();
+            if (this.davNode == null) {
+                this.parent.load();
+                if (this.parent.davNode == null) {
+                    throw getNotFoundException().params(this.parent.getUrl());
+                }
+                return this.doPutForCreate(contentType, inputStream);
+            }
             return this.doPutForUpdate(contentType, inputStream, etag);
         } finally {
             // ロックを開放する
@@ -741,12 +802,60 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         }
     }
 
+    final ResponseBuilder doPutForCreate(final String contentType, final InputStream inputStream) {
+        long now = new Date().getTime();
+        // creating node Document
+        DavNode fileNode = new DavNode(this.cell.getId(), this.box.getId(), DavCmp.TYPE_DAV_FILE);
+        fileNode.setParentId(this.parent.nodeId);
+
+        // ファイルの情報
+        Map<String, Object> data = new HashMap<String, Object>();
+        fileNode.setFile(data);
+        data.put(KEY_CONTENT_TYPE, contentType);
+
+        BufferedInputStream bufferedInput = new BufferedInputStream(inputStream);
+
+        // 親コレクション内のコレクション・ファイル数のチェック
+        checkChildResourceCount();
+
+        String newId = DcUUID.randomUUID();
+        try {
+            BinaryDataAccessor accessor = getBinaryDataAccessor();
+            long writtenBytes = accessor.create(bufferedInput, newId);
+            data.put(KEY_CONTENT_LENGTH, writtenBytes);
+        } catch (BinaryDataNotFoundException nex) {
+            throw DcCoreException.Dav.RESOURCE_NOT_FOUND.reason(nex);
+        } catch (BinaryDataAccessException ex) {
+            throw DcCoreException.Dav.FS_INCONSISTENCY_FOUND.reason(ex);
+        }
+
+        // メタデータの保存処理.
+        this.davNode = fileNode;
+        DcActionResponse res = createNodeWithId(newId);
+        if (res instanceof DcIndexResponse) {
+            this.nodeId = ((DcIndexResponse) res).getId();
+            this.version = ((DcIndexResponse) res).version();
+        } else if (res instanceof DcGetResponse) {
+            this.nodeId = ((DcGetResponse) res).getId();
+            this.version = ((DcGetResponse) res).version();
+        }
+
+        // adding newNode to this nodeDocument;
+        this.parent.linkChild(this.name, this.nodeId, now);
+        return javax.ws.rs.core.Response.ok().status(HttpStatus.SC_CREATED).header(HttpHeaders.ETAG, this.getEtag());
+    }
+
     final ResponseBuilder doPutForUpdate(final String contentType, final InputStream inputStream, String etag) {
         // 現在時刻を取得
         long now = new Date().getTime();
         // 最新ノード情報をロード
         // TODO 全体として２回ロードしてしまうので、遅延ロードの仕組みを検討
         this.load();
+        // クリティカルなタイミング(ロック～ロードまでの間)でWebDavの管理データが削除された場合の対応
+        // WebDavの管理データがこの時点で存在しない場合は404エラーとする
+        if (!this.isExists()) {
+            throw getNotFoundException().params(this.getUrl());
+        }
 
         // 指定etagがあり、かつそれが*ではなく内部データから導出されるものと異なるときはエラー
         if (etag != null && !"*".equals(etag) && !this.getEtag().equals(etag)) {
@@ -826,6 +935,10 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
                     .header(DcCoreUtils.HttpHeaders.ACCEPT_RANGES, RangeHeaderHandler.BYTES_UNIT);
 
         } catch (BinaryDataNotFoundException nex) {
+            this.load();
+            if (!this.isExists()) {
+                throw getNotFoundException().params(this.getUrl());
+            }
             throw DcCoreException.Dav.DAV_UNAVAILABLE.reason(nex);
         }
     }
@@ -1039,6 +1152,11 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
             // ここで改めて存在確認が必要。
             // 親をロードしなおして、自身へのパスがないことの確認
             this.parent.load();
+            if (!this.parent.isExists()) {
+                // クリティカルなタイミングで先に親を削除されてしまい、
+                // 親が存在しないので409エラーとする
+                throw DcCoreException.Dav.HAS_NOT_PARENT.params(this.parent.getUrl());
+            }
             if (this.parent.davNode.getChildren().get(this.name) != null) {
                 // クリティカルなタイミングで先にコレクションを作られてしまい、
                 // すでに存在するのでEXCEPTION
@@ -1081,6 +1199,91 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
 
         // レスポンス
         return javax.ws.rs.core.Response.status(HttpStatus.SC_CREATED).header(HttpHeaders.ETAG, this.getEtag());
+    }
+
+    /**
+     * MOVE処理を行う.
+     * @param etag ETag値
+     * @param overwrite 移動先のリソースを上書きするかどうか
+     * @param davDestination 移動先の階層情報
+     * @return ResponseBuilder レスポンス
+     */
+    @Override
+    public ResponseBuilder move(String etag, String overwrite, DavDestination davDestination) {
+        // ロック
+        Lock lock = this.lock();
+        try {
+            // 移動元リソースの存在チェック
+            this.load();
+            if (!this.isExists()) {
+                // クリティカルなタイミング(初回ロード～ロック取得)で移動元を削除された場合。
+                // 移動元が存在しないため404エラーとする
+                throw getNotFoundException().params(this.getUrl());
+            }
+            // 指定etagがあり、かつそれが*ではなく内部データから導出されるものと異なるときはエラー
+            if (etag != null && !"*".equals(etag) && !this.getEtag().equals(etag)) {
+                throw DcCoreException.Dav.ETAG_NOT_MATCH;
+            }
+
+            // 移動元のDavNodeをリロードしたことにより親DavNodeが別のリソースに切り替わっている可能性があるため、リロードする。
+            // この際、親DavNodeが削除されている可能性もあるため、存在チェックを実施する。
+            this.parent.nodeId = this.davNode.getParentId();
+            this.parent.load();
+            if (this.parent.davNode == null) {
+                throw getNotFoundException().params(this.parent.getUrl());
+            }
+
+            // 移動先のロード
+            davDestination.loadDestinationHierarchy();
+            // 移動先のバリデート
+            davDestination.validateDestinationResource(overwrite, this);
+
+            // MOVEメソッドでは移動元と移動先のBoxが同じであるため、移動先のアクセスコンテキストを取得しても、
+            // 移動元のアクセスコンテキストを取得しても同じObjectが取得できる
+            // このため、移動先のアクセスコンテキストを用いている
+            AccessContext ac = davDestination.getDestinationRsCmp().getAccessContext();
+            // 移動先に対するアクセス制御
+            // 以下の理由により、ロック後に移動先に対するアクセス制御を行うこととした。
+            // 1.アクセス制御ではESへのアクセスは発生しないため、ロック中に実施してもロック期間の長さに与える影響は少ない。
+            // 2.ロック前に移動先のアクセス制御を行う場合、移動先の情報を取得する必要があり、ESへのリクエストが発生するため。
+            davDestination.getDestinationRsCmp().getParent().checkAccessContext(ac, BoxPrivilege.WRITE);
+
+            DavNode srcParentNode = ((DavCmpEsImpl) this.getParent()).getDavNode();
+
+            DavNode dstParentNode = ((DavCmpEsImpl) davDestination.getDestinationCmp().getParent()).getDavNode();
+            DavNode srcNode = this.getDavNode();
+            DavMoveAccessor accessor = new DavMoveAccessor(this.getEsColType().getIndex(), this.getType(),
+                    this.getCellId());
+            accessor.setSourceParentNodeForRollback(srcParentNode);
+
+            DavCmp dstCmp = davDestination.getDestinationCmp();
+            DavNode dstNode = ((DavCmpEsImpl) dstCmp).getDavNode();
+
+            accessor.setMoveRequest(this.name, dstCmp.getName(), srcNode, dstNode, srcParentNode, dstParentNode);
+            DcBulkResponse bulkResponse = accessor.move();
+
+            // バルクレスポンスの解析
+            for (DcBulkItemResponse item : bulkResponse.items()) {
+                if (srcNode.getId().equals(item.getId())) {
+                    // Etag返却用に、ソースのノードを更新した時のElaticsearchのバージョンを付与しておく
+                    this.version = item.version();
+                }
+            }
+        } finally {
+            // ★UNLOCK
+            lock.release();
+            log.debug("unlock");
+        }
+
+        ResponseBuilder res = null;
+        if (null == ((DavCmpEsImpl) davDestination.getDestinationCmp()).getDavNode()) {
+            res = javax.ws.rs.core.Response.status(HttpStatus.SC_CREATED);
+        } else {
+            res = javax.ws.rs.core.Response.status(HttpStatus.SC_NO_CONTENT);
+        }
+        res.header(HttpHeaders.LOCATION, davDestination.getDestinationUri());
+        res.header(HttpHeaders.ETAG, this.getEtag());
+        return res;
     }
 
     private void checkChildResourceCount() {
@@ -1126,6 +1329,11 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
         // ロック
         Lock lock = this.lock();
         try {
+            // リロード
+            this.load();
+            if (this.davNode == null) {
+                throw getNotFoundException().params(this.getUrl());
+            }
             // WebDAVコレクションであって子孫リソースがあったら、エラーとする
             if (TYPE_COL_WEBDAV.equals(this.getType()) && this.davNode.getChildren().size() > 0) {
                 throw DcCoreException.Dav.HAS_CHILDREN;
@@ -1135,16 +1343,16 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
                 // ここで改めて存在確認が必要。
                 // 親をロードしなおして、自身へのパスがないことの確認
                 this.parent.load();
-                if (this.parent.davNode.getChildren().get(this.name) == null) {
+                if (!this.parent.isExists() || this.parent.davNode.getChildren().get(this.name) == null) {
                     // クリティカルなタイミングで先に削除がかかってしまい、
-                    // すでに存在しない場合はEXCEPTION
-                    throw DcCoreException.Dav.RESOURCE_NOT_FOUND;
+                    // すでに親または自身が存在しない場合はEXCEPTION
+                    throw getNotFoundException().params(this.parent.getUrl());
                 }
                 // Serviceコレクションのときは__srcの削除を行う
                 // → 取得した子供が DavCmp ではない場合はデータ不整合として500エラーを返す（ありえない）
                 if (TYPE_COL_SVC.equals(this.getType())) {
                     DavCmp srcCmp = this.getChild(DavCmp.SERVICE_SRC_COLLECTION);
-                    if (srcCmp instanceof DavCmpEsImpl) {
+                    if (srcCmp.isExists() && srcCmp instanceof DavCmpEsImpl) {
                         ((DavCmpEsImpl) srcCmp).deleteNode();
                     } else {
                         throw DcCoreException.Dav.DAV_INCONSISTENCY_FOUND;
@@ -1486,6 +1694,15 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
     }
 
     /**
+     * このDavNodeリソースのURLを返します.
+     * @return URL文字列
+     */
+    public String getUrl() {
+        // 再帰的に最上位のDavCmpEsImplまでいって、BoxCmpEsImplではここをオーバーライドしてルートURLを与えている。
+        return this.parent.getUrl() + "/" + this.name;
+    }
+
+    /**
      * BoxIdでEsを検索する.
      * @param cellObj Cell
      * @param boxId ボックスId
@@ -1501,5 +1718,15 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
             throw DcCoreException.Dav.ROLE_NOT_FOUND;
         }
         return getRes.getSource();
+    }
+
+    /**
+     * リソースに合わせてNotFoundの例外を返却する. <br />
+     * リソースによってメッセージがことなるため、各リソースのクラスはこのメソッドをオーバーライドしてメッセージを定義すること。 <br />
+     * メッセージの付加情報は、ここでは設定せずに呼び出し元で設定すること。
+     * @return NotFound例外
+     */
+    public DcCoreException getNotFoundException() {
+        return DcCoreException.Dav.RESOURCE_NOT_FOUND;
     }
 }

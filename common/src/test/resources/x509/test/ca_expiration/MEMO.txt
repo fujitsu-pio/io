@@ -1,0 +1,47 @@
+ルートCA証明書が有効期限切れ
+
+cacrt.crt：ルートCA証明書
+pio2.crt：サーバ証明書
+pio.key:サーバ秘密鍵
+
+【作成手順】(ローカルPCのsygwinでの手順実施)
+☆下準備
+・作業ディレクトリへの移動
+
+①ルート証明書
+export CATOP=./ca_expiration
+
+実行前にCA.shを以下のように編集
+
+if [ -z "$DAYS" ] ; then DAYS="-days 3" ; fi	# 1 year
+CADAYS="-days 10"	# 3 years
+REQ="$OPENSSL req $SSLEAY_CONFIG"
+CA="$OPENSSL ca $SSLEAY_CONFIG"
+VERIFY="$OPENSSL verify"
+X509="$OPENSSL x509"
+PKCS12="openssl pkcs12"
+
+ローカルPCの時計を過去時間に変更
+
+
+/usr/ssl/misc/CA.sh -newca
+
+
+②ユーザ証明書要求
+
+・RSA秘密鍵の作成
+openssl genrsa -des3 -out pio22.key 1024
+
+・RSA秘密鍵のパスフレーズ削除
+openssl rsa -in pio22.key -out pio22.key
+
+・X.509証明書要求（CSR：Certification Signing Request ）の作成
+openssl req -new -key pio22.key -out pio22.csr
+
+→ココで国名とか聞かれる
+
+・発行管理ファイル作成（存在しない場合のみ）
+#echo 00 > /home/${user}/ca_expiration/cacert.srl
+
+③ルート証明書を使ってユーザ証明書要求へ署名
+#openssl x509 -in pio22.csr -CA /home/${user}/ca_expiration/cacert.pem -CAkey /home/${user}/ca_expiration/private/cakey.pem -out pio22.crt -req -days 36500

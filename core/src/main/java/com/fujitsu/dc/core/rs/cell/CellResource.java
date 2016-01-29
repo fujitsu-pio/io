@@ -94,6 +94,11 @@ public final class CellResource {
             throw DcCoreException.Dav.CELL_NOT_FOUND;
         }
         this.davCmp = ModelFactory.cellCmp(this.cell);
+        if (!this.davCmp.isExists()) {
+            // クリティカルなタイミングでCellが削除された場合
+            throw DcCoreException.Dav.CELL_NOT_FOUND;
+        }
+
         this.cellRsCmp = new CellRsCmp(this.davCmp, this.cell, this.accessContext);
         checkReferenceMode();
     }

@@ -195,21 +195,6 @@ public final class ODataSvcSchemaResource extends ODataResource {
     }
 
     /**
-     * 更新前処理.
-     * @param oEntityWrapper OEntityWrapperオブジェクト
-     * @param oEntityKey 更新対象のentityKey
-     */
-    @Override
-    public void beforeUpdate(final OEntityWrapper oEntityWrapper, final OEntityKey oEntityKey) {
-        // 未対応のEntityTypeかチェックする
-        String entityTypeName = oEntityWrapper.getEntitySetName();
-        // ComplexTypeの更新は未対応のため501を返却する
-        if (entityTypeName.equals(ComplexType.EDM_TYPE_NAME)) {
-            throw DcCoreException.Misc.METHOD_NOT_IMPLEMENTED;
-        }
-    }
-
-    /**
      * 部分更新前処理.
      * @param oEntityWrapper OEntityWrapperオブジェクト
      * @param oEntityKey 削除対象のentityKey

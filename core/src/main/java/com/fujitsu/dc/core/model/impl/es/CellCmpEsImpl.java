@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.fujitsu.dc.common.es.response.DcGetResponse;
 import com.fujitsu.dc.common.es.response.DcIndexResponse;
 import com.fujitsu.dc.common.es.response.DcSearchResponse;
+import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.Cell;
 import com.fujitsu.dc.core.model.CellCmp;
 import com.fujitsu.dc.core.model.DavNode;
@@ -181,5 +182,10 @@ public class CellCmpEsImpl extends DavCmpEsImpl implements CellCmp {
     @Override
     public Lock lock() {
         return LockManager.getLock(Lock.CATEGORY_CELL, this.cell.getId(), null, null);
+    }
+
+    @Override
+    public DcCoreException getNotFoundException() {
+        return DcCoreException.Dav.CELL_NOT_FOUND;
     }
 }

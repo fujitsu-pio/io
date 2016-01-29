@@ -153,6 +153,11 @@ public final class OAuth2Helper {
          * refresh_token.
          */
         public static final String REFRESH_TOKEN = "refresh_token";
+        /**
+         * dc1-oidc google.
+         */
+        public static final String DC1_OIDC_GOOGLE = "urn:x-dc1:oidc:google";
+
     }
 
     /**
@@ -221,6 +226,11 @@ public final class OAuth2Helper {
          * refresh_token.
          */
         public static final String REFRESH_TOKEN = "refresh_token";
+        /**
+         * id_token.
+         */
+        public static final String ID_TOKEN = "id_token";
+
         /**
          * session_id.
          */

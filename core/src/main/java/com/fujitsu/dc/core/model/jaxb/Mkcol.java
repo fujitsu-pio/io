@@ -77,7 +77,7 @@ public final class Mkcol {
     }
 
     /**
-     * これクッションタイプ文字列を返します.
+     * コレクションタイプ文字列を返します.
      * @return ColType文字列
      * @throws RequestException 例外
      */
