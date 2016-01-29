@@ -1,10 +1,11 @@
-
 personium.io
 ====
 
 An interconnectable open source BaaS(Backend as a Service) / PDS (Personal Data Store) server.
 
 http://personium.io/
+
+
 
 ## Components
 
@@ -19,36 +20,30 @@ http://personium.io/
 	client-java             - Java client. Engine internally uses it.
 	client-js               - JavaScript client for web browsers.
 
+
 ## Documentation
 
-http://personium.io/docs/
+Documentaion including installation and development can be found at [personium.io wiki](https://github.com/personium/io/wiki).
 
-Wiki pages are also available.
-https://github.com/personium/io/wiki
+
+## Community
+
+Please join and discuss at our [google group](https://groups.google.com/forum/?hl=en#!forum/personium-io).
+
+
 
 ## Note
 
-	This project started as a proprietary service platform development
-	to accelerate Fujitsu's social innovations business.
+This  project started as a proprietary service platform to accelerate Fujitsu's social innovation.
+   On Dec. 2014, we made this project open source to share,collaborate and make innovation with comunity.
 
-	As of Dec. 2014, this project is still on the way from properietary
-	to open source, and thus this product is not ready to be comfortably
-	used by everyone yet.
 
-	We are going to prepare missing parts, e.g. documents, tools, etc.,
-	to resolve this situation as soon as possible.
 
-## Set up
 
-1. Try personium.io  on your machine !
 
-	Please refer __io-vagrant-ansible__ page. ([io-vagrant-ansible](https://github.com/personium/io-vagrant-ansible))
 
-2. Try personium.io on your cloud !
 
-	**On AWS**
 
-	Now preparing
 
 ## License
 
@@ -64,4 +59,4 @@ https://github.com/personium/io/wiki
 	See the License for the specific language governing permissions and
 	limitations under the License.
 
-	Copyright 2015 FUJITSU LIMITED
+	Copyright 2014 FUJITSU LIMITED
