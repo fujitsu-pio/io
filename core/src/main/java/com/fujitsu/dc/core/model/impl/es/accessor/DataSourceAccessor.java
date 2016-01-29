@@ -59,6 +59,7 @@ public class DataSourceAccessor {
     private EsIndex index;
     private EsType type;
     private JdbcAds ads;
+    private String routingid;
 
     /** ログ用オブジェクト. */
     static Logger log = LoggerFactory.getLogger(DataSourceAccessor.class);
@@ -93,6 +94,7 @@ public class DataSourceAccessor {
         int times = Integer.valueOf(DcCoreConfig.getESRetryTimes());
         int interval = Integer.valueOf(DcCoreConfig.getESRetryInterval());
         this.type = EsModel.type(index.getName(), name, routingId, times, interval);
+        this.routingid = routingId;
         try {
             if (DcCoreConfig.getEsAdsType().equals(DcCoreConfig.ES.ADS.TYPE_JDBC)) {
                 ads = new JdbcAds();
@@ -136,6 +138,14 @@ public class DataSourceAccessor {
      */
     public String getType() {
         return this.type.getType();
+    }
+
+    /**
+     * ESへの検索時に使用するルーティングIDを取得する.
+     * @return ルーティングID
+     */
+    protected String getRoutingId() {
+        return this.routingid;
     }
 
     /**
@@ -325,6 +335,29 @@ public class DataSourceAccessor {
     }
 
     /**
+     * ESのインデックスに対してドキュメントを検索する.
+     * @param query クエリ情報
+     * @return ES応答
+     */
+    public DcSearchResponse indexSearch(final Map<String, Object> query) {
+        Map<String, Object> requestQuery = null;
+        if (query == null) {
+            requestQuery = new HashMap<String, Object>();
+        } else {
+            requestQuery = new HashMap<String, Object>(query);
+        }
+
+        if (!requestQuery.containsKey("size")) {
+            requestQuery.put("size", this.count(query));
+        }
+        try {
+            return this.index.search(null, requestQuery);
+        } catch (EsClientException.EsNoResponseException e) {
+            throw DcCoreException.Server.ES_RETRY_OVER.params(e.getMessage());
+        }
+    }
+
+    /**
      * Delete a document.
      * @param docId Document id to delete
      * @param version The version of the document to delete
@@ -342,7 +375,8 @@ public class DataSourceAccessor {
     }
 
     /**
-     * バルクでデータを登録する.
+     * バルクでデータを登録する.<br />
+     * 更新、削除は未サポート.
      * @param esBulkRequest ES用バルク登録ドキュメントリスト
      * @param adsBulkRequest ADS用バルク登録ドキュメントリスト
      * @param routingId routingId
@@ -356,7 +390,7 @@ public class DataSourceAccessor {
 
         DcBulkResponse response = null;
         try {
-            response = this.index.bulkCreate(routingId, esBulkRequest);
+            response = this.index.bulkRequest(routingId, esBulkRequest, false);
         } catch (EsClientException.EsNoResponseException e) {
             throw DcCoreException.Server.ES_RETRY_OVER.params(e.getMessage());
         }
@@ -373,7 +407,7 @@ public class DataSourceAccessor {
                     AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                             this.getIndex().getName(), docHandler.getType(), lockKey,
                             docHandler.getCellId(), docHandler.getId(),
-                            AdsWriteFailureLogInfo.OPERATION_KIND.CREATE, 1, docHandler.getUpdated());
+                            AdsWriteFailureLogInfo.OperationKind.CREATE, 1, docHandler.getUpdated());
                     recordAdsWriteFailureLog(loginfo);
                 }
             }
@@ -382,7 +416,8 @@ public class DataSourceAccessor {
     }
 
     /**
-     * バルクでデータを登録/更新する.
+     * バルクでデータを登録/更新する.<br />
+     * 削除は未サポート.
      * @param esBulkRequest ES用バルク登録ドキュメントリスト
      * @param adsBulkEntityRequest ADS用バルク更新ドキュメントリスト(Entity)
      * @param adsBulkLinkRequest ADS用バルク登録ドキュメントリスト(Link)
@@ -398,7 +433,7 @@ public class DataSourceAccessor {
 
         DcBulkResponse response = null;
         try {
-            response = this.index.bulkCreate(routingId, esBulkRequest);
+            response = this.index.bulkRequest(routingId, esBulkRequest, false);
         } catch (EsClientException.EsNoResponseException e) {
             throw DcCoreException.Server.ES_RETRY_OVER.params(e.getMessage());
         }
@@ -428,7 +463,7 @@ public class DataSourceAccessor {
                     AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                             this.getIndex().getName(), docHandler.getType(), lockKey,
                             docHandler.getCellId(), docHandler.getId(),
-                            AdsWriteFailureLogInfo.OPERATION_KIND.UPDATE, itemResponse.version(),
+                            AdsWriteFailureLogInfo.OperationKind.UPDATE, itemResponse.version(),
                             docHandler.getUpdated());
                     recordAdsWriteFailureLog(loginfo);
                 }
@@ -448,7 +483,7 @@ public class DataSourceAccessor {
                     AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                             this.getIndex().getName(), EsModel.TYPE_CTL_LINK, lockKey,
                             docHandler.getCellId(), docHandler.getId(),
-                            AdsWriteFailureLogInfo.OPERATION_KIND.CREATE, 1, docHandler.getUpdated());
+                            AdsWriteFailureLogInfo.OperationKind.CREATE, 1, docHandler.getUpdated());
                     recordAdsWriteFailureLog(loginfo);
                 }
             }

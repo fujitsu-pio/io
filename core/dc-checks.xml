@@ -64,9 +64,9 @@
     <module name="InnerAssignment"/>
     <module name="MagicNumber"/>
     <module name="MissingSwitchDefault"/>
-    <module name="RedundantThrows">
-      <property name="allowUnchecked" value="true"/>
-    </module>
+<!--     <module name="RedundantThrows"> -->
+<!--       <property name="allowUnchecked" value="true"/> -->
+<!--     </module> -->
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="DesignForExtension">
@@ -92,7 +92,7 @@
   <module name="NewlineAtEndOfFile"/>
   <module name="Translation"/>
   <module name="FileLength">
-   <property name="max" value="2500"/>
+   <property name="max" value="4000"/>
   </module>
   <module name="FileTabCharacter">
     <property name="eachLine" value="true"/>

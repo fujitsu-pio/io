@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fujitsu.dc.core.DcCoreException;
+import com.fujitsu.dc.core.annotations.ACL;
 import com.fujitsu.dc.core.annotations.REPORT;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.model.DavCmp;
@@ -175,7 +176,7 @@ public class NullResource {
             Response response = this.davRsCmp.getDavCmp().mkcol(colType).build();
             // ServiceCollectionの場合は、ServiceSource用のWebdavCollectionを生成する
             if (colType.equals(DavCmp.TYPE_COL_SVC) && response.getStatus() == HttpStatus.SC_CREATED) {
-                this.davRsCmp.getDavCmp().load();
+                this.davRsCmp.getDavCmp().loadAndCheckDavInconsistency();
                 DavCmp srcCmp = this.davRsCmp.getDavCmp().getChild(DavCmp.SERVICE_SRC_COLLECTION);
                 response = srcCmp.mkcol(DavCmp.TYPE_COL_WEBDAV).build();
             }
@@ -275,6 +276,30 @@ public class NullResource {
      */
     @WebDAVMethod.PROPPATCH
     public final Response proppatch() {
+        // アクセス制御
+        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+
+        throw DcCoreException.Dav.RESOURCE_NOT_FOUND.params(this.davRsCmp.getUrl());
+    }
+
+    /**
+     * 404 NOT FOUNDを返す.
+     * @return Jax-RS 応答オブジェクト
+     */
+    @ACL
+    public final Response acl() {
+        // アクセス制御
+        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+
+        throw DcCoreException.Dav.RESOURCE_NOT_FOUND.params(this.davRsCmp.getUrl());
+    }
+
+    /**
+     * 404 NOT FOUNDを返す.
+     * @return Jax-RS 応答オブジェクト
+     */
+    @WebDAVMethod.MOVE
+    public final Response move() {
         // アクセス制御
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
 

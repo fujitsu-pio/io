@@ -143,7 +143,7 @@ public class DavNodeAccessor extends DataSourceAccessor {
                         davNode.getBoxId(), null);
                 AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                         this.getIndex().getName(), "dav", lockKey, davNode.getCellId(), davNode.getId(),
-                        AdsWriteFailureLogInfo.OPERATION_KIND.CREATE, 1, davNode.getUpdated());
+                        AdsWriteFailureLogInfo.OperationKind.CREATE, 1, davNode.getUpdated());
                 recordAdsWriteFailureLog(loginfo);
             }
         }
@@ -194,7 +194,7 @@ public class DavNodeAccessor extends DataSourceAccessor {
                         davNode.getBoxId(), null);
                 AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                         this.getIndex().getName(), "dav", lockKey, davNode.getCellId(), davNode.getId(),
-                        AdsWriteFailureLogInfo.OPERATION_KIND.DELETE, version, davNode.getUpdated());
+                        AdsWriteFailureLogInfo.OperationKind.DELETE, version, davNode.getUpdated());
                 recordAdsWriteFailureLog(loginfo);
             }
         }
@@ -277,7 +277,7 @@ public class DavNodeAccessor extends DataSourceAccessor {
                         davNode.getBoxId(), null);
                 AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                         this.getIndex().getName(), "dav", lockKey, davNode.getCellId(), davNode.getId(),
-                        AdsWriteFailureLogInfo.OPERATION_KIND.UPDATE, version, davNode.getUpdated());
+                        AdsWriteFailureLogInfo.OperationKind.UPDATE, version, davNode.getUpdated());
                 recordAdsWriteFailureLog(loginfo);
             }
         }

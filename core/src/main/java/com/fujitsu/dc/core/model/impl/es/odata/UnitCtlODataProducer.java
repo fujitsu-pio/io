@@ -107,6 +107,11 @@ public class UnitCtlODataProducer extends EsODataProducer {
     }
 
     @Override
+    public DataSourceAccessor getAccessorForIndex(final String entitySetName) {
+        return null; // 必要時に実装すること
+    }
+
+    @Override
     public EntitySetAccessor getAccessorForEntitySet(final String entitySetName) {
         return EsModel.unitCtl(entitySetName, EsIndex.CELL_ROUTING_KEY_NAME);
     }

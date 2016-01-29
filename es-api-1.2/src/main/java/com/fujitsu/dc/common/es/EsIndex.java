@@ -95,12 +95,13 @@ public interface EsIndex {
     void deleteByQuery(String routingId, DcQueryBuilder deleteQuery);
 
     /**
-     * バルクでドキュメントを登録.
+     * バルクでドキュメントを登録/更新/削除する.
      * @param routingId routingId
      * @param datas バルクドキュメント
+     * @param isWriteLog リクエスト情報のログ出力有無
      * @return ES応答
      */
-    DcBulkResponse bulkCreate(String routingId, List<EsBulkRequest> datas);
+    DcBulkResponse bulkRequest(final String routingId, final List<EsBulkRequest> datas, boolean isWriteLog);
 
     /**
      * インデックスの設定を更新する.

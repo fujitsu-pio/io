@@ -136,7 +136,10 @@ public class InternalEsClient {
             return;
         }
 
-        Settings st = ImmutableSettings.settingsBuilder().put("cluster.name", clusterName).build();
+        Settings st = ImmutableSettings.settingsBuilder()
+                .put("cluster.name", clusterName)
+                .put("client.transport.sniff", true)
+                .build();
         ImmutableList<DiscoveryNode> connectedNodes = null;
         esTransportClient = new TransportClient(st);
 
@@ -617,26 +620,70 @@ public class InternalEsClient {
     }
 
     /**
-     * バルクでドキュメントを登録.
+     * バルクでドキュメントを登録/更新/削除.
      * @param index インデックス名
      * @param routingId routingId
      * @param datas バルクドキュメント
+     * @param isWriteLog リクエスト情報のログ出力有無
      * @return ES応答
      */
-    public BulkResponse bulkCreate(String index, String routingId, List<EsBulkRequest> datas) {
+    @SuppressWarnings("unchecked")
+    public BulkResponse bulkRequest(String index, String routingId, List<EsBulkRequest> datas, boolean isWriteLog) {
         BulkRequestBuilder bulkRequest = esTransportClient.prepareBulk();
+        List<Map<String, Object>> bulkList = new ArrayList<Map<String, Object>>();
         for (EsBulkRequest data : datas) {
 
-            IndexRequestBuilder req = esTransportClient.
-                    prepareIndex(index, data.getType(), data.getId()).setSource(data.getSource());
-            if (routingFlag) {
-                req = req.setRouting(routingId);
+            if (EsBulkRequest.BULK_REQUEST_TYPE.DELETE == data.getRequestType()) {
+                bulkRequest.add(createDeleteRequest(index, routingId, data));
+            } else {
+                bulkRequest.add(createIndexRequest(index, routingId, data));
             }
-            bulkRequest.add(req);
+            JSONObject logData = new JSONObject();
+            logData.put("reqType", data.getRequestType().toString());
+            logData.put("type", data.getType());
+            logData.put("id", data.getId());
+            logData.put("source", data.getSource());
+            bulkList.add(logData);
         }
+        Map<String, Object> debug = new HashMap<String, Object>();
+        debug.put("bulk", bulkList);
 
         BulkResponse ret = bulkRequest.setRefresh(true).execute().actionGet();
+        if (isWriteLog) {
+            this.fireEvent(Event.afterRequest, index, "none", "none", debug, "bulkRequest");
+        }
         return ret;
+    }
+
+    /**
+     * バルクリクエストのINDEXリクエストを作成する.
+     * @param index インデックス名
+     * @param routingId ルーティングID
+     * @param data バルクドキュメント情報
+     * @return 作成したINDEXリクエスト
+     */
+    private IndexRequestBuilder createIndexRequest(String index, String routingId, EsBulkRequest data) {
+        IndexRequestBuilder request = esTransportClient.
+                prepareIndex(index, data.getType(), data.getId()).setSource(data.getSource());
+        if (routingFlag) {
+            request = request.setRouting(routingId);
+        }
+        return request;
+    }
+
+    /**
+     * バルクリクエストのDELETEリクエストを作成する.
+     * @param index インデックス名
+     * @param routingId ルーティングID
+     * @param data バルクドキュメント情報
+     * @return 作成したDELETEリクエスト
+     */
+    private DeleteRequestBuilder createDeleteRequest(String index, String routingId, EsBulkRequest data) {
+        DeleteRequestBuilder request = esTransportClient.prepareDelete(index, data.getType(), data.getId());
+        if (routingFlag) {
+            request = request.setRouting(routingId);
+        }
+        return request;
     }
 
     /**

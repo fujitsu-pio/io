@@ -36,7 +36,7 @@ public class AdsWriteFailureLogInfo {
     /**
      * ADSへの書き込みに失敗した際の操作種別.
      */
-    public enum OPERATION_KIND {
+    public enum OperationKind {
         /** データの新規作成. */
         CREATE,
         /** データの更新. */
@@ -51,8 +51,8 @@ public class AdsWriteFailureLogInfo {
          * @param value enumの文字列表現
          * @return valueに対応するenum値
          */
-        public static OPERATION_KIND fromValue(String value) {
-            for (OPERATION_KIND item : OPERATION_KIND.values()) {
+        public static OperationKind fromValue(String value) {
+            for (OperationKind item : OperationKind.values()) {
                 if (item.toString().equals(value)) {
                     return item;
                 }
@@ -72,7 +72,7 @@ public class AdsWriteFailureLogInfo {
     /** 補正データのUUID. */
     private String uuid;
     /** 操作種別. */
-    private OPERATION_KIND operation;
+    private OperationKind operation;
     /** Elasticsearch上に存在するドキュメントのバージョン情報. */
     private long esVersion;
     /** PCSで発行したドキュメントの更新時刻 . */
@@ -100,7 +100,7 @@ public class AdsWriteFailureLogInfo {
             String lockKey,
             String routingId,
             String uuid,
-            OPERATION_KIND operation,
+            OperationKind operation,
             long esVersion,
             long updated) {
         this.indexName = indexName;
@@ -246,7 +246,7 @@ public class AdsWriteFailureLogInfo {
         newObj.routingId = fields[LOG_FIELD_ROUTING_ID].trim();
         newObj.uuid = fields[LOG_FIELD_UUID].trim();
         try {
-            newObj.operation = OPERATION_KIND.fromValue(fields[LOG_FIELD_OPERATION].trim());
+            newObj.operation = OperationKind.fromValue(fields[LOG_FIELD_OPERATION].trim());
         } catch (IllegalArgumentException e) {
             String message = "Invalid field item. [%s, 'operation kind']";
             throw new AdsWriteFailureLogException(String.format(message, indata), e);

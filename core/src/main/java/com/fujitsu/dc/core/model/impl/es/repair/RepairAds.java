@@ -276,8 +276,8 @@ public class RepairAds {
                         // 各行のフォーマットチェック
                         AdsWriteFailureLogInfo logInfo = AdsWriteFailureLogInfo.parse(logRecords.get(i));
                         // セル再帰的削除のリペアは未サポートのため退避ログに出力しスキップ
-                        if (AdsWriteFailureLogInfo.OPERATION_KIND.PCS_MANAGEMENT_INSERT
-                        == AdsWriteFailureLogInfo.OPERATION_KIND.fromValue(logInfo.getOperation())) {
+                        if (AdsWriteFailureLogInfo.OperationKind.PCS_MANAGEMENT_INSERT
+                        == AdsWriteFailureLogInfo.OperationKind.fromValue(logInfo.getOperation())) {
                             writeAdsErrorLog(logInfo.toString());
                             logger.warn("CellBulkDeletion is not supported by Master Repair.");
                             continue;

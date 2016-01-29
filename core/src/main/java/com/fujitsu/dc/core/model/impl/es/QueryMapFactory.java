@@ -91,6 +91,19 @@ public final class QueryMapFactory {
     }
 
     /**
+     * bool.shouldクエリの情報を格納したMapインスタンスを生成して返却する.
+     * @param queries shouldクエリにて指定するクエリ一覧
+     * @return 入力値を格納したMap
+     */
+    public static Map<String, Object> shouldQuery(List<Map<String, Object>> queries) {
+        Map<String, Object> bool = new HashMap<String, Object>();
+        Map<String, Object> should = new HashMap<String, Object>();
+        should.put("should", queries);
+        bool.put("bool", should);
+        return bool;
+    }
+
+    /**
      * missingクエリの情報を格納したMapのインスタンスを生成して返却する.
      * @param key 検索キー
      * @return 入力値を格納したMap
@@ -185,5 +198,18 @@ public final class QueryMapFactory {
             }
         }
         return implicitFilters;
+    }
+
+    /**
+     * Elasticsearchの複数タイプに対するtermクエリのリストを生成する.
+     * @param searchTargetTypes Elasticsearchのタイプのリスト
+     * @return 作成したtermクエリのリスト
+     */
+    public static List<Map<String, Object>> multiTypeTerms(String[] searchTargetTypes) {
+        List<Map<String, Object>> multiTypeTerms = new ArrayList<Map<String, Object>>();
+        for (String type : searchTargetTypes) {
+            multiTypeTerms.add(termQuery("_type", type));
+        }
+        return multiTypeTerms;
     }
 }

@@ -1,0 +1,181 @@
+{
+  "_id": "_design/search",
+  "fulltext": {
+    "default": {
+      "index": "function(doc) {
+        var ret=new Document();
+        var findex = function(d){
+          if(typeof d == \"object\"){
+            for(var k in d){
+              if (\"::meta\" == k){continue;}
+              if (\"_rev\" == k){continue;}
+              if (\"_attachments\" == k){continue;}
+              findex(d[k]);
+            }
+          }else{
+            if (d != null){
+              ret.add(d,{\"field\": \"_fulltext\", \"type\" : \"string\",\"store\":\"yes\"});
+            }
+          }
+        };
+        findex(doc);
+        ret.add(doc._id,{\"field\": \"id\", \"store\":\"yes\"});
+        if (doc['::meta'] != undefined) {
+            ret.add(doc['::meta'].type,{\"field\": \"_self_type\", \"store\":\"yes\"});
+          if (doc['::meta'].links != undefined) {
+            for(var i=0,n=doc['::meta'].links.length;i<n;i++){
+              ret.add(doc['::meta'].links[i].id,{\"field\": \"_p_id\", \"store\":\"yes\"});
+              ret.add(doc['::meta'].links[i].type,{\"field\": \"_p_type\", \"store\":\"yes\"});
+            }
+          }
+          if (doc['::meta'].type == \"log\") {
+            ret.add(doc.date,{\"field\": \"log_date\", \"store\":\"yes\"});
+            ret.add(doc.date,{\"field\": \"log_date__substr\", \"store\":\"yes\"});
+            ret.add(doc.logType,{\"field\": \"log_logType\", \"store\":\"yes\"});
+            ret.add(doc.logType,{\"field\": \"log_logType__substr\", \"store\":\"yes\"});
+            ret.add(doc.foodType,{\"field\": \"log_foodType\", \"store\":\"yes\"});
+            ret.add(doc.foodType,{\"field\": \"log_foodType__substr\", \"store\":\"yes\"});
+            ret.add(doc.foodAmount,{\"field\": \"log_foodAmount\", \"store\":\"yes\"});
+            ret.add(doc.foodAmount,{\"field\": \"log_foodAmount__substr\", \"store\":\"yes\"});
+            ret.add(doc.pooCondition,{\"field\": \"log_pooCondition\", \"store\":\"yes\"});
+            ret.add(doc.pooCondition,{\"field\": \"log_pooCondition__substr\", \"store\":\"yes\"});
+            ret.add(doc.walkTime,{\"field\": \"log_walkTime\", \"store\":\"yes\"});
+            ret.add(doc.walkTime,{\"field\": \"log_walkTime__substr\", \"store\":\"yes\"});
+            ret.add(doc.deviceId,{\"field\": \"log_deviceId\", \"store\":\"yes\"});
+            ret.add(doc.deviceId,{\"field\": \"log_deviceId__substr\", \"store\":\"yes\"});
+            ret.add(doc.steps,{\"field\": \"log_steps\", \"store\":\"yes\"});
+            ret.add(doc.steps,{\"field\": \"log_steps__substr\", \"store\":\"yes\"});
+            ret.add(doc.temperature,{\"field\": \"log_temperature\", \"store\":\"yes\"});
+            ret.add(doc.temperature,{\"field\": \"log_temperature__substr\", \"store\":\"yes\"});
+            ret.add(doc.shakes,{\"field\": \"log_shakes\", \"store\":\"yes\"});
+            ret.add(doc.shakes,{\"field\": \"log_shakes__substr\", \"store\":\"yes\"});
+            ret.add(doc.diary,{\"field\": \"log_diary\", \"store\":\"yes\"});
+            ret.add(doc.diary,{\"field\": \"log_diary__substr\", \"store\":\"yes\"});
+            ret.add(doc.bestshotPath,{\"field\": \"log_bestshotPath\", \"store\":\"yes\"});
+            ret.add(doc.bestshotPath,{\"field\": \"log_bestshotPath__substr\", \"store\":\"yes\"});
+            ret.add(doc.bestshotComent,{\"field\": \"log_bestshotComent\", \"store\":\"yes\"});
+            ret.add(doc.bestshotComent,{\"field\": \"log_bestshotComent__substr\", \"store\":\"yes\"});
+            ret.add(doc.isBestshotPublic,{\"field\": \"log_isBestshotPublic\", \"store\":\"yes\"});
+            ret.add(doc.isBestshotPublic,{\"field\": \"log_isBestshotPublic__substr\", \"store\":\"yes\"});
+            ret.add(doc.weight,{\"field\": \"log_weight\", \"store\":\"yes\"});
+            ret.add(doc.weight,{\"field\": \"log_weight__substr\", \"store\":\"yes\"});
+            ret.add(doc.dailySteps,{\"field\": \"log_dailySteps\", \"store\":\"yes\"});
+            ret.add(doc.dailySteps,{\"field\": \"log_dailySteps__substr\", \"store\":\"yes\"});
+            ret.add(doc.dailyTemperature,{\"field\": \"log_dailyTemperature\", \"store\":\"yes\"});
+            ret.add(doc.dailyTemperature,{\"field\": \"log_dailyTemperature__substr\", \"store\":\"yes\"});
+            ret.add(doc.dailyShakes,{\"field\": \"log_dailyShakes\", \"store\":\"yes\"});
+            ret.add(doc.dailyShakes,{\"field\": \"log_dailyShakes__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlySteps,{\"field\": \"log_monthlySteps\", \"store\":\"yes\"});
+            ret.add(doc.monthlySteps,{\"field\": \"log_monthlySteps__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlyTemperature,{\"field\": \"log_monthlyTemperature\", \"store\":\"yes\"});
+            ret.add(doc.monthlyTemperature,{\"field\": \"log_monthlyTemperature__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlyShakes,{\"field\": \"log_monthlyShakes\", \"store\":\"yes\"});
+            ret.add(doc.monthlyShakes,{\"field\": \"log_monthlyShakes__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlyFoodNumber,{\"field\": \"log_monthlyFoodNumber\", \"store\":\"yes\"});
+            ret.add(doc.monthlyFoodNumber,{\"field\": \"log_monthlyFoodNumber__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlyFoodAmount,{\"field\": \"log_monthlyFoodAmount\", \"store\":\"yes\"});
+            ret.add(doc.monthlyFoodAmount,{\"field\": \"log_monthlyFoodAmount__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlyPooNumber,{\"field\": \"log_monthlyPooNumber\", \"store\":\"yes\"});
+            ret.add(doc.monthlyPooNumber,{\"field\": \"log_monthlyPooNumber__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlyWalkNumber,{\"field\": \"log_monthlyWalkNumber\", \"store\":\"yes\"});
+            ret.add(doc.monthlyWalkNumber,{\"field\": \"log_monthlyWalkNumber__substr\", \"store\":\"yes\"});
+            ret.add(doc.monthlyWalkTime,{\"field\": \"log_monthlyWalkTime\", \"store\":\"yes\"});
+            ret.add(doc.monthlyWalkTime,{\"field\": \"log_monthlyWalkTime__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlySteps,{\"field\": \"log_yearlySteps\", \"store\":\"yes\"});
+            ret.add(doc.yearlySteps,{\"field\": \"log_yearlySteps__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlyTemperature,{\"field\": \"log_yearlyTemperature\", \"store\":\"yes\"});
+            ret.add(doc.yearlyTemperature,{\"field\": \"log_yearlyTemperature__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlyShakes,{\"field\": \"log_yearlyShakes\", \"store\":\"yes\"});
+            ret.add(doc.yearlyShakes,{\"field\": \"log_yearlyShakes__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlyFoodNumber,{\"field\": \"log_yearlyFoodNumber\", \"store\":\"yes\"});
+            ret.add(doc.yearlyFoodNumber,{\"field\": \"log_yearlyFoodNumber__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlyFoodAmount,{\"field\": \"log_yearlyFoodAmount\", \"store\":\"yes\"});
+            ret.add(doc.yearlyFoodAmount,{\"field\": \"log_yearlyFoodAmount__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlyPooNumber,{\"field\": \"log_yearlyPooNumber\", \"store\":\"yes\"});
+            ret.add(doc.yearlyPooNumber,{\"field\": \"log_yearlyPooNumber__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlyWalkNumber,{\"field\": \"log_yearlyWalkNumber\", \"store\":\"yes\"});
+            ret.add(doc.yearlyWalkNumber,{\"field\": \"log_yearlyWalkNumber__substr\", \"store\":\"yes\"});
+            ret.add(doc.yearlyWalkTime,{\"field\": \"log_yearlyWalkTime\", \"store\":\"yes\"});
+            ret.add(doc.yearlyWalkTime,{\"field\": \"log_yearlyWalkTime__substr\", \"store\":\"yes\"});
+          }
+        }
+        return ret
+      }",
+      "analyzer": "perfield:{
+        id:\"keyword\",
+        _self_type:\"keyword\",
+        _p_id:\"keyword\",
+        _p_type:\"keyword\",
+        log_date:\"keyword\",
+        log_date__substr:\"standard\",
+        log_logType:\"keyword\",
+        log_logType__substr:\"standard\",
+        log_foodType:\"keyword\",
+        log_foodType__substr:\"standard\",
+        log_foodAmount:\"keyword\",
+        log_foodAmount__substr:\"standard\",
+        log_pooCondition:\"keyword\",
+        log_pooCondition__substr:\"standard\",
+        log_walkTime:\"keyword\",
+        log_walkTime__substr:\"standard\",
+        log_deviceId:\"keyword\",
+        log_deviceId__substr:\"standard\",
+        log_steps:\"keyword\",
+        log_steps__substr:\"standard\",
+        log_temperature:\"keyword\",
+        log_temperature__substr:\"standard\",
+        log_shakes:\"keyword\",
+        log_shakes__substr:\"standard\",
+        log_diary:\"keyword\",
+        log_diary__substr:\"standard\",
+        log_bestshotPath:\"keyword\",
+        log_bestshotPath__substr:\"standard\",
+        log_bestshotComent:\"keyword\",
+        log_bestshotComent__substr:\"standard\",
+        log_isBestshotPublic:\"keyword\",
+        log_isBestshotPublic__substr:\"standard\",
+        log_weight:\"keyword\",
+        log_weight__substr:\"standard\",
+        log_dailySteps:\"keyword\",
+        log_dailySteps__substr:\"standard\",
+        log_dailyTemperature:\"keyword\",
+        log_dailyTemperature__substr:\"standard\",
+        log_dailyShakes:\"keyword\",
+        log_dailyShakes__substr:\"standard\",
+        log_monthlySteps:\"keyword\",
+        log_monthlySteps__substr:\"standard\",
+        log_monthlyTemperature:\"keyword\",
+        log_monthlyTemperature__substr:\"standard\",
+        log_monthlyShakes:\"keyword\",
+        log_monthlyShakes__substr:\"standard\",
+        log_monthlyFoodNumber:\"keyword\",
+        log_monthlyFoodNumber__substr:\"standard\",
+        log_monthlyFoodAmount:\"keyword\",
+        log_monthlyFoodAmount__substr:\"standard\",
+        log_monthlyPooNumber:\"keyword\",
+        log_monthlyPooNumber__substr:\"standard\",
+        log_monthlyWalkNumber:\"keyword\",
+        log_monthlyWalkNumber__substr:\"standard\",
+        log_monthlyWalkTime:\"keyword\",
+        log_monthlyWalkTime__substr:\"standard\",
+        log_yearlySteps:\"keyword\",
+        log_yearlySteps__substr:\"standard\",
+        log_yearlyTemperature:\"keyword\",
+        log_yearlyTemperature__substr:\"standard\",
+        log_yearlyShakes:\"keyword\",
+        log_yearlyShakes__substr:\"standard\",
+        log_yearlyFoodNumber:\"keyword\",
+        log_yearlyFoodNumber__substr:\"standard\",
+        log_yearlyFoodAmount:\"keyword\",
+        log_yearlyFoodAmount__substr:\"standard\",
+        log_yearlyPooNumber:\"keyword\",
+        log_yearlyPooNumber__substr:\"standard\",
+        log_yearlyWalkNumber:\"keyword\",
+        log_yearlyWalkNumber__substr:\"standard\",
+        log_yearlyWalkTime:\"keyword\",
+        log_yearlyWalkTime__substr:\"standard\",
+        _fulltext:\"cjk\" 
+      }" 
+    }
+  }
+}
