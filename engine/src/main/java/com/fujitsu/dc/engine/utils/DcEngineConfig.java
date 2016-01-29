@@ -21,14 +21,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-
 
 /**
  * 設定情報を保持するクラス. このクラスからクラスパス上にある dc-config.propertiesの内容にアクセスできます。
@@ -42,7 +40,32 @@ public class DcEngineConfig {
     /**
      * 本アプリで使うプロパティキーのプレフィクス.
      */
-    static final String KEY_ROOT = "com.fujitsu.dc.engine.";
+    static final String KEY_ROOT = "com.fujitsu.dc.core.";
+    static final String COMPATIBLE_KEY_ROOT = "com.fujitsu.dc.engine.";
+
+    // For property compatibility.
+    // Previous version of personium.io engine module had been used property names
+    // starting with COMPATIBLE_KEY_ROOT.
+    // Now, KEY_ROOT is used instead of COMPATIBLE_KEY_ROOT.
+    static Map<String, String> compattibleToNormalKeyMap = new HashMap<String, String>();
+
+    /**
+     * Converts old style property name to current style property name.
+     * If the format is different from old style property name, returns the argument value as is.
+     * @param compatibleKey Stale property name
+     * @return Current property name
+     */
+    static String convertCompatibleKeyToNormalKey(String compatibleKey) {
+        if (compattibleToNormalKeyMap.containsKey(compatibleKey)) {
+            return compattibleToNormalKeyMap.get(compatibleKey);
+        }
+        if (compatibleKey.startsWith(COMPATIBLE_KEY_ROOT)) {
+            String normalKey = compatibleKey.replaceFirst(COMPATIBLE_KEY_ROOT, KEY_ROOT);
+            compattibleToNormalKeyMap.put(compatibleKey, normalKey);
+            return normalKey;
+        }
+        return compatibleKey;
+    }
 
     /**
      * Elastic Search 関連の設定.
@@ -52,6 +75,7 @@ public class DcEngineConfig {
          * Elastic Search ホスト設定のプロパティキー.
          */
         public static final String HOSTS = KEY_ROOT + "elasticsearch.hosts";
+
         /**
          * Elastic Search クラスタ名設定のプロパティキー.
          */
@@ -100,6 +124,11 @@ public class DcEngineConfig {
     }
 
     /**
+     * マスタートークン設定のキー.
+     */
+    public static final String MASTER_TOKEN = KEY_ROOT + "masterToken";
+
+    /**
      * X509廻りの設定.
      */
     public static final class X509 {
@@ -134,11 +163,19 @@ public class DcEngineConfig {
     public static final String CONFIG_VERSION = KEY_ROOT + "version";
 
     /**
-     *  バージョン情報を取得します.
-     *  @return バージョン情報
+     * バージョン情報を取得します.
+     * @return バージョン情報
      */
     public static String getVersion() {
         return get(CONFIG_VERSION);
+    }
+
+    /**
+     * ユニットマスタートークンの値を取得します.
+     * @return マスタートークンの値
+     */
+    public static String getMasterToken() {
+        return get(MASTER_TOKEN);
     }
 
     /**
@@ -206,6 +243,10 @@ public class DcEngineConfig {
      * 設定のリロード.
      */
     private synchronized void doReload() {
+
+        // Clear the compatible key map.
+        compattibleToNormalKeyMap.clear();
+
         Logger log = LoggerFactory.getLogger(DcEngineConfig.class);
         Properties properties = getDcConfigDefaultProperties();
         Properties propertiesOverride = getDcConfigProperties();
@@ -216,7 +257,8 @@ public class DcEngineConfig {
                 if (!(entry.getKey() instanceof String)) {
                     continue;
                 }
-                this.props.setProperty((String) entry.getKey(), (String) entry.getValue());
+                String key = convertCompatibleKeyToNormalKey((String) entry.getKey());
+                this.props.setProperty(key, (String) entry.getValue());
             }
         }
         if (!propertiesOverride.isEmpty()) {
@@ -225,7 +267,8 @@ public class DcEngineConfig {
                 if (!(entry.getKey() instanceof String)) {
                     continue;
                 }
-                this.propsOverride.setProperty((String) entry.getKey(), (String) entry.getValue());
+                String key = convertCompatibleKeyToNormalKey((String) entry.getKey());
+                this.propsOverride.setProperty(key, (String) entry.getValue());
             }
         }
         for (Object keyObj : propsOverride.keySet()) {
@@ -245,8 +288,7 @@ public class DcEngineConfig {
      */
     protected Properties getDcConfigDefaultProperties() {
         Properties properties = new Properties();
-        InputStream is = DcEngineConfig.class.getClassLoader()
-                .getResourceAsStream("dc-config-default.properties");
+        InputStream is = DcEngineConfig.class.getClassLoader().getResourceAsStream("dc-config-default.properties");
         try {
             properties.load(is);
         } catch (IOException e) {
@@ -299,8 +341,7 @@ public class DcEngineConfig {
         Logger log = LoggerFactory.getLogger(DcEngineConfig.class);
         InputStream configFileInputStream = null;
         if (configFilePath == null) {
-            configFileInputStream = DcEngineConfig.class.getClassLoader()
-                    .getResourceAsStream("dc-config.properties");
+            configFileInputStream = DcEngineConfig.class.getClassLoader().getResourceAsStream("dc-config.properties");
             return configFileInputStream;
         }
 
@@ -311,8 +352,7 @@ public class DcEngineConfig {
             log.info("dc-config.properties from system properties.");
         } catch (FileNotFoundException e) {
             // 指定されたパスにファイルが存在しない場合は、クラスパス上のファイルを読み込む
-            configFileInputStream = DcEngineConfig.class.getClassLoader()
-                    .getResourceAsStream("dc-config.properties");
+            configFileInputStream = DcEngineConfig.class.getClassLoader().getResourceAsStream("dc-config.properties");
             log.info("dc-config.properties from class path.");
         }
         return configFileInputStream;
@@ -324,7 +364,9 @@ public class DcEngineConfig {
      * @return 設定値
      */
     private String doGet(final String key) {
-        return props.getProperty(key);
+        // For compatibility of old style property name prefix.
+        String propKey = convertCompatibleKeyToNormalKey(key);
+        return props.getProperty(propKey);
     }
 
     /**
