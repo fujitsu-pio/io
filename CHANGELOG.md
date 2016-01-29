@@ -1,3 +1,19 @@
+## 1.3.23
+
+IMPROVEMENTS:
+
+  - core *[DavDestination.java, DavMoveResource.java, DavCollectionResource.java, DavCmpEsImpl.java, etc.]*:
+    MOVE method for following items are implemented. (Some restrictions apply.)
+   * WebDav
+   * Collection
+   * Service
+  - core *[UserSchemaODataProducer.java ]*:
+    PUT methods to change the name of following items are implmented.
+   * EntityType
+   * Property
+   * ComplexTypeProperty
+   * AssociationEnd
+
 ## 1.3.22a
 
 BACKWARD INCOMPATIBILITIES:

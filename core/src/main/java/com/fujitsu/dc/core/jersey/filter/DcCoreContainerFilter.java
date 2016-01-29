@@ -270,6 +270,7 @@ public final class DcCoreContainerFilter implements ContainerRequestFilter, Cont
                     HttpMethod.HEAD,
                     com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MERGE,
                     com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MKCOL,
+                    com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.MOVE,
                     com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPFIND,
                     com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.PROPPATCH,
                     com.fujitsu.dc.common.utils.DcCoreUtils.HttpMethod.ACL
