@@ -1,0 +1,4 @@
+# engine
+com.fujitsu.dc.engine.testkey=unitTest
+com.fujitsu.dc.core.testKey2=keyWithCorePrefix
+com.fujitsu.dc.engine.testKey3=keyWithEnginePrefix

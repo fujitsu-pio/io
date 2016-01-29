@@ -58,9 +58,9 @@
 		</discriminator>
 		<sift>
 			<appender name="FILE-${eventlog_path}" class="ch.qos.logback.core.rolling.RollingFileAppender">
-				<file>/fjnfs/dc-core/eventlog/${eventlog_path}/current/default.log</file>
+				<file>/personium_nfs/dc-core/eventlog/${eventlog_path}/current/default.log</file>
 				<rollingPolicy class="com.fujitsu.dc.logging.rolling.DcFixedWindowRollingPolicy">
-					<fileNamePattern>/fjnfs/dc-core/eventlog/${eventlog_path}/archive/default.log.%i.zip</fileNamePattern>
+					<fileNamePattern>/personium_nfs/dc-core/eventlog/${eventlog_path}/archive/default.log.%i.zip</fileNamePattern>
 					<minIndex>1</minIndex>
 					<maxIndex>12</maxIndex>
 				</rollingPolicy>
@@ -75,10 +75,10 @@
 	</appender>
 
 	<appender name="FILE_LOGBACK" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>/fj/logback/log/logback.log</file>
+		<file>/personium/logback/log/logback.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
-			<fileNamePattern>/fj/logback/log/logback.log.%d{yyyyMMdd}.gz</fileNamePattern>
+			<fileNamePattern>/personium/logback/log/logback.log.%d{yyyyMMdd}.gz</fileNamePattern>
 		</rollingPolicy>
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]  %logger{0} %msg%n</pattern>

@@ -19,6 +19,8 @@ package com.fujitsu.dc.core.auth;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +30,7 @@ import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.ctl.Account;
+import com.fujitsu.dc.core.odata.OEntityWrapper;
 
 /**
  * 認証関連のユーティリティ.
@@ -93,5 +96,20 @@ public final class AuthUtils {
         }
         return null;
     }
+
+    public static List<String> getAccountType(OEntityWrapper oew) {
+    	String typeStr =  (String) oew.getProperty(Account.P_TYPE.getName()).getValue();
+    	String[] typeAry = typeStr.split(" ");
+    	return Arrays.asList(typeAry);
+    }
+
+    public static boolean isAccountTypeBasic(OEntityWrapper oew) {
+        return getAccountType(oew).contains(Account.TYPE_VALUE_BASIC);
+    }
+
+    public static boolean isAccountTypeOidcGoogle(OEntityWrapper oew) {
+    	return getAccountType(oew).contains(Account.TYPE_VALUE_OIDC_GOOGLE);
+    }
+
 
 }

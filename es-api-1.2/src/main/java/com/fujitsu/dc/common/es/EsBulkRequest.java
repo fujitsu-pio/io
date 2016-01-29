@@ -24,6 +24,22 @@ import java.util.Map;
 public interface EsBulkRequest {
 
     /**
+     * バルクリクエスト内の各リクエスト種別.
+     */
+    enum BULK_REQUEST_TYPE {
+        /** バルクリクエストの登録・更新リクエストを示す識別子 .*/
+        INDEX,
+        /** バルクリクエストの削除リクエストを示す識別子 .*/
+        DELETE;
+    }
+
+    /**
+     * バルクリクエスト内の各リクエスト種別を取得する.
+     * @return バルクリクエスト内の各リクエスト種別
+     */
+    BULK_REQUEST_TYPE getRequestType();
+
+    /**
      * 登録先のタイプを取得する.
      * @return Type名
      */

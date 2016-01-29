@@ -24,12 +24,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.fujitsu.dc.common.es.EsBulkRequest;
 import com.fujitsu.dc.core.DcCoreException;
 
 /**
  * DavのNodeデータを扱うクラス.
  */
-public class DavNode {
+public class DavNode implements EsBulkRequest {
 
     String id;
     String cellId;
@@ -42,6 +43,7 @@ public class DavNode {
     long published;
     long updated;
     Map<String, Object> file;
+    private BULK_REQUEST_TYPE requestType = BULK_REQUEST_TYPE.INDEX;
 
     /** ES上のDavNode格納においてCellの内部IDを保存するJSONキー. */
     public static final String KEY_CELL_ID = "c";
@@ -327,4 +329,22 @@ public class DavNode {
         return json;
     }
 
+    @Override
+    public String getType() {
+        return "dav";
+    }
+
+    @Override
+    public BULK_REQUEST_TYPE getRequestType() {
+        return requestType;
+    }
+
+    /**
+     * リクストの種別（INDEX / DELETE)を設定する. <br />
+     * 既存の処理への影響を考慮して、デフォルト値は INDEX にしておく。
+     * @param request リクエスト種別
+     */
+    public void setRequestType(BULK_REQUEST_TYPE request) {
+        this.requestType = request;
+    }
 }

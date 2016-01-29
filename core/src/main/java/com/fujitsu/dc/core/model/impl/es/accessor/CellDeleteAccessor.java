@@ -105,7 +105,7 @@ public class CellDeleteAccessor {
                     DcCoreConfig.getAdsWriteFailureLogPhysicalDelete());
             AdsWriteFailureLogInfo loginfo = new AdsWriteFailureLogInfo(
                     dbName, null, null, null, cellId,
-                    AdsWriteFailureLogInfo.OPERATION_KIND.PCS_MANAGEMENT_INSERT, 0, 0);
+                    AdsWriteFailureLogInfo.OperationKind.PCS_MANAGEMENT_INSERT, 0, 0);
             try {
                 adsWriteFailureLogWriter.writeActiveFile(loginfo);
             } catch (AdsWriteFailureLogException e2) {

@@ -117,6 +117,11 @@ public class UserDataODataProducer extends EsODataProducer {
     private static EdmDataServices.Builder schemaEdmDataServices = CtlSchema.getEdmDataServicesForODataSvcSchema();
 
     @Override
+    public DataSourceAccessor getAccessorForIndex(final String entitySetName) {
+        return null; // 必要時に実装すること
+    }
+
+    @Override
     public EntitySetAccessor getAccessorForEntitySet(final String entitySetName) {
         return EsModel.cellCtl(cell, USER_ODATA_NAMESPACE);
     }

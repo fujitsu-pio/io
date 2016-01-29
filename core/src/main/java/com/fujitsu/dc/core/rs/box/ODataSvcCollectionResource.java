@@ -23,6 +23,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
@@ -36,6 +37,7 @@ import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.auth.OAuth2Helper.AcceptableAuthScheme;
 import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.model.DavCmp;
+import com.fujitsu.dc.core.model.DavMoveResource;
 import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.rs.odata.ODataResource;
 
@@ -110,7 +112,9 @@ public final class ODataSvcCollectionResource extends ODataResource {
     @DELETE
     public Response delete() {
         // アクセス制御
-        this.checkAccessContext(this.getAccessContext(), BoxPrivilege.WRITE);
+        // ODataSvcCollectionResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
+        this.davRsCmp.getParent().checkAccessContext(this.getAccessContext(), BoxPrivilege.WRITE);
+
         // ODataのスキーマ・データがすでにある場合、処理を失敗させる。
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             throw DcCoreException.Dav.HAS_CHILDREN;
@@ -130,10 +134,24 @@ public final class ODataSvcCollectionResource extends ODataResource {
         return DcCoreUtils.responseBuilderForOptions(
                 HttpMethod.GET,
                 HttpMethod.DELETE,
+                DcCoreUtils.HttpMethod.MOVE,
                 DcCoreUtils.HttpMethod.PROPFIND,
                 DcCoreUtils.HttpMethod.PROPPATCH,
                 DcCoreUtils.HttpMethod.ACL
                 ).build();
+    }
+
+    /**
+     * MOVEメソッドの処理.
+     * @param headers ヘッダ情報
+     * @return JAX-RS応答オブジェクト
+     */
+    @WebDAVMethod.MOVE
+    public Response move(
+            @Context HttpHeaders headers) {
+        // 移動元に対するアクセス制御(親の権限をチェックする)
+        this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        return new DavMoveResource(this.davRsCmp.getParent(), this.davRsCmp.getDavCmp(), headers).doMove();
     }
 
     @Override

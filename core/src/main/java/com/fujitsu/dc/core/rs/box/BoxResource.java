@@ -388,4 +388,18 @@ public final class BoxResource {
         }
         return res;
     }
+
+    /**
+     * MOVEメソッドの処理.
+     * @param headers ヘッダ情報
+     * @return JAX-RS応答オブジェクト
+     */
+    @WebDAVMethod.MOVE
+    public Response move(
+            @Context HttpHeaders headers) {
+
+        // Boxリソースに対するMOVEメソッドは使用禁止
+        this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
+        throw DcCoreException.Dav.RESOURCE_PROHIBITED_TO_MOVE_BOX;
+    }
 }

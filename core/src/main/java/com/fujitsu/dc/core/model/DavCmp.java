@@ -26,6 +26,7 @@ import org.apache.wink.webdav.model.Multistatus;
 import org.apache.wink.webdav.model.Propertyupdate;
 import org.apache.wink.webdav.model.Propfind;
 
+import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.jaxb.Acl;
 import com.fujitsu.dc.core.odata.DcODataProducer;
 
@@ -68,9 +69,21 @@ public interface DavCmp {
     String SERVICE_SRC_COLLECTION = "__src";
 
     /**
-     * 再読み込み.
+     * DavNodeがDB上に存在するかどうか.
+     * @return 存在する場合はtrue
+     */
+    boolean isExists();
+
+    /**
+     * Davの管理データ情報を最新化する.
      */
     void load();
+
+    /**
+     * Davの管理データ情報を最新化する.<br />
+     * 管理データが存在しない場合はエラーとする.
+     */
+    void loadAndCheckDavInconsistency();
 
     /**
      * ACLのgetter.
@@ -243,4 +256,26 @@ public interface DavCmp {
      */
     String getEtag();
 
+    /**
+     * MOVE処理を行う.
+     * @param etag ETag値
+     * @param overwrite 移動先のリソースを上書きするかどうか
+     * @param davDestination 移動先の階層情報
+     * @return ResponseBuilder レスポンス
+     */
+    ResponseBuilder move(String etag, String overwrite, DavDestination davDestination);
+
+    /**
+     * このDavNodeリソースのURLを返します.
+     * @return URL文字列
+     */
+    String getUrl();
+
+    /**
+     * リソースに合わせてNotFoundの例外を返却する. <br />
+     * リソースによってメッセージがことなるため、各リソースのクラスはこのメソッドをオーバーライドしてメッセージを定義すること。 <br />
+     * メッセージの付加情報は、ここでは設定せずに呼び出し元で設定すること。
+     * @return NotFound例外
+     */
+    DcCoreException getNotFoundException();
 }

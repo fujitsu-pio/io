@@ -219,10 +219,22 @@ public final class CellEsImpl implements Cell {
             CellEsImpl ret = new CellEsImpl();
             ret.setJson(resp.getSource());
             ret.id = resp.getId();
+            ret.url = getBaseUri(uriInfo, ret.name);
             return ret;
         } else {
             return null;
         }
+    }
+
+    private static String getBaseUri(final UriInfo uriInfo, String cellName) {
+        // URLを生成してSet
+        StringBuilder urlSb = new StringBuilder();
+        UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
+        uriBuilder.scheme(DcCoreConfig.getUnitScheme());
+        urlSb.append(uriBuilder.build().toASCIIString());
+        urlSb.append(cellName);
+        urlSb.append("/");
+        return urlSb.toString();
     }
 
     /**
@@ -279,15 +291,7 @@ public final class CellEsImpl implements Cell {
             ret.setJson(cache);
             ret.id = (String) cache.get("_id");
         }
-
-        // URLを生成してSet
-        StringBuilder urlSb = new StringBuilder();
-        UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-        uriBuilder.scheme(DcCoreConfig.getUnitScheme());
-        urlSb.append(uriBuilder.build().toASCIIString());
-        urlSb.append(ret.getName());
-        urlSb.append("/");
-        ret.url = urlSb.toString();
+        ret.url = getBaseUri(uriInfo, ret.name);
         return ret;
     }
 
