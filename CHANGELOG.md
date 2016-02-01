@@ -10,7 +10,7 @@ IMPROVEMENTS:
 
   - core *[DavDestination.java, DavMoveResource.java, DavCollectionResource.java, DavCmpEsImpl.java, etc.]*:<br>
    * MOVE method([RFC2518](https://tools.ietf.org/html/rfc2518#section-8.9)) for WedDAV collections and stored files are implemented. (Some restrictions apply.) 
-   * MOVE method requires `Destination:` header([RFC2518](https://tools.ietf.org/html/rfc2518#section-9.3)) which is absolute URI expressing the name or the directory to be destined for. MOVE method can be used to below items:
+   * MOVE method requires `Destination:` header which is absolute URI expressing the name or the directory to be changed to. MOVE method can be used by below items:
 
     1. WebDAV collections.
     2. OData collections.
@@ -28,13 +28,13 @@ IMPROVEMENTS:
    -H "Destination:http://[FQDN]/[cell]/[box]/[collection]/[new_name]/" -i -k -s
    ```
 
-   Rename file 
+   ######Rename file 
    ```curl
    curl -X MOVE "http://[FQDN]/[cell]/[box]/[collection]/[dir]/old.txt"
    -H "Destination:http://[FQDN]/[cell]/[box]/[collection]/[dir]/new.txt" -i -k -s
    ```
 
-   Move file 
+   ######Move file 
    ```curl
    curl -X MOVE "http://[FQDN]/[cell]/[box]/[collection]/[from]/file.txt"
    -H "Destination:http://[FQDN]/[cell]/[box]/[collection]/[to]/file.txt" -i -k -s
@@ -49,7 +49,7 @@ IMPROVEMENTS:
 
 KNOWN ISSUES:
   - core :
-   When [creating new Account](https://github.com/personium/io/wiki/Account#create), the posted `"Type"` value is not validated. New account can be create whatever `"Type"` values are, such mistaking values as `"Type": "basic oidc:facebook"`, `"Type": "basic_oidc:google"` (separated by underscore) etc.
+   When [creating new Account](https://github.com/personium/io/wiki/Account#create), the posted `"Type"` value is not validated. New account can be created whatever the `"Type"` value is, such mistaking values as `"Type": "basic oidc:facebook"` (not supported ID Provider), `"Type": "basic_oidc:google"` (separated by underscore) etc.
 
 ## 1.3.22a
 
