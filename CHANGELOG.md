@@ -1,3 +1,56 @@
+## 1.3.23
+
+IMPROVEMENTS:
+
+  - core *[IdToken.java, TokenEndPointResource.java etc]*:<br>
+   Supports [OpenID Connect](http://openid.net/connect/) (OIDC). In V1.3.23, supporting ID provider is **Google** only.
+   * When creating OIDC Account, post [Create Account API](https://github.com/personium/io/wiki/Account#create) with  `"Type"` key parameter in the request body such as `{"Name":"[GMAIL_ADDRESS]", "Type":"oidc:google"}`. Account name **must be Gmail address** (ex. `example@gmail.com`) to use Google OIDC. When you create an account which is authenticated with both basic ID/PW and OIDC, separate two values with **space** such as `{"Type":"basic oidc:google"}`. (Without setting of `"Type"` value, the default is `basic`).
+   * When utilizing OIDC Authentication, need to set `com.fujitsu.dc.core.oidc.google.trustedClientIds=[CLIENT_ID]` configuration by `dc-confing.properties` file. (You can get client IDs by registering your apps to [Google developer Console](https://console.developers.google.com/home).) If you want to set multiple client IDs, these values must be separated with **space**. You can also configure wild card `*`, but this setting causes more security risks, so we strongly recommend for debugging use only. (Without setting, default value is `*`.)
+   * When authenticating an account with OIDC, use [Authentication API](https://github.com/personium/io/wiki/Authentication-and-Authorization) with request body `"grant_type=urn:x-dc1:oidc:google&id_token=[ID_TOKEN]"` . If you need more information with __OAuth2.0 ID Token__, refer to [Google Developers site](https://developers.google.com/identity/protocols/OpenIDConnect).
+
+  - core *[DavDestination.java, DavMoveResource.java, DavCollectionResource.java, DavCmpEsImpl.java, etc.]*:<br>
+   * MOVE method([RFC2518](https://tools.ietf.org/html/rfc2518#section-8.9)) for WedDAV collections and stored files are implemented. (Some restrictions apply.) 
+   * MOVE method requires `Destination:` header([RFC2518](https://tools.ietf.org/html/rfc2518#section-9.3)) which is absolute URI expressing the name or the directory to be destined for. MOVE method can be used to below items:
+
+    1. WebDAV collections.
+    2. OData collections.
+    3. Service collections.
+    4. WebDAV collection files.
+    5. Service collection files under `/__src` directory.
+
+   * If you need more information this API, refer to [WebDAV MOVE API Documentation (now editing)](https://github.com/personium/io/wiki/).
+
+   #####API examples:
+
+   ######Rename collection (end slash is required)
+   ```curl
+   curl -X MOVE "http://[FQDN]/[cell]/[box]/[collection]/[old_name]/" 
+   -H "Destination:http://[FQDN]/[cell]/[box]/[collection]/[new_name]/" -i -k -s
+   ```
+
+   Rename file 
+   ```curl
+   curl -X MOVE "http://[FQDN]/[cell]/[box]/[collection]/[dir]/old.txt"
+   -H "Destination:http://[FQDN]/[cell]/[box]/[collection]/[dir]/new.txt" -i -k -s
+   ```
+
+   Move file 
+   ```curl
+   curl -X MOVE "http://[FQDN]/[cell]/[box]/[collection]/[from]/file.txt"
+   -H "Destination:http://[FQDN]/[cell]/[box]/[collection]/[to]/file.txt" -i -k -s
+   ```
+
+  - core *[UserSchemaODataProducer.java ]*:<br>
+    PUT methods to change the name of following items are implemented.
+   * EntityType
+   * Property
+   * ComplexTypeProperty
+   * AssociationEnd
+
+KNOWN ISSUES:
+  - core :
+   When [creating new Account](https://github.com/personium/io/wiki/Account#create), the posted `"Type"` value is not validated. New account can be create whatever `"Type"` values are, such mistaking values as `"Type": "basic oidc:facebook"`, `"Type": "basic_oidc:google"` (separated by underscore) etc.
+
 ## 1.3.22a
 
 BACKWARD INCOMPATIBILITIES:
