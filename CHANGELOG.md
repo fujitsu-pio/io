@@ -18,7 +18,7 @@ IMPROVEMENTS:
     4. WebDAV collection files.
     5. Service collection files under `/__src` directory.
 
-   * If you need more information this API, refer to [WebDAV MOVE API Documentation (now editing)](https://github.com/personium/io/wiki/).
+   * If you need more information this API, refer to [Colleciton Move API Documentation](https://github.com/personium/io/wiki/Collection#move).
 
    #####API examples:
 
