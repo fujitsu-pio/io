@@ -785,10 +785,12 @@ dc.BoxCtl = function(obj) {
  * 新しいAccountオブジェクトを作成する.
  * @class Accountクラス
  * @property {string} name ユーザー名
+ * @property {dc.LinkManager} role RoleへのLink操作を行うためのプロパティ
  */
 dc.Account = function(obj) {
     this.core = obj;
     this.name = "";
+    this.role = new dc.LinkManager(this.core.role);
 };
 
 /**
@@ -804,10 +806,10 @@ dc.Role = function(obj) {
     this.core = obj;
     this.name = "";
     this.id = "";
-    this.account = new dc.LinkManager(this.core.account)
-    this.relation = new dc.LinkManager(this.core.relation)
-    this.extCell = new dc.LinkManager(this.core.extCell)
-    this.extRole = new dc.LinkManager(this.core.extRole)
+    this.account = new dc.LinkManager(this.core.account);
+    this.relation = new dc.LinkManager(this.core.relation);
+    this.extCell = new dc.LinkManager(this.core.extCell);
+    this.extRole = new dc.LinkManager(this.core.extRole);
 };
 
 /**
@@ -822,8 +824,8 @@ dc.Relation = function(obj) {
     this.core = obj;
     this.name = "";
     this.id = "";
-    this.role = new dc.LinkManager(this.core.role)
-    this.extCell = new dc.LinkManager(this.core.extCell)
+    this.role = new dc.LinkManager(this.core.role);
+    this.extCell = new dc.LinkManager(this.core.extCell);
 };
 
 /**
@@ -838,7 +840,7 @@ dc.ExtRole = function(obj) {
     this.relationName = "";
     this.relationBoxName = "";
     this.id = "";
-    this.role = new dc.LinkManager(this.core.role)
+    this.role = new dc.LinkManager(this.core.role);
 };
 
 /**
@@ -853,8 +855,8 @@ dc.ExtCell = function(obj) {
     this.core = obj;
     this.name = "";
     this.id = "";
-    this.role = new dc.LinkManager(this.core.role)
-    this.relation = new dc.LinkManager(this.core.relation)
+    this.role = new dc.LinkManager(this.core.role);
+    this.relation = new dc.LinkManager(this.core.relation);
 };
 
 /**
