@@ -260,7 +260,7 @@ public class TokenEndPointResource {
         if (!id.equals(tcToken.getIssuer())) {
             throw DcCoreAuthnException.CLIENT_SERCRET_ISSUER_MISMATCH.realm(cell.getUrl());
         }
-
+        
         // トークンのターゲットが自分でない場合はエラー応答
         if (!tcToken.getTarget().equals(cell.getUrl())) {
             throw DcCoreAuthnException.CLIENT_SERCRET_TARGET_WRONG.realm(cell.getUrl());
@@ -510,6 +510,14 @@ public class TokenEndPointResource {
         if (oew == null) {
             throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
         }
+        
+        // Typeの値確認
+        if (!AuthUtils.isAccountTypeBasic(oew)) {
+        	//アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
+        	DcCoreLog.Auth.UNSUPPORTED_ACCOUNT_GRANT_TYPE.params(Account.TYPE_VALUE_BASIC, username).writeLog();;
+            throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
+        }        
+        
         // 最終ログイン時刻を更新するために、UUIDをクラス変数にひかえておく
         accountId = (String) oew.getUuid();
 
