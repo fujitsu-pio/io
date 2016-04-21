@@ -36,6 +36,8 @@ public class Account {
      * Type値　oidc:google.
      */
     public static final String TYPE_VALUE_OIDC_GOOGLE = "oidc:google";
+
+    // TODO: 対応するID providerが増えた場合は追加する
     /**
      * 有効なType値の配列.
      */
@@ -69,7 +71,8 @@ public class Account {
      * Typeプロパティの定義体.
      */
     public static final EdmProperty.Builder P_TYPE = EdmProperty.newBuilder("Type").setType(EdmSimpleType.STRING)
-            .setDefaultValue(TYPE_VALUE_BASIC);
+            .setDefaultValue(TYPE_VALUE_BASIC).setAnnotations(Common.DC_FORMAT_ACCOUNT_TYPE);
+    
     /**
      * Cellプロパティの定義体.
      */
