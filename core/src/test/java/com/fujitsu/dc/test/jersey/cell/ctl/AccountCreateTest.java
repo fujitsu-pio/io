@@ -343,19 +343,18 @@ public class AccountCreateTest extends ODataCommon {
     }
 
     /**
-     * Account新規登録時に不正なType文字列を指定して400になること.(未実装なのでIgnore)
+     * Account新規登録時に不正なType文字列を指定して400になること.
      */
     @Test
-    @Ignore
     public final void Account新規登録時に不正なType文字列を指定して400になること() {
         ArrayList<String> invalidTypeStrings = new ArrayList<String>();
         invalidTypeStrings.add("Type=");
         invalidTypeStrings.add("");
         invalidTypeStrings.add("!aa");
-        invalidTypeStrings.add("pass%word");
+        invalidTypeStrings.add("basic  oidc:google");
         invalidTypeStrings.add("%E3%81%82");
         invalidTypeStrings.add("あ");
-        invalidTypeStrings.add("123456789012345678901234567890123");
+        invalidTypeStrings.add("       ");
 
         String testAccountName = "account_badpassword";
         String testAccountPass = "password1234";

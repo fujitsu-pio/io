@@ -99,6 +99,9 @@ public class Setup extends AbstractCase {
 	/** Basic認証用のテストセルの名前. */
 	public static final String TEST_CELL_BASIC = "basicTestSetupCell";
 
+	/** OpenID Connect認証用のテストセルの名前. */
+	public static final String TEST_CELL_OIDC = "OidcTestSetupCell";
+	
 	/** $filterテスト用セル名. */
 	public static final String TEST_CELL_FILTER = "filterTypeValidateTest";
 
@@ -267,6 +270,9 @@ public class Setup extends AbstractCase {
 		basicTestCellConf.role = settingRole(basicTestCellConf.account, basicTestCellConf.extRole);
 		basicTestCellConf.box.add(basicTestBox);
 		confs.add(basicTestCellConf);
+		
+		//TODO OIDC用のTestCell作成
+		// IDToken取得機構を作るときに対応予定
 
 	}
 

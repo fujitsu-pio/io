@@ -84,6 +84,32 @@ public class AuthErrorTest extends JerseyTest {
     }
 
     /**
+     * Typeがoidc系のみのアカウントに対しパスワード認証をしようとするとエラーが返ること.
+     */
+    @Test
+    public final void Typeがoidc系のみのアカウントに対しパスワード認証をしようとするとエラーが返ること() {
+        String accountName = "NonBasicTypeAccount";
+        String type = "oidc:google";
+        String pass = "dammypasswd";
+        try {
+        	AccountUtils.createWithType(AbstractCase.MASTER_TOKEN_NAME, TEST_CELL1, type, accountName,
+        			pass, HttpStatus.SC_CREATED);
+
+        	Http.request("authn/password-cl-c0.txt")
+            	.with("remoteCell", TEST_CELL1)
+            	.with("username", accountName)
+            	.with("password", pass)
+            	.returns()
+            	.statusCode(HttpStatus.SC_BAD_REQUEST);
+        	
+        } finally {
+            AccountUtils.delete(TEST_CELL1, AbstractCase.MASTER_TOKEN_NAME, accountName, -1);
+        }
+    }
+   
+    
+    
+    /**
      * ロールが払い出されない関係のセルに対してトランスセルトークンを送信. ロールの検索処理で1件も無いと落ちてしまう問題の確認（異常系）.
      */
     @Test

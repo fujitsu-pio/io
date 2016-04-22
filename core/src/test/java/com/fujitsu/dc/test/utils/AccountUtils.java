@@ -99,6 +99,30 @@ public class AccountUtils {
     }
 
     /**
+     * X-Dc-Credentialヘッダー有でTypeを指定してアカウントを作成するユーティリティ.
+     * @param token トークン
+     * @param typeName Type値
+     * @param cellName セル名
+     * @param userName ユーザ名
+     * @param pass パスワード
+     * @param code ステータスコード
+     * @return レスポンス
+     */
+    public static TResponse createWithType(final String token, final String cellName, final String typeName,
+            final String userName, final String pass, int code) {
+        // AccountのC
+        TResponse tresponse = Http.request("account-create-with-type.txt")
+                .with("token", token)
+                .with("cellPath", cellName)
+                .with("username", userName)
+                .with("password", pass)
+                .with("accountType", typeName)
+                .returns()
+                .statusCode(code);
+        return tresponse;
+    }
+
+    /**
      * X-Dc-Credentialヘッダー無しでアカウントを作成するユーティリティ.
      * @param token トークン
      * @param cellName セル名
@@ -118,6 +142,28 @@ public class AccountUtils {
         return tresponse;
     }
 
+    /**
+     * X-Dc-Credentialヘッダー無しでTypeを指定してアカウントを作成するユーティリティ.
+     * @param token トークン
+     * @param cellName セル名
+     * @param userName ユーザ名
+     * @param type Type値
+     * @param code ステータスコード
+     * @return レスポンス
+     */
+    public static TResponse createNonCredentialWithType(final String token, final String cellName,
+            final String userName, final String type, int code) {
+        // AccountのC
+        TResponse tresponse = Http.request("account-create-Non-Credential-with-type.txt")
+                .with("token", token)
+                .with("cellPath", cellName)
+                .with("username", userName)
+                .with("accountType", type)
+                .returns()
+                .statusCode(code);
+        return tresponse;
+    }
+    
     /**
      * AccountとRoleの$links登録.
      * @param token トークン

@@ -618,6 +618,11 @@ public class TokenEndPointResource {
         // id_tokenをパースする
         IdToken idt = IdToken.parse(idToken);
         
+        // Tokenに有効期限(exp)があるかnullチェック
+        if (idt.exp == null) {
+    		throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN.params("ID Token expiration time null.");  	
+        }
+        
         // Tokenの検証。検証失敗したらDcCoreAuthnExceptionが投げられる
         idt.verify();
         
@@ -646,15 +651,7 @@ public class TokenEndPointResource {
         	DcCoreLog.OIDC.NO_SUCH_ACCOUNT.params(mail).writeLog();
             throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
         }
-        
-    	// 認証リクエストしているusernameとIdToken内のemailが一致しているか確認 
-        // 同様にusernameは無視する暫定仕様
-        /*OEntityWrapper ReqUserOew = this.cell.getAccount(username);
-        if (!ReqUserOew.equals(idTokenUserOew)) {
-        	DcCoreLog.OIDC.INVALID_ACCOUNT.params(username).writeLog();
-            throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
-        }*/
-        
+                
     	// アカウントタイプがoidc:googleになっているかを確認。
         // Account があるけどTypeにOidCが含まれていない
         if (!AuthUtils.isAccountTypeOidcGoogle(idTokenUserOew)) {
