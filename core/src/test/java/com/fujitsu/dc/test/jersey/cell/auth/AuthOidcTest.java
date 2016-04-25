@@ -131,13 +131,12 @@ public class AuthOidcTest extends JerseyTest {
     }
 	/**
      * 有効期限切れのIDTokenを指定し400エラーが返却されること.
-     * (プロキシ配下では、公開鍵が取れないため、500エラーになる.)
      * @throws InterruptedException 待機失敗
      */
     @Test
     public final void 有効期限切れのIDTokenを指定し400エラーが返却されること()
             throws InterruptedException {
-        String accountName = "personium.io\\@gmail.com";
+        String accountName = "expiredIdTokenAccount";
         try {
             // テスト用のアカウントを作成
             // 他のテストと共用するAccountを使用すると、認証失敗のロックがかかり、テストが失敗する。このため、このテスト独自のAccountを作成する
@@ -156,13 +155,12 @@ public class AuthOidcTest extends JerseyTest {
 
     /**
      * デコードできないJWT形式の不正なIDTokenを指定し400エラーが返却されること.
-     * (プロキシ配下では、公開鍵が取れないため、500エラーになる.)
      * @throws InterruptedException 待機失敗
      */
     @Test
     public final void デコードできないJWT形式の不正なIDTokenを指定し400エラーが返却されること()
             throws InterruptedException {
-        String accountName = "personium.dummy\\@gmail.com";
+        String accountName = "invalidIdTokenAccount";
         try {
             // テスト用のアカウントを作成
             // 他のテストと共用するAccountを使用すると、認証失敗のロックがかかり、テストが失敗する。このため、このテスト独自のAccountを作成する
