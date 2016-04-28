@@ -16,8 +16,7 @@
  */
 package com.fujitsu.dc.test.jersey.concurrent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,6 +122,7 @@ public class ConcurrentODataRequestTest extends JerseyTest {
      * 同一キーのエンティティ同時追加がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一キーのエンティティ同時追加がひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -177,6 +177,7 @@ public class ConcurrentODataRequestTest extends JerseyTest {
      * 同一キーのエンティティ同時削除がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一キーのエンティティ同時削除がひとつだけ成功する() throws InterruptedException {
         // 削除すべきレコードを準備
@@ -233,6 +234,7 @@ public class ConcurrentODataRequestTest extends JerseyTest {
      * 同一キーのETagつきエンティティ同時更新がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一キーのETagつきエンティティ同時更新がひとつだけ成功する() throws InterruptedException {
         // 更新すべきレコードを準備
@@ -290,6 +292,7 @@ public class ConcurrentODataRequestTest extends JerseyTest {
      * 同一キーのETagなし主キー変更を伴うエンティティ同時更新がひとつだけ成功.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一キーのETagなし主キー変更を伴うエンティティ同時更新がひとつだけ成功() throws InterruptedException {
         // 更新すべきレコードを準備
@@ -346,6 +349,7 @@ public class ConcurrentODataRequestTest extends JerseyTest {
      * 同一対象リンク同時追加がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一対象リンク同時追加がひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -400,6 +404,7 @@ public class ConcurrentODataRequestTest extends JerseyTest {
      * 同一対象リンク同時削除がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一対象リンク同時削除がひとつだけ成功する() throws InterruptedException {
         this.linkAccountRoleRequest(ACCOUNT_NAME, ROLE_NAME, null).returns();
@@ -456,8 +461,8 @@ public class ConcurrentODataRequestTest extends JerseyTest {
     /**
      * 更新ロック取得がタイムアウトした場合に503エラーとなる.
      */
-    @Test
     @Ignore("ビルド環境からIT環境に向けてテストを実施した場合に問題あったため一時的に除外")
+    @Test
     public void 更新ロック取得がタイムアウトした場合に503エラーとなる() {
         String accessTargetCellId = getTestingCellId();
         Lock lock = getLockForTimeoutTest(accessTargetCellId);

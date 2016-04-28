@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -264,7 +265,114 @@ public class AccountCreateTest extends ODataCommon {
             }
         }
     }
+    
+    /**
+     * Account新規登録時にPasswordなしでTypeに"oidc:google"を指定して登録できること.
+     */
+    @Test
+    public final void Account新規登録時にPasswordなしでTypeにoidcコロンgoogleを指定して登録できること() {
+        String testAccountName = "personium.io\\@gmail.com";
+    	String testAccountType = "oidc:google";
+        String accLocHeader = null;
 
+        try {
+            accLocHeader = createNoPassAccount(testAccountName, testAccountType, HttpStatus.SC_CREATED);
+        } finally {
+            if (accLocHeader != null) {
+                deleteAccount(accLocHeader);
+            }
+        }
+    }
+
+    /**
+     * Account新規登録時にPasswordありでTypeに"oidc:google"を指定して登録できること.
+     */
+    @Test
+    public final void Account新規登録時にPasswordありでTypeにoidcコロンgoogleを指定して登録できること() {
+        String testAccountName = "personium.io\\@gmail.com";
+    	String testAccountType = "oidc:google";
+       	String testAccountPass = "password1234";
+    	String accLocHeader = null;
+
+        try {
+            accLocHeader = createAccount(testAccountName, testAccountPass, testAccountType, HttpStatus.SC_CREATED);
+        } finally {
+            if (accLocHeader != null) {
+                deleteAccount(accLocHeader);
+            }
+        }
+    }
+
+    /**
+     * Account新規登録時にパスワードなしでTypeに"basic oidc:google"を指定して登録できること.
+     */
+    @Test
+    public final void Account新規登録時にパスワードなしでTypeにbasicスペースoidcコロンgoogleを指定して登録できること() {
+        String testAccountName = "personium.io\\@gmail.com";
+    	String testAccountType = "basic oidc:google";
+        String accLocHeader = null;
+
+        try {
+            accLocHeader = createNoPassAccount(testAccountName, testAccountType, HttpStatus.SC_CREATED);
+        } finally {
+            if (accLocHeader != null) {
+                deleteAccount(accLocHeader);
+            }
+        }
+    }
+
+    
+    
+    /**
+     * Account新規登録時にパスワードありでTypeに"basic oidc:google"を指定して登録できること.
+     */
+    @Test
+    public final void Account新規登録時にパスワードありでTypeにbasicスペースoidcコロンgoogleを指定して登録できること() {
+        String testAccountName = "personium.io\\@gmail.com";
+    	String testAccountType = "basic oidc:google";
+    	String testAccountPass = "password1234";
+        String accLocHeader = null;
+
+        try {
+            accLocHeader = createAccount(testAccountName, testAccountPass, testAccountType, HttpStatus.SC_CREATED);
+        } finally {
+            if (accLocHeader != null) {
+                deleteAccount(accLocHeader);
+            }
+        }
+    }
+
+    /**
+     * Account新規登録時に不正なType文字列を指定して400になること.
+     */
+    @Test
+    public final void Account新規登録時に不正なType文字列を指定して400になること() {
+        ArrayList<String> invalidTypeStrings = new ArrayList<String>();
+        invalidTypeStrings.add("Type=");
+        invalidTypeStrings.add("");
+        invalidTypeStrings.add("!aa");
+        invalidTypeStrings.add("basic  oidc:google");
+        invalidTypeStrings.add("%E3%81%82");
+        invalidTypeStrings.add("あ");
+        invalidTypeStrings.add("       ");
+
+        String testAccountName = "account_badpassword";
+        String testAccountPass = "password1234";
+        String accLocHeader = null;
+
+        try {
+            for (String value : invalidTypeStrings) {
+                accLocHeader = createAccount(testAccountName, testAccountPass, value, HttpStatus.SC_BAD_REQUEST);
+            }
+        } finally {
+            if (accLocHeader != null) {
+                deleteAccount(accLocHeader);
+            }
+        }
+    }
+
+    
+    
     /**
      * Account新規登録時にLastAuthenticatedに時刻を指定して登録できること.
      */
@@ -496,7 +604,7 @@ public class AccountCreateTest extends ODataCommon {
             }
         }
     }
-
+  
     private String createAccount(String testAccountName, String testAccountPass, int code) {
         String accLocHeader;
         TResponse res = Http.request("account-create.txt")
@@ -510,7 +618,43 @@ public class AccountCreateTest extends ODataCommon {
         res.statusCode(code);
         return accLocHeader;
     }
-
+    
+    /**
+     *  @Overload
+     * Typeを指定してAccountを登録する場合
+     */
+    private String createAccount(String testAccountName, String testAccountPass, String testAccountType, int code) {
+        String accLocHeader;
+        TResponse res = Http.request("account-create-with-type.txt")
+                .with("token", AbstractCase.MASTER_TOKEN_NAME)
+                .with("cellPath", cellName)
+                .with("username", testAccountName)
+                .with("password", testAccountPass)
+                .with("accountType", testAccountType)
+                .returns()
+                .debug();
+        accLocHeader = res.getLocationHeader();
+        res.statusCode(code);
+        return accLocHeader;
+    }
+    
+    /**
+     *  Typeを指定してAccountを登録、かつ、パスワードを登録しない場合
+     */
+    private String createNoPassAccount(String testAccountName, String testAccountType, int code) {
+    	String accLocHeader;
+        TResponse res = Http.request("account-create-Non-Credential-with-type.txt")
+                .with("token", AbstractCase.MASTER_TOKEN_NAME)
+                .with("cellPath", cellName)
+                .with("username", testAccountName)
+                .with("accountType", testAccountType)
+                .returns()
+                .debug();
+        accLocHeader = res.getLocationHeader();
+        res.statusCode(code);
+        return accLocHeader;        	
+    }
+  
     private void deleteAccount(String accountUrl) {
         DcRequest req = DcRequest.delete(accountUrl)
                 .header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN)

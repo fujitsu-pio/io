@@ -18,9 +18,11 @@ package com.fujitsu.dc.core.rs.odata;
 
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -681,7 +683,9 @@ public abstract class AbstractODataResource {
                     validatePropertyRegEx(propName, op, dcFormat);
                 } else if (dcFormat.equals(Common.DC_FORMAT_PATTERN_URI)) {
                     validatePropertyUri(propName, op);
-                }
+                } else if (dcFormat.startsWith(Common.DC_FORMAT_PATTERN_USUSST)) {
+                    validatePropertyUsusst(propName, op, dcFormat);
+                } 
             }
         }
     }
@@ -770,6 +774,48 @@ public abstract class AbstractODataResource {
         }
     }
 
+    /**
+     * プロパティ項目の値を、1つ以上のスペース区切り文字列にマッチするかチェックする.
+     * @param propName プロパティ名
+     * @param op OProperty
+     * @param dcFormat dcFormatの値
+     */
+    protected void validatePropertyUsusst(String propName, OProperty<?> op, String dcFormat) {
+    	// dcFormatから候補をリストとして抽出.
+        Pattern formatPattern = Pattern.compile(Common.DC_FORMAT_PATTERN_USUSST + "\\((.+)\\)");
+        Matcher formatMatcher = formatPattern.matcher(dcFormat);
+        formatMatcher.matches();
+        dcFormat = formatMatcher.group(1);
+
+        String[] allowedTokens = dcFormat.split(", ");
+        for (int i = 0; i < allowedTokens.length; i++) {
+        	allowedTokens[i] = allowedTokens[i].replaceAll("\'(.+)\'", "$1");//remove single quotations.
+        }
+        List<String> allowedTokenList = Arrays.asList(allowedTokens);
+
+        // 検証される文字列を配列にする
+        String value = op.getValue().toString();
+    	if (value.indexOf("  ") > -1) {
+        	throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propName);
+       	}
+        String[] tokens = value.split(" ");
+        Set<String> overlapChk = new HashSet<>();
+
+        // 検証される文字列をループして全てマッチするか確認する
+    	// 1回でもマッチしないものがあったら、例外を投げる
+        for (String token : tokens) {
+        	if (!allowedTokenList.contains(token)) {
+            	throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propName);
+           	}
+        	//重複チェック
+        	if (overlapChk.contains(token)) {
+            	throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propName);
+           	} else {
+           		overlapChk.add(token);
+           	}
+        }
+    }
+    
     /**
      * OEntityKeyの正規化を行う.
      * 正規化後のOEntityKeyをtoKeyStringすると、同一キーであれば同一文字列になる。

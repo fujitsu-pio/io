@@ -30,6 +30,7 @@ import org.junit.runners.Suite.SuiteClasses;
         AuthCheckTest.class,
         AuthErrorTest.class,
         AuthTest.class,
+        AuthOidcTest.class,
         ImplicitFlowTest.class,
         MyPasswordTest.class,
         SchemaAuthTest.class,
