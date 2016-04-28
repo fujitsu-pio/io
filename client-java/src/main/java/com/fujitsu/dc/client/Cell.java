@@ -337,7 +337,7 @@ public class Cell extends AbstractODataContext {
     // * Boxへアクセスするためのクラスを生成して返します。 Accessorがスキーマ認証済みである場合はその認証されたスキーマに対応するBoxを、
     // * そうでない場合は、このセルのDcContexｔに指定されたスキーマのＢｏｘを返します. 該当するＢｏｘが存在しないときは、例外をスローします。 例外:
     // * <ul>
-    // * <li>スキーマ認証済みで対応するＢｏxが存在しない場合。</li>
+    // * <li>スキーマ認証済みで対応するBoxが存在しない場合。</li>
     // * <li>スキーマ認証なしでDcContextにスキーマが定義されていない場合。</li>
     // * <li>スキーマ認証なしでDcContextに定義されたスキーマに対応するＢｏｘが見つからない場合。</li>
     // * </ul>
@@ -349,10 +349,10 @@ public class Cell extends AbstractODataContext {
      * authenticated if Accessor is a schema authenticated, Otherwise, it returns a Box of schema that is specified in
      * the DcContext of this cell. When there is no corresponding Box, it throws an exception. Exception:
      * <ul>
-     * <li>If the Box the corresponding schema authenticated does not exist.</ li>
-     * <li>If the schema is not defined in the DcContext without authentication schema.</ li>
+     * <li>If the Box the corresponding schema authenticated does not exist.</li>
+     * <li>If the schema is not defined in the DcContext without authentication schema.</li>
      * <li>If the Box that corresponds to the schema defined in the DcContext without authentication schema can not be
-     * found.</ li>
+     * found.</li>
      * </ul>
      * @return Box object
      * @throws DaoException Exception thrown

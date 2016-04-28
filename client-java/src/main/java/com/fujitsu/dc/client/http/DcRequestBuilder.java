@@ -84,7 +84,7 @@ public class DcRequestBuilder {
 
     /**
      * This method is used to get Http Request Headers.
-     * @return Map<String, String> map of headers
+     * @return map of headers
      */
     public Map<String, String> getHeaders() {
         return headers;
