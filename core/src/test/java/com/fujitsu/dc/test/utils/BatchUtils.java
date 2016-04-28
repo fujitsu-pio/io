@@ -628,8 +628,8 @@ public class BatchUtils {
                 + "HTTP/1.1 201 Created\n"
                 + "ETag: .*\n"
                 + "DataServiceVersion: 2.0\n"
-                + "Content-Type: application/json\n"
                 + "Location: " + uri + "\n\n"
+                + "Content-Type: application/json\n"
                 + "\\{\"d\":\\{\"results\":\\{.*\"__metadata\":"
                 + "\\{.*,\"etag\":\".*\",\"type\":\".+" + entitySetName + "\"}.*\"__id\":\"" + id
                 + "\",.*\\}\\}\\}\n\n"
