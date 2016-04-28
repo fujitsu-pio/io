@@ -1,3 +1,22 @@
+## 1.3.24
+
+IMPROVEMENTS:
+  - core *[pom.xml etc]*:<br>
+   Enabled Java 8 compilation.
+   * Compilation on Java 8 used to fail due to incompatibility between Java 7 and 8. Now it is fixed and both Java 7 and 8 can compile the source.
+   * Also checked it surely runs on Java 8.
+
+  - core *[Account.java, Common.java, AbstractODataResource.java etc]*:<br>
+   Fixed the known issue in V1.3.23 about [Create Account API](https://github.com/personium/io/wiki/Account#create).
+   * Account object's `"Type"` value can be validated when you create a new Account.
+   * Available values are:<br> `"basic"`,`"oidc:google"` or these space-separated values such as `"oidc:google basic"`.
+   * If the above check fails, the response code will be `400 Bad Request`. 
+
+  - core *[TokenEndPointResource.java etc]*:<br>
+   Fixed the bug about password authentication.
+   * Added checking that Account object's `"Type"` value contains `"basic"` at the time of password authentication.
+   * If the above check fails, the response code will be `400 Bad Request`. 
+
 ## 1.3.23
 
 IMPROVEMENTS:
