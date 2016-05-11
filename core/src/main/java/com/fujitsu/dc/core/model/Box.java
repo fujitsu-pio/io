@@ -171,7 +171,7 @@ public final class Box {
      */
     public static List<EdmAnnotation<?>> createSchemaAnnotation(final String name) {
         List<EdmAnnotation<?>> schemaAnnotation = CtlSchema.createNamedUkAnnotation(name);
-        schemaAnnotation.add(Common.createFormatUriAnnotation());
+        schemaAnnotation.add(Common.createFormatSchemaUriAnnotation());
         return schemaAnnotation;
     }
 
