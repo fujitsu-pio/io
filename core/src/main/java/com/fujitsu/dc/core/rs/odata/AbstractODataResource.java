@@ -779,26 +779,24 @@ public abstract class AbstractODataResource {
     }
 
     /**
-     * プロパティ項目の値をSchema URIかチェックする.
-     * @param propName プロパティ名
+     * Schema URI Format Check.
+     * @param propName Property name
      * @param op OProperty
      */
     protected void validatePropertySchemaUri(String propName, OProperty<?> op) {
-        // TODO Impl
-        if (!ODataUtils.isValidUri(propName, op.getValue().toString())) {
-            throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propName);
+        if (!ODataUtils.isValidSchemaUri(op.getValue().toString())) {
+            throw DcCoreException.OData.SCHEMA_URI_FORMAT_ERROR.params(propName);
         }
     }
 
     /**
-     * プロパティ項目の値をCell URLかチェックする.
-     * @param propName プロパティ名
+     * Cell URL Format Check.
+     * @param propName Property name
      * @param op OProperty
      */
     protected void validatePropertyCellUrl(String propName, OProperty<?> op) {
-        // TODO Impl
-        if (!ODataUtils.isValidUri(propName, op.getValue().toString())) {
-            throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propName);
+        if (!ODataUtils.isValidCellUrl(op.getValue().toString())) {
+            throw DcCoreException.OData.CELL_URL_FORMAT_ERROR.params(propName);
         }
     }
 
