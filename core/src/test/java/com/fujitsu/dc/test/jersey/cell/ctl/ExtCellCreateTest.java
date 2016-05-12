@@ -16,6 +16,7 @@
  */
 package com.fujitsu.dc.test.jersey.cell.ctl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -36,6 +37,8 @@ public class ExtCellCreateTest extends ODataCommon {
 
     private static String cellName = "testcell1";
     private final String token = AbstractCase.MASTER_TOKEN_NAME;
+    private final String TRAILING_SLASH = "/";
+
 
     /**
      * コンストラクタ. テスト対象のパッケージをsuperに渡す必要がある
@@ -59,6 +62,15 @@ public class ExtCellCreateTest extends ODataCommon {
     }
 
     /**
+     * TrailingSlashの無いURLを指定した場合400エラーを返却すること.
+     */
+    @Test
+    public final void TrailingSlashの無いURLを指定した場合400エラーを返却すること() {
+        String extCellUrl = "http://localhost:9998/testCell1";
+        ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    /**
      * Urlが空文字の場合400エラーを返却すること.
      */
     @Test
@@ -68,21 +80,21 @@ public class ExtCellCreateTest extends ODataCommon {
     }
 
     /**
+     * TrailingSlashの無いURLを指定した場合400エラーを返却すること.
+     */
+    @Test
+    public final void 正規化されていないパスを含むURLを指定した場合400エラーを返却すること() {
+        String extCellUrl = "http://localhost:8080/dc1-core/testcell1/../test/./box/../";
+        ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
+    }
+
+    
+    /**
      * Urlが1024文字の場合正常に作成されること.
      */
     @Test
     public final void Urlが1024文字の場合正常に作成されること() {
-        String extCellUrl = "http://localhost:8080/dc1-core/testcell1"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String extCellUrl = "http://localhost:8080/dc1-core/testcell1" + StringUtils.repeat("a", 983) + TRAILING_SLASH;
 
         try {
             ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_CREATED);
@@ -96,27 +108,26 @@ public class ExtCellCreateTest extends ODataCommon {
      */
     @Test
     public final void Urlが1025文字以上の場合400エラーを返却すること() {
-        String extCellUrl = "http://localhost:8080/dc1-core/testcell1"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-
+        String extCellUrl = "http://localhost:8080/dc1-core/testcell1" + StringUtils.repeat("a", 984) + TRAILING_SLASH;
         ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
     }
 
     /**
-     * Urlのschemeが不正の場合400エラーを返却すること.
+     * UrlのschemeがFTPの場合400エラーを返却すること.
      */
     @Test
-    public final void Urlのschemeが不正の場合400エラーを返却すること() {
-        String extCellUrl = "ftp://localhost:21/dc1-core/testcell1";
+    public final void UrlのschemeがFTPの場合400エラーを返却すること() {
+        String extCellUrl = "ftp://localhost:21/dc1-core/testcell1/";
         ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
     }
+    
+    /**
+     * UrlのschemeがURNの場合400エラーを返却すること.
+     */
+    @Test
+    public final void UrlのschemeがURNの場合400エラーを返却すること() {
+        String extCellUrl = "urn:x-dc1:test";
+        ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
+    }
+
 }
