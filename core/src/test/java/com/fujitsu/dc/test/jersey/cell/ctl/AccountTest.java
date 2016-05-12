@@ -153,7 +153,7 @@ public class AccountTest extends ODataCommon {
 
         // BOX作成
         String boxName = "testbox";
-        String boxSchema = "https://example.com/hogecell";
+        String boxSchema = "https://example.com/hogecell/";
         createBox2(boxName, boxSchema);
 
         // パスワード認証。セルトークン取得。

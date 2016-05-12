@@ -18,6 +18,7 @@ package com.fujitsu.dc.test.jersey.cell.ctl;
 
 import javax.ws.rs.HttpMethod;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.junit.Test;
@@ -83,17 +84,7 @@ public class ExtCellUpdateTest extends ODataCommon {
      */
     @Test
     public final void Urlが1024文字の場合正常に作成されること() {
-        String newCellUrl = "http://localhost:8080/dc1-core/testcell1"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String newCellUrl = "http://localhost:8080/dc1-core/testcell1" + StringUtils.repeat("a", 983) + "/";
 
         try {
             ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_CREATED);
@@ -108,17 +99,7 @@ public class ExtCellUpdateTest extends ODataCommon {
      */
     @Test
     public final void Urlが1025文字以上の場合400エラーを返却すること() {
-        String newCellUrl = "http://localhost:8080/dc1-core/testcell1"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String newCellUrl = "http://localhost:8080/dc1-core/testcell1" + StringUtils.repeat("a", 984) + "/";
 
         try {
             ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_CREATED);
@@ -129,11 +110,11 @@ public class ExtCellUpdateTest extends ODataCommon {
     }
 
     /**
-     * Urlのschemeが不正の場合400エラーを返却すること.
+     * UrlのschemeがFTPの場合400エラーを返却すること.
      */
     @Test
-    public final void Urlのschemeが不正の場合400エラーを返却すること() {
-        String newCellUrl = "ftp://localhost:21/dc1-core/testcell1";
+    public final void UrlのschemeがFTPの場合400エラーを返却すること() {
+        String newCellUrl = "ftp://localhost:21/dc1-core/testcell1/";
 
         try {
             ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_CREATED);
@@ -165,5 +146,20 @@ public class ExtCellUpdateTest extends ODataCommon {
         body.put("Url", extCellUrl);
         ExtCellUtils.extCellAccess(HttpMethod.PUT, cellName, "false", token, body.toJSONString(),
                 HttpStatus.SC_BAD_REQUEST);
+    }
+
+    /**
+     * Urlが正規化されていない場合400エラーを返却すること.
+     */
+    @Test
+    public final void Urlが正規化されていない場合400エラーを返却すること() {
+        String newCellUrl = "https://localhost:8080/dc1-core/test/../cell/./box/../";
+
+        try {
+            ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_CREATED);
+            ExtCellUtils.update(token, cellName, extCellUrl, newCellUrl, HttpStatus.SC_BAD_REQUEST);
+        } finally {
+            ExtCellUtils.delete(token, cellName, extCellUrl, -1);
+        }
     }
 }

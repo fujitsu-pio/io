@@ -152,7 +152,7 @@ public class BasicAuthCellLevelTest extends JerseyTest {
 
         try {
             // 事前準備
-            BoxUtils.createWithScheme(cellName, schemaBox, AbstractCase.MASTER_TOKEN_NAME,
+            BoxUtils.createWithSchema(cellName, schemaBox, AbstractCase.MASTER_TOKEN_NAME,
                     UrlUtils.cellRoot(schemaCell));
 
             // 401エラーとなること

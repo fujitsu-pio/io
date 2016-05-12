@@ -329,7 +329,7 @@ public class BarInstallTest extends JerseyTest {
 
         try {
             // テスト用Box作成（Schema付）
-            BoxUtils.createWithScheme(reqCell, "boxInstallTestBox", AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
+            BoxUtils.createWithSchema(reqCell, "boxInstallTestBox", AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
             res = BarInstallTestUtils.request(REQUEST_NORM_FILE, reqCell, reqPath, headers, body);
             res.statusCode(HttpStatus.SC_BAD_REQUEST);
             String code = DcCoreException.BarInstall.BAR_FILE_BOX_SCHEMA_ALREADY_EXISTS.getCode();
@@ -1942,7 +1942,7 @@ public class BarInstallTest extends JerseyTest {
             createInstallTarget(reqCellName, userName, password, false);
 
             // テスト用Box作成（Schema付）
-            BoxUtils.createWithScheme(reqCellName, reqBoxName, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
+            BoxUtils.createWithSchema(reqCellName, reqBoxName, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
 
             // パスワード認証
             String token = getAccessToken(reqCellName, userName, password);
@@ -2086,7 +2086,7 @@ public class BarInstallTest extends JerseyTest {
             CellUtils.create(cell2Name, AbstractCase.MASTER_TOKEN_NAME, ownerName, HttpStatus.SC_CREATED);
 
             // Cell1へスキーマあり用Boxを作成
-            BoxUtils.createWithScheme(cell1Name, INSTALL_TARGET, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
+            BoxUtils.createWithSchema(cell1Name, INSTALL_TARGET, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
 
             // 先に作成したBoxと同じスキーマURLを持つBox（名前も同じ）へBoxインストールして正常登録（Boxの親Cellはそれぞれ異なる）
             res = BarInstallTestUtils.request(REQUEST_NORM_FILE, cell2Name, INSTALL_TARGET, headers, body);
