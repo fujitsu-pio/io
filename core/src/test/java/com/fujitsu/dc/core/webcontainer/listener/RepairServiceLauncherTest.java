@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -42,7 +41,6 @@ public class RepairServiceLauncherTest {
      * ExecutorServiceの起動_終了テスト.
      */
     @Test
-    @Ignore
     public void ExecutorServiceの起動_終了テスト() {
         RepairServiceLauncher launcher = new RepairServiceLauncher();
         assertThat(launcher.executor.getPoolSize(), is(1));
