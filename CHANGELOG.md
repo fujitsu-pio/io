@@ -1,3 +1,20 @@
+## 1.3.25
+
+IMPROVEMENTS:
+  - core *[Common.java, Box.java, ExtCell.java, ODataUtils.java etc]*:<br>
+    Improved formats of Box object's `"Schema"` and ExtCell object's `"Name"`. <br>
+    The definitions of these formats are below.<br>
+
+|Object  |Property |Format name  |Proper format definition                      |Examples           |
+|:-------|:--------|:------------|:---------------------------------------------|:------------------|
+|Box     |Schema   |`Schema URI` |`Cell URL` or URN.                            |http://fqdn/adc/<br>urn:x-dc1:adc|
+|ExtCell |Name     |`Cell URL`   |Normalized URL with http(s) scheme and **trailing slash**.|http://fqdn/adc/|
+
+   * The formats of URI, URN and URL are based on [RFC3986](https://tools.ietf.org/html/rfc3986).
+   * **Trailing slash** is the character `/` which is in the end of URL.
+   * These values are validated at the time of creating/updating `Box` or `ExtCell`.
+   * If the above check fails, the response code will be `400 Bad Request`.
+
 ## 1.3.24
 
 IMPROVEMENTS:
