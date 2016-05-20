@@ -69,6 +69,10 @@ public class Common {
     public static final String DC_FORMAT_PATTERN_REGEX = "regEx";
     /** 拡張スキーマFormat定義. */
     public static final String DC_FORMAT_PATTERN_URI = "uri";
+    /** 拡張スキーマFormat定義. */
+    public static final String DC_FORMAT_PATTERN_SCHEMA_URI = "schema-uri";
+    /** 拡張スキーマFormat定義. */
+    public static final String DC_FORMAT_PATTERN_CELL_URL = "cell-url";
     /** 拡張スキーマFormat定義.1つ以上のスペース区切り英数字 */
     public static final String DC_FORMAT_PATTERN_USUSST = "unordered-set-of-unique-space-separated-tokens";
     /** 先頭が-,_以外で始まる半角英数大小文字,-,_が1文字から128文字. */
@@ -122,6 +126,14 @@ public class Common {
      */
     public static final List<EdmAnnotation<?>> DC_FORMAT_URI = new ArrayList<EdmAnnotation<?>>();
     /**
+     * dc:FormatのSchema URI定義.
+     */
+    public static final List<EdmAnnotation<?>> DC_FORMAT_SCHEMA_URI = new ArrayList<EdmAnnotation<?>>();
+    /**
+     * dc:FormatのCell URL定義.
+     */
+    public static final List<EdmAnnotation<?>> DC_FORMAT_CELL_URL = new ArrayList<EdmAnnotation<?>>();
+    /**
      * Multiplicity項目に対するdc:Formatの定義.
      */
     public static final List<EdmAnnotation<?>> DC_FORMAT_MULTIPLICITY = new ArrayList<EdmAnnotation<?>>();
@@ -171,6 +183,8 @@ public class Common {
         DC_FORMAT_NAME.add(createFormatNameAnnotation());
         DC_FORMAT_NAME_WITH_SIGN.add(createFormatNameWithSignAnnotation());
         DC_FORMAT_URI.add(createFormatUriAnnotation());
+        DC_FORMAT_SCHEMA_URI.add(createFormatSchemaUriAnnotation());
+        DC_FORMAT_CELL_URL.add(createFormatCellUrlAnnotation());
         DC_FORMAT_MULTIPLICITY.add(createFormatMultiplicityAnnotation());
         DC_FORMAT_ID.add(createFormatIdAnnotation());
         DC_FORMAT_RELATION_NAME.add(createFormatRelationNameAnnotation());
@@ -219,6 +233,26 @@ public class Common {
         return new EdmAnnotationAttribute(
                 DC_NAMESPACE.getUri(), DC_NAMESPACE.getPrefix(),
                 DC_FORMAT, DC_FORMAT_PATTERN_URI);
+    }
+
+    /**
+     * dc:FormatのSchema URIのAnnotationを返却.
+     * @return EdmAnnotation
+     */
+    public static EdmAnnotation<?> createFormatSchemaUriAnnotation() {
+        return new EdmAnnotationAttribute(
+                DC_NAMESPACE.getUri(), DC_NAMESPACE.getPrefix(),
+                DC_FORMAT, DC_FORMAT_PATTERN_SCHEMA_URI);
+    }
+
+    /**
+     * dc:FormatのCell URLのAnnotationを返却.
+     * @return EdmAnnotation
+     */
+    public static EdmAnnotation<?> createFormatCellUrlAnnotation() {
+        return new EdmAnnotationAttribute(
+                DC_NAMESPACE.getUri(), DC_NAMESPACE.getPrefix(),
+                DC_FORMAT, DC_FORMAT_PATTERN_CELL_URL);
     }
 
     /**

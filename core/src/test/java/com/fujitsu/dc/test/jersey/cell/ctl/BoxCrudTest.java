@@ -70,7 +70,7 @@ public class BoxCrudTest extends ODataCommon {
     private static final String TEST_BOX_NAME = "testBox";
     private static final String TEST_BOX_NAME_WITH_SCHEMA = "testBoxWithSchema";
     private static final String TEST_BOX_NAME_WITH_SCHEMA2 = "testBoxWithSchema2";
-    private static final String TEST_BOX_SCHEMA = "https://example.com/schema1";
+    private static final String TEST_BOX_SCHEMA = "https://example.com/schema1/";
 
     /**
      * BOX新規登録のテストSchema指定なし.
@@ -238,13 +238,43 @@ public class BoxCrudTest extends ODataCommon {
     }
 
     /**
+     * BOX新規登録時にSchamaにtrailing_slashの無いURL形式文字_https_を指定した場合_400になることを確認.
+     */
+    @Test
+    public void BOX新規登録時にSchamaにtrailing_slashの無いURL形式文字_https_を指定した場合_400になることを確認() {
+        DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
+        String[] key = {"Name", "Schema" };
+        String[] value = {"testBox", "https://xxx.com/test" };
+        req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
+        DcResponse res = request(req);
+
+        // 400になることを確認
+        assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
+    }
+
+    /**
+     * BOX新規登録時にSchamaに正規化されていないパスを含むURL形式文字_https_を指定した場合_400になることを確認.
+     */
+    @Test
+    public void  BOX新規登録時にSchamaに正規化されていないパスを含むURL形式文字_https_を指定した場合_400になることを確認() {
+        DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
+        String[] key = {"Name", "Schema" };
+        String[] value = {"testBox", "https://xxx.com/test/1/2/../3/./../test/" };
+        req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
+        DcResponse res = request(req);
+
+        // 400になることを確認
+        assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
+    }
+
+    /**
      * BOX新規登録時にSchemaをURL形式文字_https_を指定して場合_201になることを確認.
      */
     @Test
     public void BOX新規登録時にSchemaをURL形式_https_文字を指定して場合_201になることを確認() {
         DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
         String[] key = {"Name", "Schema" };
-        String[] value = {"testBox", "https://xxx.com/test" };
+        String[] value = {"testBox", "https://xxx.com/test/" };
         req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
         try {
             DcResponse res = request(req);
@@ -257,13 +287,45 @@ public class BoxCrudTest extends ODataCommon {
     }
 
     /**
+     * BOX新規登録時にSchamaにtrailing_slashの無いURL形式文字_http_を指定した場合_400になることを確認.
+     */
+    @Test
+    public void BOX新規登録時にSchamaにtrailing_slashの無いURL形式文字_http_を指定した場合_400になることを確認() {
+        DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
+        String[] key = {"Name", "Schema" };
+        String[] value = {"testBox", "http://xxx.com/test" };
+        req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
+        DcResponse res = request(req);
+
+        // 400になることを確認
+        assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
+    }
+    
+    /**
+     * BOX新規登録時にSchamaに正規化されていないパスを含むURL形式文字_http_を指定した場合_400になることを確認.
+     */
+    @Test
+    public void BOX新規登録時にSchamaに正規化されていないパスを含むURL形式文字_http_を指定した場合_400になることを確認() {
+        DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
+        String[] key = {"Name", "Schema" };
+        String[] value = {"testBox", "http://xxx.com/test/0/../1/./2/test/" };
+        req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
+        DcResponse res = request(req);
+
+        // 400になることを確認
+        assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
+    }
+
+    
+    
+    /**
      * BOX新規登録時にSchemaをURL形式文字_http_を指定して場合_201になることを確認.
      */
     @Test
     public void BOX新規登録時にSchemaをURL形式_http_文字を指定して場合_201になることを確認() {
         DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
         String[] key = {"Name", "Schema" };
-        String[] value = {"testBox", "http://xxx.com/test" };
+        String[] value = {"testBox", "http://xxx.com/test/" };
         req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
         try {
             DcResponse res = request(req);
@@ -315,7 +377,7 @@ public class BoxCrudTest extends ODataCommon {
     @Test
     public void BOX新規登録時にSchemaに1024文字を指定して場合_201になることを確認() {
         DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
-        String schema = "http://" + StringUtils.repeat("x", 1013) + ".com";
+        String schema = "http://" + StringUtils.repeat("x", 1012) + ".com/";
         String[] key = {"Name", "Schema" };
         String[] value = {"testBox", schema };
         req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
@@ -335,7 +397,7 @@ public class BoxCrudTest extends ODataCommon {
     @Test
     public void BOX新規登録時にSchemaに1025文字を指定して場合_400になることを確認() {
         DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
-        String schema = "http://" + StringUtils.repeat("x", 1014) + ".com";
+        String schema = "http://" + StringUtils.repeat("x", 1013) + ".com/";
         String[] key = {"Name", "Schema" };
         String[] value = {"testBox", schema };
         req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
@@ -462,7 +524,7 @@ public class BoxCrudTest extends ODataCommon {
                     .returns().statusCode(409);
 
             // Box1のUK変更が成功
-            updateBoxRequest(TEST_BOX_NAME, TEST_BOX_NAME, "http://example.net/hoge", etag1)
+            updateBoxRequest(TEST_BOX_NAME, TEST_BOX_NAME, "http://example.net/hoge/", etag1)
                     .returns().statusCode(204).getHeader(HttpHeaders.ETAG);
 
         } catch (Exception e) {

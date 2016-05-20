@@ -56,6 +56,9 @@ public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {
      * @param res TResponse
      * @param expectedResBody 期待するレスポンスボディ
      */
+    //TODO :文字列比較ロジック見直す
+    //1.Boundary区切り数の比較
+    //2.各区切り毎に単純比較ではなく、同様と見なせる解釈を付加する（ヘッダー順不同、ボディ内容など）
     public static void checkBatchResponseBody(TResponse res, String expectedResBody) {
         String[] arrResBody = res.getBody().split("\n");
         String[] arrExpResBody = expectedResBody.split("\n");

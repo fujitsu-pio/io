@@ -71,7 +71,7 @@ public class BarInstallEventLogTest extends JerseyTest {
     private static final String CURRENT_COLLECTION = "current";
     private static final String UNIT_USER_CELL = "UnitUserCell";
 
-    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1";
+    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1/";
 
     /**
      * コンストラクタ. テスト対象のパッケージをsuperに渡す必要がある
