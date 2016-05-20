@@ -155,7 +155,7 @@ public class ImplicitFlowTest extends JerseyTest {
 
         try {
             // Box作成
-            BoxUtils.createWithScheme(Setup.TEST_CELL1, "authzBox", AbstractCase.MASTER_TOKEN_NAME, clientId);
+            BoxUtils.createWithSchema(Setup.TEST_CELL1, "authzBox", AbstractCase.MASTER_TOKEN_NAME, clientId);
 
             DcResponse res = requesttoAuthz(null, Setup.TEST_CELL1, clientId, null);
             assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
@@ -1143,7 +1143,7 @@ public class ImplicitFlowTest extends JerseyTest {
                     HttpStatus.SC_CREATED);
 
             // Box作成
-            BoxUtils.createWithScheme(cellName, "box", AbstractCase.MASTER_TOKEN_NAME,
+            BoxUtils.createWithSchema(cellName, "box", AbstractCase.MASTER_TOKEN_NAME,
                     UrlUtils.cellRoot(Setup.TEST_CELL_SCHEMA1));
 
             // パスワード認証で自分セルリフレッシュトークン取得

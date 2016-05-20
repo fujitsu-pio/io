@@ -76,7 +76,7 @@ public class CollectionLimitTest extends JerseyTest {
     private static final String REQ_CONTENT_TYPE = "application/zip";
     private static final String REQUEST_NORM_FILE = "bar-install.txt";
     private static final String RESOURCE_PATH = "requestData/barInstall";
-    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1";
+    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1/";
 
     /**
      * 階層チェックのテスト_WebDavコレクションの追加.

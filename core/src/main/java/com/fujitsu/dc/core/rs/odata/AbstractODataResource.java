@@ -683,6 +683,10 @@ public abstract class AbstractODataResource {
                     validatePropertyRegEx(propName, op, dcFormat);
                 } else if (dcFormat.equals(Common.DC_FORMAT_PATTERN_URI)) {
                     validatePropertyUri(propName, op);
+                } else if (dcFormat.startsWith(Common.DC_FORMAT_PATTERN_SCHEMA_URI)) {
+                    validatePropertySchemaUri(propName, op);
+                } else if (dcFormat.startsWith(Common.DC_FORMAT_PATTERN_CELL_URL)) {
+                    validatePropertyCellUrl(propName, op);
                 } else if (dcFormat.startsWith(Common.DC_FORMAT_PATTERN_USUSST)) {
                     validatePropertyUsusst(propName, op, dcFormat);
                 } 
@@ -771,6 +775,28 @@ public abstract class AbstractODataResource {
     protected void validatePropertyUri(String propName, OProperty<?> op) {
         if (!ODataUtils.isValidUri(propName, op.getValue().toString())) {
             throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propName);
+        }
+    }
+
+    /**
+     * Schema URI Format Check.
+     * @param propName Property name
+     * @param op OProperty
+     */
+    protected void validatePropertySchemaUri(String propName, OProperty<?> op) {
+        if (!ODataUtils.isValidSchemaUri(op.getValue().toString())) {
+            throw DcCoreException.OData.SCHEMA_URI_FORMAT_ERROR.params(propName);
+        }
+    }
+
+    /**
+     * Cell URL Format Check.
+     * @param propName Property name
+     * @param op OProperty
+     */
+    protected void validatePropertyCellUrl(String propName, OProperty<?> op) {
+        if (!ODataUtils.isValidCellUrl(op.getValue().toString())) {
+            throw DcCoreException.OData.CELL_URL_FORMAT_ERROR.params(propName);
         }
     }
 

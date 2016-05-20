@@ -554,8 +554,8 @@ public class SchemaAuthTest extends JerseyTest {
             AccountUtils.create(MASTER_TOKEN, schema01, user, pass, HttpStatus.SC_CREATED);
 
             // Boxの作成
-            BoxUtils.createWithScheme(cell02, testbox03, MASTER_TOKEN, UrlUtils.cellRoot(schema01));
-            BoxUtils.createWithScheme(cell02, testbox04, MASTER_TOKEN, UrlUtils.cellRoot(cell01));
+            BoxUtils.createWithSchema(cell02, testbox03, MASTER_TOKEN, UrlUtils.cellRoot(schema01));
+            BoxUtils.createWithSchema(cell02, testbox04, MASTER_TOKEN, UrlUtils.cellRoot(cell01));
 
             // Roleの作成
             RoleUtils.create(cell02, MASTER_TOKEN, testbox03, role, HttpStatus.SC_CREATED);
