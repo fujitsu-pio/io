@@ -76,7 +76,7 @@ public class BarInstallUserDataTest extends JerseyTest {
             "/V1_1_2_bar_userdata_not_exist_entitytype.bar";
     private static final String BAR_FILE_USERDATA_DIFFERENT_FILE_NAME = "/V1_1_2_bar_userdata_different_file_name.bar";
 
-    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1";
+    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1/";
 
     /**
      * コンストラクタ. テスト対象のパッケージをsuperに渡す必要がある

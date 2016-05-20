@@ -103,9 +103,9 @@ public class BarInstallTest extends JerseyTest {
     private static final String BAR_FILE_EMPTY = "/V1_1_2_bar_empty.bar";
     private static final String BAR_FILE_WRONGDIR = "/V1_1_2_bar_wrongdir.bar";
     private static final String BAR_FILE_WRONGFILE = "/V1_1_2_bar_wrongfile.bar";
-    private static final String BAR_FILE_00META_NOTEXSIST = "/V1_1_2_bar_00meta_notexsist.bar";
-    private static final String BAR_FILE_00MANIFEST_NOTEXSIST = "/V1_1_2_bar_00manifest_notexsist.bar";
-    private static final String BAR_FILE_90ROOTPROPS_NOTEXSIST = "/V1_1_2_bar_90rootprops_notexsist.bar";
+    private static final String BAR_FILE_00META_NOTEXIST = "/V1_1_2_bar_00meta_notexsist.bar";
+    private static final String BAR_FILE_00MANIFEST_NOTEXIST = "/V1_1_2_bar_00manifest_notexsist.bar";
+    private static final String BAR_FILE_90ROOTPROPS_NOTEXIST = "/V1_1_2_bar_90rootprops_notexsist.bar";
     private static final String BAR_FILE_ROOTDIR_ORDER = "/V1_1_2_bar_rootdir_order.bar";
     private static final String BAR_FILE_00META_ORDER = "/V1_1_2_bar_00meta_order.bar";
     private static final String BAR_FILE_RELATION_NONAME = "/V1_1_2_bar_relation_noname.bar";
@@ -128,7 +128,7 @@ public class BarInstallTest extends JerseyTest {
     private static final String BAR_FILE_INVALID_CONT_ORDER = "/V1_1_2_bar_invalid_contents_order.bar";
     private static final String BAR_FILE_WEBDAV_ODATA = "/V1_1_2_bar_webdav_odata.bar";
 
-    private static final String SCHEMA_URL = "https://fqdn/testcell1";
+    private static final String SCHEMA_URL = "https://fqdn/testcell1/";
 
     private static final Map<String, String> INIT_PARAMS = new HashMap<String, String>();
 
@@ -1229,7 +1229,7 @@ public class BarInstallTest extends JerseyTest {
         String reqPath = INSTALL_TARGET;
 
         TResponse res = null;
-        File barFile = new File(RESOURCE_PATH + BAR_FILE_00META_NOTEXSIST);
+        File barFile = new File(RESOURCE_PATH + BAR_FILE_00META_NOTEXIST);
         byte[] body = BarInstallTestUtils.readBarFile(barFile);
         Map<String, String> headers = new LinkedHashMap<String, String>();
         headers.put(HttpHeaders.CONTENT_TYPE, REQ_CONTENT_TYPE);
@@ -1253,7 +1253,7 @@ public class BarInstallTest extends JerseyTest {
         String reqPath = INSTALL_TARGET;
 
         TResponse res = null;
-        File barFile = new File(RESOURCE_PATH + BAR_FILE_00MANIFEST_NOTEXSIST);
+        File barFile = new File(RESOURCE_PATH + BAR_FILE_00MANIFEST_NOTEXIST);
         byte[] body = BarInstallTestUtils.readBarFile(barFile);
         Map<String, String> headers = new LinkedHashMap<String, String>();
         headers.put(HttpHeaders.CONTENT_TYPE, REQ_CONTENT_TYPE);
@@ -1277,7 +1277,7 @@ public class BarInstallTest extends JerseyTest {
         String reqPath = INSTALL_TARGET;
 
         TResponse res = null;
-        File barFile = new File(RESOURCE_PATH + BAR_FILE_90ROOTPROPS_NOTEXSIST);
+        File barFile = new File(RESOURCE_PATH + BAR_FILE_90ROOTPROPS_NOTEXIST);
         byte[] body = BarInstallTestUtils.readBarFile(barFile);
         Map<String, String> headers = new LinkedHashMap<String, String>();
         headers.put(HttpHeaders.CONTENT_TYPE, REQ_CONTENT_TYPE);
@@ -2060,7 +2060,7 @@ public class BarInstallTest extends JerseyTest {
         res.statusCode(HttpStatus.SC_BAD_REQUEST);
         String code = DcCoreException.BarInstall.BAR_FILE_BOX_SCHEMA_ALREADY_EXISTS.getCode();
         String message = DcCoreException.BarInstall.BAR_FILE_BOX_SCHEMA_ALREADY_EXISTS.
-                params("https://fqdn/testcell1").getMessage();
+                params("https://fqdn/testcell1/").getMessage();
         res.checkErrorResponse(code, message);
     }
 

@@ -62,7 +62,7 @@ public class BarInstallCollectionTest extends JerseyTest {
     private static final String REQUEST_NORM_FILE = "bar-install.txt";
     private static final String RESOURCE_PATH = "requestData/barInstall";
 
-    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1";
+    private static final String DEFAULT_SCHEMA_URL = "https://fqdn/testcell1/";
 
     /**
      * コンストラクタ. テスト対象のパッケージをsuperに渡す必要がある
