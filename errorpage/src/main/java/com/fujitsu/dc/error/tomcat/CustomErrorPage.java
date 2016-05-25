@@ -119,7 +119,7 @@ public class CustomErrorPage extends ErrorReportValve {
         sb.append("</p>");
 
         sb.append("<hr/>");
-        sb.append("<h3>").append("Persona Container Server").append("</h3>");
+        sb.append("<h3>").append("personium.io").append("</h3>");
         sb.append("</body></html>");
         return sb.toString();
     }

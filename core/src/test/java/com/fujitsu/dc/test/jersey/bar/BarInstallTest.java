@@ -103,9 +103,9 @@ public class BarInstallTest extends JerseyTest {
     private static final String BAR_FILE_EMPTY = "/V1_1_2_bar_empty.bar";
     private static final String BAR_FILE_WRONGDIR = "/V1_1_2_bar_wrongdir.bar";
     private static final String BAR_FILE_WRONGFILE = "/V1_1_2_bar_wrongfile.bar";
-    private static final String BAR_FILE_00META_NOTEXSIST = "/V1_1_2_bar_00meta_notexsist.bar";
-    private static final String BAR_FILE_00MANIFEST_NOTEXSIST = "/V1_1_2_bar_00manifest_notexsist.bar";
-    private static final String BAR_FILE_90ROOTPROPS_NOTEXSIST = "/V1_1_2_bar_90rootprops_notexsist.bar";
+    private static final String BAR_FILE_00META_NOTEXIST = "/V1_1_2_bar_00meta_notexsist.bar";
+    private static final String BAR_FILE_00MANIFEST_NOTEXIST = "/V1_1_2_bar_00manifest_notexsist.bar";
+    private static final String BAR_FILE_90ROOTPROPS_NOTEXIST = "/V1_1_2_bar_90rootprops_notexsist.bar";
     private static final String BAR_FILE_ROOTDIR_ORDER = "/V1_1_2_bar_rootdir_order.bar";
     private static final String BAR_FILE_00META_ORDER = "/V1_1_2_bar_00meta_order.bar";
     private static final String BAR_FILE_RELATION_NONAME = "/V1_1_2_bar_relation_noname.bar";
@@ -128,7 +128,7 @@ public class BarInstallTest extends JerseyTest {
     private static final String BAR_FILE_INVALID_CONT_ORDER = "/V1_1_2_bar_invalid_contents_order.bar";
     private static final String BAR_FILE_WEBDAV_ODATA = "/V1_1_2_bar_webdav_odata.bar";
 
-    private static final String SCHEMA_URL = "https://fqdn/testcell1";
+    private static final String SCHEMA_URL = "https://fqdn/testcell1/";
 
     private static final Map<String, String> INIT_PARAMS = new HashMap<String, String>();
 
@@ -329,7 +329,7 @@ public class BarInstallTest extends JerseyTest {
 
         try {
             // テスト用Box作成（Schema付）
-            BoxUtils.createWithScheme(reqCell, "boxInstallTestBox", AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
+            BoxUtils.createWithSchema(reqCell, "boxInstallTestBox", AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
             res = BarInstallTestUtils.request(REQUEST_NORM_FILE, reqCell, reqPath, headers, body);
             res.statusCode(HttpStatus.SC_BAD_REQUEST);
             String code = DcCoreException.BarInstall.BAR_FILE_BOX_SCHEMA_ALREADY_EXISTS.getCode();
@@ -1229,7 +1229,7 @@ public class BarInstallTest extends JerseyTest {
         String reqPath = INSTALL_TARGET;
 
         TResponse res = null;
-        File barFile = new File(RESOURCE_PATH + BAR_FILE_00META_NOTEXSIST);
+        File barFile = new File(RESOURCE_PATH + BAR_FILE_00META_NOTEXIST);
         byte[] body = BarInstallTestUtils.readBarFile(barFile);
         Map<String, String> headers = new LinkedHashMap<String, String>();
         headers.put(HttpHeaders.CONTENT_TYPE, REQ_CONTENT_TYPE);
@@ -1253,7 +1253,7 @@ public class BarInstallTest extends JerseyTest {
         String reqPath = INSTALL_TARGET;
 
         TResponse res = null;
-        File barFile = new File(RESOURCE_PATH + BAR_FILE_00MANIFEST_NOTEXSIST);
+        File barFile = new File(RESOURCE_PATH + BAR_FILE_00MANIFEST_NOTEXIST);
         byte[] body = BarInstallTestUtils.readBarFile(barFile);
         Map<String, String> headers = new LinkedHashMap<String, String>();
         headers.put(HttpHeaders.CONTENT_TYPE, REQ_CONTENT_TYPE);
@@ -1277,7 +1277,7 @@ public class BarInstallTest extends JerseyTest {
         String reqPath = INSTALL_TARGET;
 
         TResponse res = null;
-        File barFile = new File(RESOURCE_PATH + BAR_FILE_90ROOTPROPS_NOTEXSIST);
+        File barFile = new File(RESOURCE_PATH + BAR_FILE_90ROOTPROPS_NOTEXIST);
         byte[] body = BarInstallTestUtils.readBarFile(barFile);
         Map<String, String> headers = new LinkedHashMap<String, String>();
         headers.put(HttpHeaders.CONTENT_TYPE, REQ_CONTENT_TYPE);
@@ -1942,7 +1942,7 @@ public class BarInstallTest extends JerseyTest {
             createInstallTarget(reqCellName, userName, password, false);
 
             // テスト用Box作成（Schema付）
-            BoxUtils.createWithScheme(reqCellName, reqBoxName, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
+            BoxUtils.createWithSchema(reqCellName, reqBoxName, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
 
             // パスワード認証
             String token = getAccessToken(reqCellName, userName, password);
@@ -2060,7 +2060,7 @@ public class BarInstallTest extends JerseyTest {
         res.statusCode(HttpStatus.SC_BAD_REQUEST);
         String code = DcCoreException.BarInstall.BAR_FILE_BOX_SCHEMA_ALREADY_EXISTS.getCode();
         String message = DcCoreException.BarInstall.BAR_FILE_BOX_SCHEMA_ALREADY_EXISTS.
-                params("https://fqdn/testcell1").getMessage();
+                params("https://fqdn/testcell1/").getMessage();
         res.checkErrorResponse(code, message);
     }
 
@@ -2086,7 +2086,7 @@ public class BarInstallTest extends JerseyTest {
             CellUtils.create(cell2Name, AbstractCase.MASTER_TOKEN_NAME, ownerName, HttpStatus.SC_CREATED);
 
             // Cell1へスキーマあり用Boxを作成
-            BoxUtils.createWithScheme(cell1Name, INSTALL_TARGET, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
+            BoxUtils.createWithSchema(cell1Name, INSTALL_TARGET, AbstractCase.MASTER_TOKEN_NAME, SCHEMA_URL);
 
             // 先に作成したBoxと同じスキーマURLを持つBox（名前も同じ）へBoxインストールして正常登録（Boxの親Cellはそれぞれ異なる）
             res = BarInstallTestUtils.request(REQUEST_NORM_FILE, cell2Name, INSTALL_TARGET, headers, body);

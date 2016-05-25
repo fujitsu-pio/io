@@ -200,7 +200,7 @@ public class AuthCheckTest extends JerseyTest {
 
             // ２．スキーマありのボックスと結びつくロールのトランスセル確認
             // Box作成(スキーマあり:Box2)
-            BoxUtils.createWithScheme(testCellName, boxNameWithScheme,
+            BoxUtils.createWithSchema(testCellName, boxNameWithScheme,
                     AbstractCase.MASTER_TOKEN_NAME, scheme);
 
             // アカウント追加(user2)
@@ -430,7 +430,7 @@ public class AuthCheckTest extends JerseyTest {
             CellUtils.create(CELL_NAME1, masterToken, HttpStatus.SC_CREATED);
             CellUtils.create(CELL_NAME2, masterToken, HttpStatus.SC_CREATED);
             // テスト用ボックスの作成
-            BoxUtils.createWithScheme(CELL_NAME2, BOX_NAME1, masterToken, BOX_SCHEMA_NAME);
+            BoxUtils.createWithSchema(CELL_NAME2, BOX_NAME1, masterToken, BOX_SCHEMA_NAME);
             BoxUtils.create(CELL_NAME2, BOX_NAME2, masterToken);
             // Cell2のユーザを作成する
             AccountUtils.create(AbstractCase.MASTER_TOKEN_NAME, CELL_NAME2,

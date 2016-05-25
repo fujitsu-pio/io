@@ -1745,7 +1745,7 @@ public class BarFileValidateTest {
             Method method = BarFileInstaller.class.getDeclaredMethod(
                     "storeTemporaryBarFile", new Class<?>[] {InputStream.class});
             method.setAccessible(true);
-            method.invoke(bfi, new FileInputStream("hoge"));
+            method.invoke(bfi, new FileInputStream("pom.xml"));//any file
             Mockito.verify(bfi, Mockito.atLeast(1)).sync((FileDescriptor) Mockito.anyObject());
         } finally {
             DcCoreConfig.set(BinaryData.FSYNC_ENABLED, String.valueOf(fsyncEnabled));
@@ -1768,7 +1768,7 @@ public class BarFileValidateTest {
             Method method = BarFileInstaller.class.getDeclaredMethod(
                     "storeTemporaryBarFile", new Class<?>[] {InputStream.class});
             method.setAccessible(true);
-            method.invoke(bfi, new FileInputStream("hoge"));
+            method.invoke(bfi, new FileInputStream("pom.xml"));//any file
             Mockito.verify(bfi, Mockito.never()).sync((FileDescriptor) Mockito.anyObject());
         } finally {
             DcCoreConfig.set(BinaryData.FSYNC_ENABLED, String.valueOf(fsyncEnabled));

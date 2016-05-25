@@ -1,3 +1,39 @@
+## 1.3.25
+
+IMPROVEMENTS:
+  - core *[Common.java, Box.java, ExtCell.java, ODataUtils.java etc]*:<br>
+    Improved formats of Box object's `"Schema"` and ExtCell object's `"Name"`. <br>
+    The definitions of these formats are below.<br>
+
+|Object  |Property |Format name  |Proper format definition                      |Examples           |
+|:-------|:--------|:------------|:---------------------------------------------|:------------------|
+|Box     |Schema   |`Schema URI` |`Cell URL` or URN.                            |http://fqdn/adc/<br>urn:x-dc1:adc|
+|ExtCell |Name     |`Cell URL`   |Normalized URL with http(s) scheme and **trailing slash**.|http://fqdn/adc/|
+
+   * The formats of URI, URN and URL are based on [RFC3986](https://tools.ietf.org/html/rfc3986).
+   * **Trailing slash** is the character `/` which is in the end of URL.
+   * These values are validated at the time of creating/updating `Box` or `ExtCell`.
+   * If the above check fails, the response code will be `400 Bad Request`.
+
+## 1.3.24
+
+IMPROVEMENTS:
+  - core *[pom.xml etc]*:<br>
+   Enabled Java 8 compilation.
+   * Compilation on Java 8 used to fail due to incompatibility between Java 7 and 8. Now it is fixed and both Java 7 and 8 can compile the source.
+   * Also checked it surely runs on Java 8.
+
+  - core *[Account.java, Common.java, AbstractODataResource.java etc]*:<br>
+   Fixed the known issue in V1.3.23 about [Create Account API](https://github.com/personium/io/wiki/Account#create).
+   * Account object's `"Type"` value can be validated when you create a new Account.
+   * Available values are:<br> `"basic"`,`"oidc:google"` or these space-separated values such as `"oidc:google basic"`.
+   * If the above check fails, the response code will be `400 Bad Request`. 
+
+  - core *[TokenEndPointResource.java etc]*:<br>
+   Fixed the bug about password authentication.
+   * Added checking that Account object's `"Type"` value contains `"basic"` at the time of password authentication.
+   * If the above check fails, the response code will be `400 Bad Request`. 
+
 ## 1.3.23
 
 IMPROVEMENTS:

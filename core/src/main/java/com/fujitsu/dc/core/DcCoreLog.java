@@ -98,6 +98,11 @@ public final class DcCoreLog {
          * {0}：詳細メッセージ
          */
         public static final DcCoreLog ACCOUNT_ALREADY_DELETED = create("PL-AU-0004");
+        /**
+         * 対応するアカウントが存在したが、指定されたGrantTypeに対応していない.
+         * {0}：詳細メッセージ
+         */
+        public static final DcCoreLog UNSUPPORTED_ACCOUNT_GRANT_TYPE = create("PL-AU-0005");
     }
     
     /**

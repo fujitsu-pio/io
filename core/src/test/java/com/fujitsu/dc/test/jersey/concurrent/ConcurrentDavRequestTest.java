@@ -16,6 +16,8 @@
  */
 package com.fujitsu.dc.test.jersey.concurrent;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -44,11 +47,6 @@ import com.fujitsu.dc.test.utils.Http;
 import com.fujitsu.dc.test.utils.TResponse;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Dav系APIへの同時リクエストテスト.
@@ -141,6 +139,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称コレクション同時作成がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称コレクション同時作成がひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -196,6 +195,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイル同時作成がすべて成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイル同時作成がすべて成功する() throws InterruptedException {
         // カウンタを準備
@@ -252,6 +252,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイル同時削除がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイル同時削除がひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -309,6 +310,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称コレクションから同一名称コレクションへの同時移動がひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称コレクションから同一名称コレクションへの同時移動がひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -362,6 +364,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 複数のファイルから同一名称ファイルへの同時移動がすべて成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 複数のファイルから同一名称ファイルへの同時移動がすべて成功する() throws InterruptedException {
         // カウンタを準備
@@ -428,6 +431,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのPROPFIND中のDELETEリクエストがひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへのPROPFIND中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -482,6 +486,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * コレクションのPROPFIND中に子要素のDELETEを実行した場合リクエストがすべて成功すること.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void コレクションのPROPFIND中に子要素のDELETEを実行した場合リクエストがすべて成功すること() throws InterruptedException {
         String cell = Setup.TEST_CELL1;
@@ -560,6 +565,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのACL中のDELETEリクエストがひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称コレクションへのACL中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -612,6 +618,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのPROPPATCH中のDELETEリクエストがひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへのPROPPATCH中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -666,6 +673,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのPUT中のDELETEリクエストが204もしくは404になること.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへのPUT中のDELETEリクエストが204もしくは404になること() throws InterruptedException {
         // カウンタを準備
@@ -718,6 +726,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのPUT中のMOVEリクエストが201もしくは404になること.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへのPUT中のMOVEリクエストが201もしくは404になること() throws InterruptedException {
         // カウンタを準備
@@ -789,6 +798,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのGET中のDELETEリクエストがひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへのGET中のDELETEリクエストがひとつだけ成功する() throws InterruptedException {
         // カウンタを準備
@@ -853,6 +863,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのGET中のMOVEリクエストがひとつだけ成功する.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへのGET中にMOVEリクエストが1回だけ201になること() throws InterruptedException {
         // カウンタを準備
@@ -921,6 +932,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへのDELETE中のMOVEリクエストが201もしくは404になること.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへのDELETE中のMOVEリクエストが201もしくは404になること() throws InterruptedException {
         // カウンタを準備
@@ -987,6 +999,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称ファイルへの複数のMOVEリクエストが201もしくは204になること.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称ファイルへの複数のMOVEリクエストが201もしくは204になること() throws InterruptedException {
         // カウンタを準備
@@ -1044,6 +1057,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称コレクションの作成時に親コレクションが存在しない場合に409になること.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称コレクションの作成時に親コレクションが存在しない場合に409になること() throws InterruptedException {
         final String cell = "concurrencyTestCell";
@@ -1117,6 +1131,7 @@ public class ConcurrentDavRequestTest extends JerseyTest {
      * 同一名称コレクションの削除時に親コレクションが存在しない場合に404になること.
      * @throws InterruptedException InterruptedException
      */
+    @Ignore
     @Test
     public final void 同一名称コレクションの削除時に親コレクションが存在しない場合に404になること() throws InterruptedException {
         final String cell = "concurrencyTestCell";

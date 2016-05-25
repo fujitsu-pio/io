@@ -311,12 +311,12 @@ public final class ODataUtils {
         URI uri;
         try {
             uri = new URI(propValue);
-            String schema = uri.getScheme();
-            // スキーマチェック
+            String scheme = uri.getScheme();
+            // Scheme check
             if (uri.getScheme() == null
-                    || (!(schema.equals("http"))
-                            && !(schema.equals("https"))
-                            && !(schema.equals("urn")))) {
+                    || (!(scheme.equals("http"))
+                            && !(scheme.equals("https"))
+                            && !(scheme.equals("urn")))) {
                 return false;
             }
             // 文字列長チェック
@@ -327,6 +327,46 @@ public final class ODataUtils {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check if string is valid Schema URI.
+     * @param str Input string
+     * @return true if valid
+     */
+    public static boolean isValidSchemaUri(String str) {
+        boolean isValidLength = str.length() <= URI_MAX_LENGTH;
+        URI uri;
+        try {
+            uri = new URI(str);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+        String scheme = uri.getScheme();
+        boolean isUrn = scheme != null && (scheme.equals("urn")) && isValidLength;
+        return isUrn || isValidCellUrl(str);
+    }
+
+    /**
+     * Check if string is valid Cell URL.
+     * @param str Input string
+     * @return true if valid
+     */
+    public static boolean isValidCellUrl(String str) {
+        boolean isValidLength = str.length() <= URI_MAX_LENGTH;
+        URI uri;
+        try {
+            uri = new URI(str);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+        String scheme = uri.getScheme();
+        boolean isValidScheme = scheme != null
+                && ((scheme.equals("http"))
+                        || (scheme.equals("https")));
+        boolean isNormalized = uri.normalize().toString().equals(str);
+        boolean hasTrailingSlash = str.endsWith("/");
+        return isValidLength && isValidScheme && isNormalized && hasTrailingSlash;
     }
 
     /**

@@ -264,6 +264,17 @@ public class DcCoreException extends RuntimeException {
         public static final DcCoreException OPERATOR_AND_OPERAND_UNABLE_TO_UNESCAPE = create("PR400-OD-0048");
 
         /**
+         * Cell URL Invalid format.
+         * {0} property name
+         */
+        public static final DcCoreException CELL_URL_FORMAT_ERROR = create("PR400-OD-0049");
+        /**
+         * Schema URI Invalid format.
+         * {0} property name
+         */
+        public static final DcCoreException SCHEMA_URI_FORMAT_ERROR = create("PR400-OD-0050");
+
+        /**
          * 該当EntitySetが存在しない.
          */
         public static final DcCoreException NO_SUCH_ENTITY_SET = create("PR404-OD-0001");

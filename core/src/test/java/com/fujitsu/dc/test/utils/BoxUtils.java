@@ -135,14 +135,14 @@ public class BoxUtils {
      * @param token token
      * @param scheme scheme
      */
-    public static void createWithScheme(final String cellName, final String boxName,
-            final String token, final String scheme) {
+    public static void createWithSchema(final String cellName, final String boxName,
+            final String token, final String schema) {
         // Box作成
         Http.request("cell/box-create-with-scheme.txt")
                 .with("token", token)
                 .with("cellPath", cellName)
                 .with("boxPath", boxName)
-                .with("schema", scheme)
+                .with("schema", schema)
                 .returns()
                 .statusCode(HttpStatus.SC_CREATED);
     }

@@ -16,38 +16,8 @@
  */
 package com.fujitsu.dc.test.jersey.box.odatacol.batch;
 
-import static com.fujitsu.dc.test.utils.BatchUtils.BOUNDARY;
-import static com.fujitsu.dc.test.utils.BatchUtils.END_BOUNDARY;
-import static com.fujitsu.dc.test.utils.BatchUtils.START_BOUNDARY;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveChangeSetResErrorBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveDeleteBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveDeleteResBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveGetBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveGetResBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveListBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveListResBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveListSupplierResBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveMultiRequestBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveMultiRequestResBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrieveNestChangesetBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePostBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePostBodyBoundaryHeaderError;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePostBodyChangesetHeaderError;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePostBodyIntData;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePostBodyJsonFormatError;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePostBodyNoId;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePostWithBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePutBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePutBodyFieledInvalidError;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePutBodyIntData;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePutBodyMetadataFieledInvalidError;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePutResBody;
-import static com.fujitsu.dc.test.utils.BatchUtils.retrievePutResBody400;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static com.fujitsu.dc.test.utils.BatchUtils.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +31,7 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -840,6 +811,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     /**
      * UserDataを$batchに複数リクエスト指定で正常に処理ができること.
      */
+    @Ignore
     @Test
     public final void UserDataを$batchに複数リクエスト指定で正常に処理ができること() {
         String body = START_BOUNDARY + retrieveMultiRequestBody("Supplier", "testBatch1")

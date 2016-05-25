@@ -264,7 +264,7 @@ public class EsTypeImpl extends EsTranslogHandler implements EsType {
         @SuppressWarnings("unchecked")
         @Override
         IndexResponse doProcess() {
-            return asyncIndex(id, data, OpType.CREATE, -1).actionGet();
+            return (IndexResponse)asyncIndex(id, data, OpType.CREATE, -1).actionGet();
         }
 
         @Override
@@ -354,7 +354,7 @@ public class EsTypeImpl extends EsTranslogHandler implements EsType {
         @SuppressWarnings("unchecked")
         @Override
         IndexResponse doProcess() {
-            return asyncIndex(id, data, OpType.INDEX, version).actionGet();
+            return (IndexResponse)asyncIndex(id, data, OpType.INDEX, version).actionGet();
         }
 
         @Override
