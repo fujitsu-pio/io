@@ -8,3 +8,5 @@ engine/src/main/resources/dc-config.properties
 engine/src/test/resources/dc-config.properties
 core/src/main/resources/dc-config.properties
 
+*.log
+engine/.gitignore
