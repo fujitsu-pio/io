@@ -17,11 +17,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<final.name>dc1-core</final.name>
 		<esapi.version>1_2</esapi.version>
-		<java.version>1.7</java.version>
-		<jvm.option>-Xms512m -Xmx1024m -XX:MaxPermSize=256m
-			-XX:-UseSplitVerifier</jvm.option>
+		<java.source.version>1.7</java.source.version>
+		<java.target.version>1.7</java.target.version>
 		<logback.version>1.0.12</logback.version>
 		<slf4j.version>1.7.4</slf4j.version>
+		<jacoco.include.package>com.fujitsu.*</jacoco.include.package>
 	</properties>
 
 	<dependencies>
@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -278,8 +278,8 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<source>${java.source.version}</source>
+					<target>${java.target.version}</target>
 					<encoding>UTF-8</encoding>
 					<debug>true</debug>
 					<optimize>false</optimize>
@@ -308,9 +308,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
+				<version>2.19.1</version>
 				<configuration>
-					<argLine>${jvm.option}</argLine>
+					<argLine>${jacocoArgs} -Xms512m -Xmx1024m -XX:MaxPermSize=256m -XX:-UseSplitVerifier</argLine>
 					<excludes>
 						<exclude>**/jersey/box/ServiceRelayTest.java</exclude>
 						<exclude>**/jersey/AcceptEncodingTest.java</exclude>
@@ -338,19 +338,14 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.6</version>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.13</version>
+				<version>2.13</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.5.1</version>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.5.1</version>
 				<configuration>
 					<locales>ja</locales>
 					<inputEncoding>UTF-8</inputEncoding>
@@ -389,6 +384,26 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.7.201606060606</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<propertyName>jacocoArgs</propertyName>
+							<includes>
+								<include>${jacoco.include.package}</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<reporting>
@@ -413,23 +428,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>report-only</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<configuration>
-					<formats>
-						<format>xml</format>
-						<format>html</format>
-					</formats>
-				</configuration>
+				<version>2.19.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -450,7 +449,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.3</version>
+				<version>3.0.3</version>
 				<configuration>
 					<effort>Max</effort>
 					<findbugsXmlWithMessages>true</findbugsXmlWithMessages>
@@ -462,8 +461,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.6</version>
 				<configuration>
-					<targetJdk>${java.version}</targetJdk>
+					<targetJdk>${java.source.version}</targetJdk>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -474,7 +474,10 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>javancss-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</reporting>
-
 </project>
