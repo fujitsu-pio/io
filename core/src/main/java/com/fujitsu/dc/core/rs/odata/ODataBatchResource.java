@@ -81,7 +81,7 @@ public class ODataBatchResource extends AbstractODataResource {
     /**
      * Lockを他プロセスに譲るためにスリープするか否か.
      */
-    public static enum BatchPriority {
+    public enum BatchPriority {
         /** Lockを他プロセスに譲らない. */
         HIGH("high"),
         /** Lockを他プロセスに譲る. */

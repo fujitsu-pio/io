@@ -348,12 +348,12 @@ public class UserDataODataProducer extends EsODataProducer {
 
     @Override
     public String getBoxId() {
-        return davCmp.getBoxId();
+        return davCmp.getBox().getId();
     }
 
     @Override
     public String getNodeId() {
-        return davCmp.getNodeId();
+        return davCmp.getId();
     }
 
     /**
@@ -487,7 +487,7 @@ public class UserDataODataProducer extends EsODataProducer {
             Map<String, Object> queryMap = createDynamicPropertyCountQuery(docHandler, propertyDocHandlerList);
             long count = accessor.count(queryMap);
             if (0 != count) {
-                UserDataSchemaCache.clear(this.davCmp.getNodeId());
+                UserDataSchemaCache.clear(this.davCmp.getId());
                 throw DcCoreException.Misc.TOO_MANY_CONCURRENT_REQUESTS;
             }
 
@@ -495,7 +495,7 @@ public class UserDataODataProducer extends EsODataProducer {
                 accessor.create(propertyDocHandler);
             }
 
-            UserDataSchemaCache.clear(this.davCmp.getNodeId());
+            UserDataSchemaCache.clear(this.davCmp.getId());
             reloadMetadata();
         }
     }

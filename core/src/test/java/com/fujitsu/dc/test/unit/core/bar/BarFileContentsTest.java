@@ -27,7 +27,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.fujitsu.dc.core.bar.BarFileReadRunner;
+import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
+import com.fujitsu.dc.core.model.impl.fs.DavCmpFsImpl;
 import com.fujitsu.dc.test.categories.Unit;
 
 /**
@@ -35,12 +37,25 @@ import com.fujitsu.dc.test.categories.Unit;
  */
 @Category({Unit.class })
 public class BarFileContentsTest {
+    private static DavCmp newDavCmp(String name) {
+        return newDavCmpFsImpl(name);
+    }
+    private static DavCmp newDavCmpFsImpl(String name) {
+        return DavCmpFsImpl.create(name, null);
+    }
+    private static DavCmp newDavCmpEsImpl(String name) {
+        return new DavCmpEsImpl(name, null, null, null, null);
+    }
+
+    private static final String ODATA_COL_NAME = "odataCol";
+    private static final String WEBDAV_COL_NAME = "davCol";
+    private static final String SVC_COL_NAME = "svcCol";
 
     /**
      * .
      */
     private class TestBarRunner extends BarFileReadRunner {
-        public TestBarRunner() {
+        TestBarRunner() {
             super(null, null, null, null, null, null, null, null);
         }
 
@@ -54,9 +69,9 @@ public class BarFileContentsTest {
          * @return エントリのタイプ
          */
         protected int getEntryType(String entryName,
-                Map<String, DavCmpEsImpl> odataCols,
-                Map<String, DavCmpEsImpl> webdavCols,
-                Map<String, DavCmpEsImpl> serviceCols,
+                Map<String, DavCmp> odataCols,
+                Map<String, DavCmp> webdavCols,
+                Map<String, DavCmp> serviceCols,
                 Map<String, String> davFiles) {
             return super.getEntryType(entryName, odataCols, webdavCols, serviceCols, davFiles);
         }
@@ -68,7 +83,7 @@ public class BarFileContentsTest {
          * @param doneKeys 処理済みのODataコレクション用エントリリスト
          * @return 判定処理結果
          */
-        protected boolean isValidODataContents(String entryName, Map<String, DavCmpEsImpl> colMap,
+        protected boolean isValidODataContents(String entryName, Map<String, DavCmp> colMap,
                 List<String> doneKeys) {
             return super.isValidODataContents(entryName, colMap, doneKeys);
         }
@@ -80,42 +95,28 @@ public class BarFileContentsTest {
      */
     @Test
     public void contents直下のODataコレクションの場合TYPE_ODATA_COLLECTIONが返却されること() {
-        String odatacolName = "odataCol";
-        String entryName = "bar/90_contents/" + odatacolName;
 
-        String key = "bar/90_contents/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+
+        
+        String key = "bar/90_contents/" + ODATA_COL_NAME;
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
-        key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
+        key = "bar/90_contents/" + WEBDAV_COL_NAME;
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
-        key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
+        key = "bar/90_contents/" + SVC_COL_NAME;
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
+
+        String entryName = "bar/90_contents/" + ODATA_COL_NAME;
 
         TestBarRunner testBarRunner = new TestBarRunner();
         int res = testBarRunner.getEntryType(entryName, odataCols, webDavCols, svcCols, davFileMap);
@@ -129,38 +130,26 @@ public class BarFileContentsTest {
     @Test
     public void ODataコレクション配下のエントリの場合TYPE_ODATA_COLLECTIONが返却されること() {
         String odatacolName = "odataCol";
+        String webDavColName = "davCol";
+        String svcColName = "svcCol";
+
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+        
         String entryName = "bar/90_contents/odataCol/90_data/entityType/1.json";
 
         String key = "bar/90_contents/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
         key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
         key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
@@ -177,38 +166,27 @@ public class BarFileContentsTest {
     @Test
     public void WebDavコレクション配下のODataコレクションの場合TYPE_ODATA_COLLECTIONが返却されること() {
         String odatacolName = "odataCol";
+        String webDavColName = "davCol";
+        String svcColName = "svcCol";
+
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+
+        
         String entryName = "bar/90_contents/davCol/" + odatacolName;
 
         String key = "bar/90_contents/davCol/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
         key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
         key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
@@ -227,36 +205,24 @@ public class BarFileContentsTest {
         String entryName = "bar/90_contents/davCol";
 
         String odatacolName = "odataCol";
+        String webDavColName = "davCol";
+        String svcColName = "svcCol";
+
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+        
         String key = "bar/90_contents/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
         key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
         key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
@@ -275,36 +241,24 @@ public class BarFileContentsTest {
         String entryName = "bar/90_contents/davCol/hoge.jpg";
 
         String odatacolName = "odataCol";
+        String webDavColName = "davCol";
+        String svcColName = "svcCol";
+
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+        
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+        
         String key = "bar/90_contents/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
         key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
         key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
@@ -325,36 +279,24 @@ public class BarFileContentsTest {
         String entryName = "bar/90_contents/svcCol";
 
         String odatacolName = "odataCol";
+        String webDavColName = "davCol";
+        String svcColName = "svcCol";
+
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+        
         String key = "bar/90_contents/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
         key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
         key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
@@ -373,36 +315,24 @@ public class BarFileContentsTest {
         String entryName = "bar/90_contents/svcCol/hoge.js";
 
         String odatacolName = "odataCol";
+        String webDavColName = "davCol";
+        String svcColName = "svcCol";
+
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+
         String key = "bar/90_contents/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
         key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
         key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
@@ -422,36 +352,24 @@ public class BarFileContentsTest {
         String entryName = "bar/90_contents/dummyCol";
 
         String odatacolName = "odataCol";
+        String webDavColName = "davCol";
+        String svcColName = "svcCol";
+
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
+        DavCmp svcCol = newDavCmp(SVC_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
+        Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
+
         String key = "bar/90_contents/" + odatacolName;
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                odatacolName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
         odataCols.put(key, odataCol);
 
-        String webDavColName = "davCol";
         key = "bar/90_contents/" + webDavColName;
-        DavCmpEsImpl webDavCol = new DavCmpEsImpl(
-                webDavColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> webDavCols = new HashMap<String, DavCmpEsImpl>();
         webDavCols.put(key, webDavCol);
 
-        String svcColName = "svcCol";
         key = "bar/90_contents/" + svcColName;
-        DavCmpEsImpl svcCol = new DavCmpEsImpl(
-                svcColName,
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> svcCols = new HashMap<String, DavCmpEsImpl>();
         svcCols.put(key, svcCol);
 
         Map<String, String> davFileMap = new HashMap<String, String>();
@@ -469,13 +387,9 @@ public class BarFileContentsTest {
     public void ODataコレクション配下の階層が正しい場合trueが返却されること() {
 
         String key = "bar/90_contents/odataCol/";
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                "odataCol",
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+        
+        Map<String, DavCmp> odataCols = new HashMap<>();
         odataCols.put(key, odataCol);
 
         List<String> doneKeys = new ArrayList<String>();
@@ -519,13 +433,9 @@ public class BarFileContentsTest {
     public void WebDavコレクション配下のODataコレクション配下の階層が正しい場合trueが返却されること() {
 
         String key = "bar/90_contents/webdavCol/odataCol/";
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                "odataCol",
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<>();
         odataCols.put(key, odataCol);
 
         List<String> doneKeys = new ArrayList<String>();
@@ -572,13 +482,9 @@ public class BarFileContentsTest {
     public void ODataコレクション直下のファイル順序が不正な場合falseが返却されること() {
 
         String key = "bar/90_contents/webdavCol/odataCol/";
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                "odataCol",
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<>();
         odataCols.put(key, odataCol);
 
         List<String> doneKeys = new ArrayList<String>();
@@ -615,13 +521,9 @@ public class BarFileContentsTest {
     public void ODataコレクション配下のユーザデータディレクトリが存在しない場合falseが返却されること() {
 
         String key = "bar/90_contents/webdavCol/odataCol/";
-        DavCmpEsImpl odataCol = new DavCmpEsImpl(
-                "odataCol",
-                null,
-                null,
-                null,
-                null);
-        Map<String, DavCmpEsImpl> odataCols = new HashMap<String, DavCmpEsImpl>();
+        DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
+
+        Map<String, DavCmp> odataCols = new HashMap<>();
         odataCols.put(key, odataCol);
 
         List<String> doneKeys = new ArrayList<String>();

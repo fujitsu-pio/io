@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.json.simple.JSONObject;
 
-import com.fujitsu.dc.core.model.DavNode;
+import com.fujitsu.dc.core.model.impl.es.DavNode;
 import com.fujitsu.dc.core.model.impl.es.doc.EntitySetDocHandler;
 import com.fujitsu.dc.core.model.impl.es.doc.LinkDocHandler;
 

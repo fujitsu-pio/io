@@ -53,8 +53,8 @@ import com.fujitsu.dc.core.bar.BarFileInstaller;
 import com.fujitsu.dc.core.bar.BarFileReadRunner;
 import com.fujitsu.dc.core.bar.jackson.JSONManifest;
 import com.fujitsu.dc.core.bar.jackson.JSONMappedObject;
+import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.impl.es.CellEsImpl;
-import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
 import com.fujitsu.dc.test.categories.Unit;
 
 /**
@@ -135,7 +135,7 @@ public class BarFileValidateTest {
          * @param davCmp Collection操作用オブジェクト
          * @return 正常終了した場合はtrue
          */
-        protected boolean registUserSchema(String entryName, InputStream inputStream, DavCmpEsImpl davCmp) {
+        protected boolean registUserSchema(String entryName, InputStream inputStream, DavCmp davCmp) {
             return super.registUserSchema(entryName, inputStream, davCmp);
         }
 

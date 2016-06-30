@@ -22,7 +22,6 @@ import java.util.List;
 
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
-import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
 
 /**
  * Davのあて先情報を管理するクラス.
@@ -80,8 +79,8 @@ public class DavDestination {
      */
     public void validateDestinationResource(String overwrite, DavCmp davCmp) {
         List<String> destinationPaths = this.destinationPath.getResourcePath();
-        DavCmpEsImpl currentCmp = (DavCmpEsImpl) this.destinationRsCmp.getDavCmp();
-        DavCmpEsImpl parentCmp = (DavCmpEsImpl) this.destinationRsCmp.getParent().getDavCmp();
+        DavCmp currentCmp =  this.destinationRsCmp.getDavCmp();
+        DavCmp parentCmp = this.destinationRsCmp.getParent().getDavCmp();
 
         // 移動先の途中のペアレントリソースが存在するかをチェック
         checkHasParent(destinationPaths, this.destinationHierarchyNumber);
@@ -114,8 +113,8 @@ public class DavDestination {
      * @param currentCmp 移動対象のリソースのDavCmp
      * @param parentCmp 移動先の親リソースのDavCmp
      */
-    private void checkParentChildCount(DavCmpEsImpl currentCmp, DavCmpEsImpl parentCmp) {
-        if (null == currentCmp.getDavNode()
+    private void checkParentChildCount(DavCmp currentCmp, DavCmp parentCmp) {
+        if (!currentCmp.exists()
                 && DcCoreConfig.getMaxChildResourceCount() <= parentCmp.getChildrenCount()) {
             // 移動先にリソースが存在しない、かつ、移動先の親の子要素数がすでに最大値に達している場合
             // ※移動先にすでにリソースが存在する（上書き）の場合は、移動先のリソース作成時に最大値に関するチェックは行われているので、ここでは実施しない
@@ -135,10 +134,10 @@ public class DavDestination {
     }
 
     private void checkIsProhibitedResource(String overwrite,
-            DavCmpEsImpl currentCmp,
-            DavCmpEsImpl parentCmp,
+            DavCmp currentCmp,
+            DavCmp parentCmp,
             String sourceResourceType) {
-        if (null != currentCmp.getDavNode()) {
+        if (currentCmp.exists()) {
             // 移動先のリソースを上書きしようとしている場合に必要なチェック
 
             if (DavCommon.OVERWRITE_FALSE.equalsIgnoreCase(overwrite)) {
@@ -189,11 +188,11 @@ public class DavDestination {
         DavRsCmp currentRsCmp = null;
         int pathIndex;
         for (pathIndex = 0; pathIndex < destinationPaths.size(); pathIndex++) {
-            DavCmpEsImpl parentCmp = (DavCmpEsImpl) parentRsCmp.getDavCmp();
+            DavCmp parentCmp = parentRsCmp.getDavCmp();
             String resourceName = destinationPaths.get(pathIndex);
-            DavCmpEsImpl currentCmp = (DavCmpEsImpl) parentCmp.getChild(resourceName);
+            DavCmp currentCmp = parentCmp.getChild(resourceName);
             currentRsCmp = new DavRsCmp(parentRsCmp, currentCmp);
-            if (null == currentCmp.getDavNode()) {
+            if (!currentCmp.exists()) {
                 // 処理中の階層のリソースが存在しない
                 break;
             }
@@ -213,8 +212,8 @@ public class DavDestination {
      *         移動先DavNodeの実体が存在しない場合もfalseを返す。
      */
     public boolean equalsDestinationNodeId(DavCmp davCmp) {
-        if (null != this.getDestinationCmp() && this.getDestinationCmp().isExists()
-                && this.getDestinationCmp().getNodeId().equals(davCmp.getNodeId())) {
+        if (null != this.getDestinationCmp() && this.getDestinationCmp().exists()
+                && this.getDestinationCmp().getId().equals(davCmp.getId())) {
             return true;
         }
         return false;

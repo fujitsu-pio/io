@@ -16,12 +16,14 @@
  */
 package com.fujitsu.dc.test.jersey.box.odatacol.batch;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fujitsu.dc.client.ODataBatchResponseParser;
+import com.fujitsu.dc.client.ODataResponse;
 import com.fujitsu.dc.test.jersey.box.odatacol.AbstractUserDataTest;
 import com.fujitsu.dc.test.setup.Setup;
 import com.fujitsu.dc.test.utils.BatchUtils;
@@ -31,20 +33,20 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 /**
  * UserData $batchテスト用の抽象クラス.
  */
-public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {
+public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {    
     String cellName = Setup.TEST_CELL1;
     String boxName = Setup.TEST_BOX1;
     String colName = Setup.TEST_ODATA;
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     public AbstractUserDataBatchTest() {
         super();
     }
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param descripter WebAppDescriptor
      */
     public AbstractUserDataBatchTest(WebAppDescriptor descripter) {
@@ -52,24 +54,39 @@ public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {
     }
 
     /**
-     * レスポンスボディのチェック.
+     * check response body.
      * @param res TResponse
-     * @param expectedResBody 期待するレスポンスボディ
+     * @param expectedResBody Expected response body
      */
-    //TODO :文字列比較ロジック見直す
-    //1.Boundary区切り数の比較
-    //2.各区切り毎に単純比較ではなく、同様と見なせる解釈を付加する（ヘッダー順不同、ボディ内容など）
     public static void checkBatchResponseBody(TResponse res, String expectedResBody) {
         String[] arrResBody = res.getBody().split("\n");
         String[] arrExpResBody = expectedResBody.split("\n");
 
-        for (int i = 0; i < arrResBody.length; i++) {
-            Pattern p = Pattern.compile(arrExpResBody[i]);
-            Matcher m = p.matcher(arrResBody[i]);
-            assertTrue("expected " + arrExpResBody[i] + " but was " + arrResBody[i], m.matches());
-        }
+        ODataBatchResponseParser parser = new ODataBatchResponseParser();
 
-        assertFalse(arrResBody.length < arrExpResBody.length);
+        List<ODataResponse> odResEx = parser.parse(expectedResBody, arrExpResBody[0]);
+        List<ODataResponse> odResAc = parser.parse(res.getBody(), arrResBody[0]);
+
+        // check if # parts equals
+        assertTrue("inconsistent #Parts. #expected=" + odResEx.size() + ", while #actual=" + odResAc.size(),  odResAc.size() == odResEx.size());
+
+        for (int i = 0 ; i < odResEx.size(); i++) {
+            ODataResponse resEx = odResEx.get(i);
+            ODataResponse resAc = odResAc.get(i);
+            // should be same status code
+            org.junit.Assert.assertEquals(resEx.getStatusCode(), resAc.getStatusCode());
+            org.junit.Assert.assertEquals(resEx.bodyAsString(), resAc.bodyAsString());
+
+            for (String headerKey : resEx.getHeaders().keySet()) {
+                String hValueEx = resEx.getHeader(headerKey);
+                String hValueAc = resAc.getHeader(headerKey);
+                Pattern p = Pattern.compile(hValueEx);
+                Matcher m = p.matcher(hValueAc);
+                assertTrue("Header " + headerKey + " should match.\n\n Expected\n" + hValueEx + "\nActual\n" + hValueAc, 
+                        hValueEx.equals(hValueAc) || m.matches());
+            }
+        }
+        // assertFalse("res body shorter than expected", arrResBody.length < arrExpResBody.length);
 
     }
 
