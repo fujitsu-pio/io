@@ -284,9 +284,9 @@ public class MoveFileHeaderValidateTest extends JerseyTest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SC_CREATED);
 
             // 移動元のファイルが存在しないこと
-            DavResourceUtils.getWebDav(CELL_NAME, TOKEN , BOX_NAME, FILE_NAME, HttpStatus.SC_NOT_FOUND);
+            DavResourceUtils.getWebDav(CELL_NAME, TOKEN, BOX_NAME, FILE_NAME, HttpStatus.SC_NOT_FOUND);
             // 移動先のファイルが存在すること
-            DavResourceUtils.getWebDav(CELL_NAME, TOKEN , BOX_NAME, destFileName, HttpStatus.SC_OK);
+            DavResourceUtils.getWebDav(CELL_NAME, TOKEN, BOX_NAME, destFileName, HttpStatus.SC_OK);
         } finally {
             DavResourceUtils.deleteWebDavFile(CELL_NAME, TOKEN, BOX_NAME, FILE_NAME);
             DavResourceUtils.deleteWebDavFile(CELL_NAME, TOKEN, BOX_NAME, destFileName);

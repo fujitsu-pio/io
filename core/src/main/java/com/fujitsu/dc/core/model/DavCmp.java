@@ -14,21 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.fujitsu.dc.core.model;
 
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.wink.webdav.model.Multistatus;
 import org.apache.wink.webdav.model.Propertyupdate;
-import org.apache.wink.webdav.model.Propfind;
 
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.jaxb.Acl;
 import com.fujitsu.dc.core.odata.DcODataProducer;
+
 
 /**
  * JaxRS Resource オブジェクトから処理の委譲を受けてDav関連の永続化処理を行うインターフェース.
@@ -72,7 +74,7 @@ public interface DavCmp {
      * DavNodeがDB上に存在するかどうか.
      * @return 存在する場合はtrue
      */
-    boolean isExists();
+    boolean exists();
 
     /**
      * Davの管理データ情報を最新化する.
@@ -92,6 +94,48 @@ public interface DavCmp {
     Acl getAcl();
 
     /**
+     * @return acl
+     */
+    Map<String, String> getProperties();
+
+    /**
+     * Cellのgetter.
+     * @return Cell
+     */
+    Cell getCell();
+
+    /**
+     * Boxのgetter.
+     * @return Cell
+     */
+    Box getBox();
+
+    /**
+     * @return Update time stamp
+     */
+    Long getUpdated();
+
+    /**
+     * @return Create time stamp
+     */
+    Long getPublished();
+
+    /**
+     * @return Content Length
+     */
+    Long getContentLength();
+
+    /**
+     * @return Content type
+     */
+    String getContentType();
+
+    /**
+     * @return true if Cell Level
+     */
+    boolean isCellLevel();
+
+    /**
      * スキーマ認証レベル設定のgetter.
      * @return スキーマ認証レベル
      */
@@ -109,6 +153,11 @@ public interface DavCmp {
      * @return 子パスを担当する部品
      */
     DavCmp getChild(String name);
+
+    /**
+     * @return chilrdren DavCmp in the form of Map<path, DavCmp>
+     */
+    Map<String, DavCmp> getChildren();
 
     /**
      * 親パスを担当する部品を返す.
@@ -134,17 +183,12 @@ public interface DavCmp {
      */
     String getName();
 
-    /**
-     * このオブジェクトのboxIdを返す.
-     * @return nodeId
-     */
-    String getBoxId();
 
     /**
      * このオブジェクトのnodeIdを返す.
      * @return nodeId
      */
-    String getNodeId();
+    String getId();
 
     /**
      * 配下にデータがない場合はtrueを返す.
@@ -206,16 +250,6 @@ public interface DavCmp {
     ResponseBuilder unlinkChild(String name, Long asof);
 
     /**
-     * PROPFINDメソッドの処理.
-     * @param propfind Propfind要求オブジェクト
-     * @param depth Depthヘッダ
-     * @param url URL
-     * @param isAclRead ACL情報取得
-     * @return 応答オブジェクト
-     */
-    Multistatus propfind(Propfind propfind, String depth, String url, boolean isAclRead);
-
-    /**
      * PROPPATCHメソッドの処理.
      * @param propUpdate PROPPATCH要求オブジェクト
      * @param url URL
@@ -226,9 +260,10 @@ public interface DavCmp {
     /**
      * 削除処理を行う.
      * @param ifMatch If-Matchヘッダ
+     * @param recursive set true to process recursively
      * @return JAX-RS ResponseBuilder
      */
-    ResponseBuilder delete(String ifMatch);
+    ResponseBuilder delete(String ifMatch, boolean recursive);
 
     /**
      * GETメソッドを処理する.

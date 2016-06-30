@@ -49,40 +49,34 @@ import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.annotations.ACL;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.CellPrivilege;
-import com.fujitsu.dc.core.cell.CellBulkDeletionRunner;
 import com.fujitsu.dc.core.event.DcEvent;
 import com.fujitsu.dc.core.event.EventBus;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.Cell;
+import com.fujitsu.dc.core.model.CellCmp;
 import com.fujitsu.dc.core.model.CellRsCmp;
-import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.ModelFactory;
-import com.fujitsu.dc.core.model.impl.es.EsModel;
-import com.fujitsu.dc.core.model.impl.es.accessor.CellAccessor;
-import com.fujitsu.dc.core.model.impl.es.accessor.CellDeleteAccessor;
-import com.fujitsu.dc.core.model.impl.es.cache.CellCache;
-import com.fujitsu.dc.core.model.impl.es.doc.CellDocHandler;
-import com.fujitsu.dc.core.model.lock.CellLockManager;
 import com.fujitsu.dc.core.model.lock.UnitUserLockManager;
 import com.fujitsu.dc.core.rs.box.BoxResource;
 
 /**
- * JAX-RS Resource handling DC Cell Level Api. /{cell名}というパスにきたときの処理.
+ * JAX-RS Resource handling Cell Level Api.
+ *  logics for the url path /{cell name}.
  */
 public final class CellResource {
 
     /**
-     * ログ用オブジェクト.
+     * logger.
      */
     static Logger log = LoggerFactory.getLogger(CellResource.class);
 
     Cell cell;
-    DavCmp davCmp;
+    CellCmp cellCmp;
     CellRsCmp cellRsCmp;
     AccessContext accessContext;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param accessContext AccessContext
      */
     public CellResource(
@@ -93,13 +87,13 @@ public final class CellResource {
         if (this.cell == null) {
             throw DcCoreException.Dav.CELL_NOT_FOUND;
         }
-        this.davCmp = ModelFactory.cellCmp(this.cell);
-        if (!this.davCmp.isExists()) {
+        this.cellCmp = ModelFactory.cellCmp(this.cell);
+        if (!this.cellCmp.exists()) {
             // クリティカルなタイミングでCellが削除された場合
             throw DcCoreException.Dav.CELL_NOT_FOUND;
         }
 
-        this.cellRsCmp = new CellRsCmp(this.davCmp, this.cell, this.accessContext);
+        this.cellRsCmp = new CellRsCmp(this.cellCmp, this.cell, this.accessContext);
         checkReferenceMode();
     }
 
@@ -125,7 +119,7 @@ public final class CellResource {
      * System.out.println(arg0.toString()); } }); }
      */
     /**
-     * ルートに対するGETメソッド.
+     * handler for GET Method.
      * @return JAX-RS Response Object
      */
     @GET
@@ -134,93 +128,42 @@ public final class CellResource {
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("<cell xmlns=\"urn:x-dc1:xmlns\">");
         sb.append("<uuid>" + this.cell.getId() + "</uuid>");
+        sb.append("<ctl>" + this.cell.getUrl() + "__ctl/" + "</ctl>");
         sb.append("</cell>");
         return Response.ok().entity(sb.toString()).build();
     }
 
     /**
-     * セル一括削除API.
-     * @param recursiveHeader X-Dc-Recursiveヘッダ
+     * handler for DELETE Method.
+     * ie, Recursive Cell Deletion.
+     * @param recursiveHeader X-Dc-Recursive Header
      * @return JAX-RS Response Object
      */
     @DELETE
     public Response cellBulkDeletion(
             @HeaderParam(DcCoreUtils.HttpHeaders.X_DC_RECURSIVE) final String recursiveHeader) {
-        // セル一括削除
-        String cellId = this.cell.getId();
-        String cellName = this.cell.getName();
-        String unitUserName = this.cell.getUnitUserName();
-        String cellInfoLog = String.format(" CellId:[%s], CellName:[%s], CellUnitUserName:[%s]", cellId, cellName,
-                unitUserName);
-        log.info("Cell Bulk Deletion." + cellInfoLog);
-
+        // X-Dc-Recursiveヘッダの指定が"true"でない場合はエラーとする
+        if (!"true".equals(recursiveHeader)) {
+            throw DcCoreException.Misc.PRECONDITION_FAILED.params(DcCoreUtils.HttpHeaders.X_DC_RECURSIVE);
+        }
         // アクセス権限の確認を実施する
         // ユニットマスター、ユニットユーザ、ユニットローカルユニットユーザ以外は権限エラーとする
         String cellOwner = this.cell.getOwner();
         checkAccessContextForCellBulkDeletion(cellOwner);
 
-        // X-Dc-Recursiveヘッダの指定が"true"でない場合はエラーとする
-        if (!"true".equals(recursiveHeader)) {
-            throw DcCoreException.Misc.PRECONDITION_FAILED.params(DcCoreUtils.HttpHeaders.X_DC_RECURSIVE);
-        }
+        String cellId = this.cell.getId();
+        String cellName = this.cell.getName();
+        String unitUserName = this.cell.getDataBundleName();
+        String cellInfoLog = String.format(" CellId:[%s], CellName:[%s], CellUnitUserName:[%s]", cellId, cellName,
+                unitUserName);
+        log.info("Cell Bulk Deletion." + cellInfoLog);
+        this.cell.delete(true, unitUserName);
 
-        // Cellに対するアクセス数を確認して、アクセスをロックする
-        int maxLoopCount = Integer.valueOf(DcCoreConfig.getCellLockRetryTimes());
-        long interval = Long.valueOf(DcCoreConfig.getCellLockRetryInterval());
-        waitCellAccessible(cellId, maxLoopCount, interval);
-
-        CellLockManager.setBulkDeletionStatus(cellId);
-
-        // Cellエンティティを削除する
-        CellAccessor cellAccessor = (CellAccessor) EsModel.cell();
-        CellDocHandler docHandler = new CellDocHandler(cellAccessor.get(cell.getId()));
-        try {
-            cellAccessor.delete(docHandler);
-            log.info("Cell Entity Deletion End.");
-        } finally {
-            CellCache.clear(this.cell.getName());
-            CellLockManager.resetBulkDeletionStatus(cellId);
-        }
-
-        // Cell削除管理テーブルに削除対象のDB名とセルIDを追加する
-        insertCellDeleteRecord(unitUserName, cellId);
-
-        // 非同期でWebDavファイル、EventLogファイル、ESのCell配下のエンティティを削除する
-        // MySQLのCell配下のエンティティはバッチにて削除する
-        CellBulkDeletionRunner runner = new CellBulkDeletionRunner(cell);
-        Thread thread = new Thread(runner);
-        thread.start();
-
-        // 204を返却する
+        // respond 204
         return Response.noContent().build();
     }
 
-    private void insertCellDeleteRecord(String unitUserName, String cellId) {
-        CellDeleteAccessor accessor = new CellDeleteAccessor();
-        if (!accessor.isValid()) {
-            log.warn(String.format("Insert CELL_DELETE Record To Ads Failed. db_name:[%s], cell_id:[%s]",
-                    unitUserName, cellId));
-            return;
-        }
-        accessor.createManagementDatabase();
-        accessor.insertCellDeleteRecord(unitUserName, cellId);
-    }
 
-    private void waitCellAccessible(String cellId, int maxLoopCount, long interval) {
-        for (int loopCount = 0; loopCount < maxLoopCount; loopCount++) {
-            long count = CellLockManager.getReferenceCount(cellId);
-            // 自分のリクエスト分も含まれるので他のリクエストが存在する場合は１より大きくなる
-            if (count <= 1) {
-                return;
-            }
-            try {
-                Thread.sleep(interval);
-            } catch (InterruptedException e) {
-                throw DcCoreException.Misc.CONFLICT_CELLACCESS;
-            }
-        }
-        throw DcCoreException.Misc.CONFLICT_CELLACCESS;
-    }
 
     private void checkAccessContextForCellBulkDeletion(String cellOwner) {
 

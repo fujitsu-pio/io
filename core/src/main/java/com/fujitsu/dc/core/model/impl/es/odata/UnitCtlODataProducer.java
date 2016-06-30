@@ -31,6 +31,8 @@ import com.fujitsu.dc.common.es.EsIndex;
 import com.fujitsu.dc.common.es.response.DcGetResponse;
 import com.fujitsu.dc.common.es.response.DcSearchHit;
 import com.fujitsu.dc.core.auth.AccessContext;
+import com.fujitsu.dc.core.model.Cell;
+import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.CtlSchema;
 import com.fujitsu.dc.core.model.impl.es.EsModel;
 import com.fujitsu.dc.core.model.impl.es.accessor.DataSourceAccessor;
@@ -81,6 +83,15 @@ public class UnitCtlODataProducer extends EsODataProducer {
         return implicitFilters;
     }
 
+    @Override
+    public void afterCreate(final String entitySetName, final OEntity oEntity, final EntitySetDocHandler docHandler) {
+        if (!Cell.EDM_TYPE_NAME.equals(entitySetName)) {
+            return;
+        }
+        Cell cell = ModelFactory.cell(((OEntityWrapper) oEntity).getUuid(), null);
+        // Init Cell Cmp (create metadata if not exist.)
+        ModelFactory.cellCmp(cell);
+    }
     /**
      * 実装サブクラスProducer更新処理を行いたいときは、ここをoverrideして子データの存在チェックし、結果を返すよう実装する。
      * @param entitySetName エンティティセット名
@@ -187,7 +198,6 @@ public class UnitCtlODataProducer extends EsODataProducer {
     @Override
     protected void checkInvalidLinks(EntitySetDocHandler sourceDocHandler, OEntity entity, String targetEntitySetName) {
     }
-
     @Override
     public void onChange(String entitySetName) {
     }

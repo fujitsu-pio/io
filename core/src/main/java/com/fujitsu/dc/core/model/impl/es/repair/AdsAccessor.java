@@ -29,7 +29,7 @@ import com.fujitsu.dc.common.es.response.DcSearchHit;
 import com.fujitsu.dc.common.es.response.DcSearchResponse;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.Cell;
-import com.fujitsu.dc.core.model.DavNode;
+import com.fujitsu.dc.core.model.impl.es.DavNode;
 import com.fujitsu.dc.core.model.impl.es.ads.Ads;
 import com.fujitsu.dc.core.model.impl.es.ads.AdsException;
 import com.fujitsu.dc.core.model.impl.es.ads.JdbcAds;

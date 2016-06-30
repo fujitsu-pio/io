@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.model.jaxb.Ace;
 import com.fujitsu.dc.core.model.jaxb.Acl;
 import com.fujitsu.dc.core.model.jaxb.ObjectIo;
@@ -49,6 +50,7 @@ public class TestMethodUtils {
      */
     public static void aclResponseTest(Element doc, String resorce,
             List<Map<String, List<String>>> list, int responseIndex, String baseUrl, String requireSchamaAuthz) {
+    	String xmlStr = DcCoreUtils.nodeToString(doc);
         NodeList response = doc.getElementsByTagName("response");
         assertEquals(responseIndex, response.getLength());
         Element node = (Element) response.item(0);

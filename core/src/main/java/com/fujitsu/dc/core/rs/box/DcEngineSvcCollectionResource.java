@@ -123,7 +123,7 @@ public final class DcEngineSvcCollectionResource {
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             throw DcCoreException.Dav.HAS_CHILDREN;
         }
-        return this.davCmp.delete(null).build();
+        return this.davCmp.delete(null, false).build();
     }
 
     /**
@@ -175,7 +175,7 @@ public final class DcEngineSvcCollectionResource {
     @Path("__src")
     public DcEngineSourceCollection src() {
         DavCmp nextCmp = this.davCmp.getChild(DavCmp.SERVICE_SRC_COLLECTION);
-        if (nextCmp.isExists()) {
+        if (nextCmp.exists()) {
             return new DcEngineSourceCollection(this.davRsCmp, nextCmp);
         } else {
             // サービスソースコレクションが存在しないため404エラーとする

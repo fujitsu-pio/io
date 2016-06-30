@@ -33,7 +33,7 @@ import com.fujitsu.dc.core.odata.OEntityWrapper;
 
 
 /**
- * Boxのモデル.
+ * Model class for personium Box.
  */
 public final class Box {
     private Cell cell;
@@ -43,23 +43,23 @@ public final class Box {
     private long published;
 
     /**
-     * デフォルトボックス名.
+     * main box name.
      */
     public static final String DEFAULT_BOX_NAME = "__";
 
     /**
      * Constructor.
-     * @param cell cellオブジェクト
-     * @param entity OEntity オブジェクト
+     * @param cell cell object
+     * @param entity OEntity object
      */
     public Box(final Cell cell, final OEntity entity) {
         this.cell = cell;
         if (entity == null) {
-            // デフォルトボックス用の処理
+            // MAIN BOX 用の処理
             this.name = Box.DEFAULT_BOX_NAME;
-            // デフォルトボックスのスキーマURLは自セルのURLになる
+            // MAIN BOX のスキーマURLは自セルのURLになる
             this.schema = cell.getUrl();
-            // デフォルトボックの内部IDはセルのIDと一緒にする。
+            // MAIN BOX の内部IDはセルのIDと一緒にする。
             this.id = cell.getId();
             return;
         }
@@ -74,7 +74,7 @@ public final class Box {
     }
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param cell cellオブジェクト
      * @param name Box名
      * @param schema Boxスキーマ

@@ -30,7 +30,6 @@ import com.fujitsu.dc.common.es.response.DcSearchResponse;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.Cell;
 import com.fujitsu.dc.core.model.CellCmp;
-import com.fujitsu.dc.core.model.DavNode;
 import com.fujitsu.dc.core.model.impl.es.accessor.EntitySetAccessor;
 import com.fujitsu.dc.core.model.impl.es.cache.CellCache;
 import com.fujitsu.dc.core.model.impl.es.doc.CellDocHandler;
@@ -138,7 +137,10 @@ public class CellCmpEsImpl extends DavCmpEsImpl implements CellCmp {
             CellCache.clear(this.cell.getName());
         }
     }
-
+    @Override
+    public void makeEmpty() {
+        // TODO Impl
+    }
     /**
      * 子リソースの情報を取得する.
      * @return 子リソースの検索結果

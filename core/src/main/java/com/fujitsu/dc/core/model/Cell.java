@@ -33,25 +33,25 @@ import com.fujitsu.dc.core.odata.OEntityWrapper;
 import java.util.Arrays;
 
 /**
- * Cellのモデルクラス.
+ * Model Class for Cell.
  */
 public interface Cell {
 
     /**
-     * Cell名を取得します.
-     * @return Cell名
+     * returns Cell name.
+     * @return Cell name
      */
     String getName();
 
     /**
-     * このCellの内部IDを返します.
-     * @return 内部ID文字列
+     * returns internal ID string.
+     * @return internal ID string
      */
     String getId();
 
     /**
-     * このCellのURLを返します.
-     * @return URL文字列
+     * returns URL string for this cell.
+     * @return URL string
      */
     String getUrl();
 
@@ -65,13 +65,13 @@ public interface Cell {
      * CellのプレフィックスなしのUnit User名を取得します.
      * @return .
      */
-    String getUnitUserNameWithOutPrefix();
+    String getDataBundleNameWithOutPrefix();
 
     /**
      * CellのUnit User名を取得します.
      * @return ユニットユーザ名
      */
-    String getUnitUserName();
+    String getDataBundleName();
 
     /**
      * CellのEventBusを取得します.
@@ -81,7 +81,7 @@ public interface Cell {
 
     /**
      * Cellの作成時間を取得します.
-     * @return EventBus
+     * @return time stamp of this cell creation.
      */
     long getPublished();
 
@@ -96,6 +96,13 @@ public interface Cell {
      * 配下にあるデータや制御オブジェクト(Box,Account等)をすべて削除する.
      */
     void makeEmpty();
+
+    /**
+     * delete this cell.
+     * @param recursive set true if you want to delete recursively
+     * @param unitUserName to use for deletion operation
+     */
+    void delete(boolean recursive, String unitUserName);
 
     /**
      * Box名を指定してBoxを取得します.
@@ -140,7 +147,20 @@ public interface Cell {
      */
     List<Role> getRoleListHere(IExtRoleContainingToken token);
 
-    // スキーマ情報
+    /**
+     * convert role internal id to role resource URL.
+     * @param roleId internal id of a role.
+     * @return URL string
+     */
+    String roleIdToRoleResourceUrl(String roleId);
+
+    /**
+     * convert role resource url to its internal id.
+     * @param roleUrl Role Url
+     * @param baseUrl Base Url
+     * @return internal id of the given role
+     */
+    String roleResourceUrlToId(String roleUrl, String baseUrl);
 
     /**
      * Edm.Entity Type名.

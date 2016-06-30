@@ -28,7 +28,7 @@ public class Event {
      * 小文字でのinfo/warn/errorは旧APIとの互換を保つために置かれている.
      * このため、通常は大文字のINFO/WARN/ERRORを使用すること.
      */
-    public static enum LEVEL {
+    public enum LEVEL {
         /** INFOレベル . */
         INFO,
         /** INFOレベル . */

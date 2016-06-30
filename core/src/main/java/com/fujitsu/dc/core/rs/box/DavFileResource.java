@@ -108,7 +108,7 @@ public class DavFileResource {
         // DavFileResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
         this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
 
-        ResponseBuilder rb = this.davRsCmp.getDavCmp().delete(ifMatch);
+        ResponseBuilder rb = this.davRsCmp.getDavCmp().delete(ifMatch, false);
         return rb.build();
     }
 
