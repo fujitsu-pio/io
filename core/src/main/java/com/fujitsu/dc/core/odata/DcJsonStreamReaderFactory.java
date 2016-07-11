@@ -236,57 +236,24 @@ public class DcJsonStreamReaderFactory {
         /**
          * JsonTokenType.
          */
-        public enum JsonTokenType {
-            /**
-             * 左中括弧.
-             */
+        enum JsonTokenType {
             LEFT_CURLY_BRACKET,
-            /**
-             * 右中括弧.
-             */
             RIGHT_CURLY_BRACKET,
-            /**
-             * 左括弧.
-             */
             LEFT_BRACKET,
-            /**
-             * 右括弧.
-             */
             RIGHT_BRACKET,
-            /**
-             * カンマ.
-             */
             COMMA,
-            /**
-             * コロン.
-             */
             COLON,
-            /**
-             * 真.
-             */
             TRUE,
-            /**
-             * 偽.
-             */
             FALSE,
-            /**
-             * NULL.
-             */
             NULL,
-            /**
-             * 数値型.
-             */
             NUMBER,
-            /**
-             * 文字列.
-             */
             STRING;
         }
 
         /**
          * JsonToken.
          */
-        public class JsonToken {
+        class JsonToken {
             /**
              * JSONトークンのタイプ.
              */

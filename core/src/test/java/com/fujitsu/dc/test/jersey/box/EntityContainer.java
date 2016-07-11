@@ -84,10 +84,10 @@ public class EntityContainer {
         assertEquals(entitySets, entityContainer.entitySets);
 
         if (associationSets.size() != entityContainer.associationSets.size()) {
-            Edmx.printResult(this
-                    , "AssociationSet"
-                    , entityContainer.associationSets.toString()
-                    , associationSets.toString());
+            Edmx.printResult(this,
+                "AssociationSet",
+                entityContainer.associationSets.toString(),
+                associationSets.toString());
         }
         if (!associationSets.equals(entityContainer.associationSets)) {
             return false;

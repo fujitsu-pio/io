@@ -116,13 +116,15 @@ public class CellAccessor extends AbstractEntitySetAccessor {
         countQuery.put("query", query);
         return countQuery;
     }
-
     /**
      * セル配下のエンティティを一括削除する.
      * @param cellId 削除対象のセルID
      * @param unitUserName ユニットユーザ名
      */
     public void cellBulkDeletion(String cellId, String unitUserName) {
+        // AdsのCell配下のエンティティはバッチにて削除するので
+        // Cell削除管理テーブルに削除対象のDB名とセルIDを追加する
+        insertCellDeleteRecord(unitUserName, cellId);
         DataSourceAccessor accessor = EsModel.dsa(unitUserName);
 
         // セルIDを指定してelasticsearchからセル関連エンティティを一括削除する
@@ -135,6 +137,16 @@ public class CellAccessor extends AbstractEntitySetAccessor {
             log.warn(String.format("Delete CellResource From KVS Failed. CellId:[%s], CellUnitUserName:[%s]",
                     cellId, unitUserName), e);
         }
+    }
+    private void insertCellDeleteRecord(String unitUserName, String cellId) {
+        CellDeleteAccessor accessor = new CellDeleteAccessor();
+        if (!accessor.isValid()) {
+            log.warn(String.format("Insert CELL_DELETE Record To Ads Failed. db_name:[%s], cell_id:[%s]",
+                    unitUserName, cellId));
+            return;
+        }
+        accessor.createManagementDatabase();
+        accessor.insertCellDeleteRecord(unitUserName, cellId);
     }
 
     /**

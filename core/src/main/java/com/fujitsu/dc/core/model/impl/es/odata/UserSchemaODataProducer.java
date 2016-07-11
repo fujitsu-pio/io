@@ -147,12 +147,12 @@ public class UserSchemaODataProducer extends EsODataProducer {
 
     @Override
     public String getBoxId() {
-        return davCmp.getBoxId();
+        return davCmp.getBox().getId();
     }
 
     @Override
     public String getNodeId() {
-        return davCmp.getNodeId();
+        return davCmp.getId();
     }
 
     /**
@@ -181,17 +181,17 @@ public class UserSchemaODataProducer extends EsODataProducer {
 
     @Override
     public void afterCreate(final String entitySetName, final OEntity oEntity, final EntitySetDocHandler docHandler) {
-        UserDataSchemaCache.disable(this.davCmp.getNodeId());
+        UserDataSchemaCache.disable(this.davCmp.getId());
     }
 
     @Override
     public void afterUpdate() {
-        UserDataSchemaCache.disable(this.davCmp.getNodeId());
+        UserDataSchemaCache.disable(this.davCmp.getId());
     }
 
     @Override
     public void afterDelete() {
-        UserDataSchemaCache.disable(this.davCmp.getNodeId());
+        UserDataSchemaCache.disable(this.davCmp.getId());
     }
 
     /**
@@ -645,7 +645,7 @@ public class UserSchemaODataProducer extends EsODataProducer {
 
     @Override
     public void onChange(String entitySetName) {
-        UserDataSchemaCache.clear(this.davCmp.getNodeId());
+        UserDataSchemaCache.clear(this.davCmp.getId());
     }
 
     /**

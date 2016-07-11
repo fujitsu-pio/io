@@ -119,7 +119,7 @@ public final class ODataSvcCollectionResource extends ODataResource {
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             throw DcCoreException.Dav.HAS_CHILDREN;
         }
-        return this.davCmp.delete(null).build();
+        return this.davCmp.delete(null, false).build();
     }
 
     /**

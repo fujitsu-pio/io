@@ -24,7 +24,6 @@ import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.BoxCmp;
 import com.fujitsu.dc.core.model.DavCmp;
-import com.fujitsu.dc.core.model.DavNode;
 import com.fujitsu.dc.core.model.impl.es.accessor.DavNodeAccessor;
 
 /**

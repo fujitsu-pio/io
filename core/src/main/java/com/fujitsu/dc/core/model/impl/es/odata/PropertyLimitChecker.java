@@ -84,7 +84,7 @@ public class PropertyLimitChecker {
      * 内部例外クラス.
      */
     @SuppressWarnings("serial")
-    class PropertyLimitException extends Exception {
+    static class PropertyLimitException extends Exception {
 
         private String entityTypeName = null;
 
@@ -92,7 +92,7 @@ public class PropertyLimitChecker {
          * コンストラクタ.
          * @param message メッセージ
          */
-        public PropertyLimitException(String message) {
+        PropertyLimitException(String message) {
             super(message);
         }
 
@@ -101,7 +101,7 @@ public class PropertyLimitChecker {
          * @param entityTypeName EntityType名
          * @param message メッセージ
          */
-        public PropertyLimitException(String entityTypeName, String message) {
+        PropertyLimitException(String entityTypeName, String message) {
             super(message);
             this.entityTypeName = entityTypeName;
         }
@@ -127,12 +127,12 @@ public class PropertyLimitChecker {
      * EntityTypeの階層の深さが制限を超えた場合の例外.
      */
     @SuppressWarnings("serial")
-    class EntityTypeDepthExceedException extends PropertyLimitException {
+    static class EntityTypeDepthExceedException extends PropertyLimitException {
         /**
-         * コンストラクタ.
+         * constructor.
          * @param message メッセージ
          */
-        public EntityTypeDepthExceedException(String message) {
+        EntityTypeDepthExceedException(String message) {
             super(message);
         }
     }
@@ -146,7 +146,7 @@ public class PropertyLimitChecker {
     int complexMaxForOverallLayers = 0;
 
     /**
-     * デフォルトコンストラクタ.
+     * default constructor.
      */
     public PropertyLimitChecker() {
         this.maxPropertyLimitInEntityType = DcCoreConfig.getMaxPropertyCountInEntityType();
@@ -163,7 +163,7 @@ public class PropertyLimitChecker {
     }
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param metadata UserDataのメタデータ（プロパティ更新前)
      * @param entityTypeName 追加対象のEntityType名
      * @param dynamicPropCount 追加されるDynamicProperty数
@@ -189,7 +189,7 @@ public class PropertyLimitChecker {
     }
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param metadata UserDataのメタデータ（プロパティ更新前)
      * @param propHandler 追加するプロパティのハンドラ
      */
