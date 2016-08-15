@@ -264,11 +264,10 @@ public interface DavCmp {
 
     /**
      * process GET method.
-     * @param ifNoneMatch If-None-Matchヘッダ
      * @param rangeHeaderField Rangeヘッダ
      * @return JAX-RS ResponseBuilder
      */
-    ResponseBuilder get(String ifNoneMatch, String rangeHeaderField);
+    ResponseBuilder get(String rangeHeaderField);
 
     /**
      * データ操作用ODataProducerを返します.

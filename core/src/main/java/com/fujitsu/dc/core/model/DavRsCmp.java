@@ -35,6 +35,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -80,7 +81,7 @@ import com.fujitsu.dc.core.utils.ResourceUtils;
  */
 public class DavRsCmp {
     /**
-     * ログ用オブジェクト.
+     * Logger.
      */
     private static Logger log = LoggerFactory.getLogger(DavRsCmp.class);
 
@@ -191,6 +192,31 @@ public class DavRsCmp {
         return this.parent.getAccessContext();
     }
 
+    /**
+     * @param etag string
+     * @return true if given string matches  the stored Etag
+     */
+    public boolean matchesETag(String etag) {
+        if (etag == null) {
+            return false;
+            }
+        String storedEtag = this.davCmp.getEtag();
+        String weakEtag = "W/" +  storedEtag;
+        return etag.equals(storedEtag) || etag.equals(weakEtag);
+    }
+    /**
+     * Process a GET request.
+     * @param ifNoneMatch ifNoneMatch header
+     * @param rangeHeaderField range header
+     * @return ResponseBuilder object
+     */
+    public final ResponseBuilder get(final String ifNoneMatch, final String rangeHeaderField) {
+        // return "Not-Modified" if "If-None-Match" header matches.
+        if (matchesETag(ifNoneMatch)) {
+            return javax.ws.rs.core.Response.notModified().header(HttpHeaders.ETAG, this.davCmp.getEtag());
+        }
+        return this.davCmp.get(rangeHeaderField);
+    }
     /**
      * PROPFINDの処理. バックエンド実装に依らない共通的な振る舞い.
      * @param requestBodyXml requestBody

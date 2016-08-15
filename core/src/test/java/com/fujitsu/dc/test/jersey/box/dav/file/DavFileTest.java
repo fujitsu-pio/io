@@ -94,33 +94,47 @@ public class DavFileTest extends JerseyTest {
      * IfNoneMatchでに正しい形式の値を指定してFileをGetした場合に指定が有効になること.
      */
     @Test
-    public final void IfNoneMatchでに正しい形式の値を指定してFileをGetした場合に指定が有効になること() {
+    public final void returns_304_on_GET_with_matching_ETag_in_IfNoneMatch_header() {
         try {
-            // ファイル新規作成
+            // create new DAV file for this test
             final Http theReq = this.putFileRequest(FILE_NAME, FILE_BODY, null, Setup.TEST_BOX1);
             TResponse resp = theReq.returns()
                     .statusCode(HttpStatus.SC_CREATED);
 
-            // Etag取得
+            // Retrieve Etag header
             String etag1 = resp.getHeader(HttpHeaders.ETAG);
             assertNotNull(etag1);
 
-            // If-None-Matchヘッダで登録されたファイルと一致するETagを指定してファイル取得した場合304になること
+            // Should return 304 on GET request with
+            // matching ETag specified in If-None-Match.
             TResponse getResp = this.getFileRequest(FILE_NAME, TEST_BOX1, etag1)
                     .returns();
             getResp.statusCode(HttpStatus.SC_NOT_MODIFIED);
+            // Body Should be empty.
             assertEquals("", getResp.getBody());
+            // Same ETag should be returned again
             assertEquals(etag1, resp.getHeader(HttpHeaders.ETAG));
 
-            // ファイル更新
+            // Weak ETag format should also work.
+            String wEtag = "W/" + etag1;
+            getResp = this.getFileRequest(FILE_NAME, TEST_BOX1, wEtag)
+                    .returns();
+            getResp.statusCode(HttpStatus.SC_NOT_MODIFIED);
+            // Body Should be empty.
+            assertEquals("", getResp.getBody());
+            // Same ETag should be returned again
+            assertEquals(etag1, resp.getHeader(HttpHeaders.ETAG));
+
+            // Update the DAV File
             resp = this.putFileRequest(FILE_NAME, FILE_BODY, null, Setup.TEST_BOX1).returns()
                     .statusCode(HttpStatus.SC_NO_CONTENT);
 
-            // Etag取得
+            // retrieve new Etag
             String etag2 = resp.getHeader(HttpHeaders.ETAG);
             assertNotNull(etag2);
 
-            // If-None-Matchヘッダで登録されたファイルと一致しないETagを指定してファイル取得した場合200になること
+            // Should return 200 on GET request with
+            // non-matching ETag specified in If-None-Match.
             getResp = this.getFileRequest(FILE_NAME, TEST_BOX1, etag1)
                     .returns();
             getResp.statusCode(HttpStatus.SC_OK);
@@ -128,6 +142,7 @@ public class DavFileTest extends JerseyTest {
             assertEquals(etag2, resp.getHeader(HttpHeaders.ETAG));
 
         } finally {
+            // delete the DAV file for this test
             this.deleteFileRequest(FILE_NAME, null, Setup.TEST_BOX1).returns()
                     .statusCode(HttpStatus.SC_NO_CONTENT);
         }
@@ -138,14 +153,14 @@ public class DavFileTest extends JerseyTest {
      * IfNoneMatchにアスタを指定してFileをGetした場合に200が返却されること.
      */
     @Test
-    public final void IfNoneMatchにアスタを指定してFileをGetした場合に200が返却されること() {
+    public final void returns_200_on_GET_with_asterisk_in_IfNoneMatch_header() {
         try {
-            // ファイル新規作成
+            // create new DAV file for this test
             final Http theReq = this.putFileRequest(FILE_NAME, FILE_BODY, null, Setup.TEST_BOX1);
             TResponse resp = theReq.returns()
                     .statusCode(HttpStatus.SC_CREATED);
 
-            // Etag取得
+            // retrieve Etag header
             String etag = resp.getHeader(HttpHeaders.ETAG);
             assertNotNull(etag);
 
@@ -164,17 +179,17 @@ public class DavFileTest extends JerseyTest {
     }
 
     /**
-     * IfNoneMatchに無効な値を指定してFileをGetした場合に200が返却されること.
+     * It should return 200 on GET with invalid value in IfNoneMatch header.
      */
     @Test
-    public final void IfNoneMatchに無効な値を指定してFileをGetした場合に200が返却されること() {
+    public final void returns_200_on_GET_with_invalid_value_in_IfNoneMatch_header() {
         try {
-            // ファイル新規作成
+            // create new DAV file for this test
             final Http theReq = this.putFileRequest(FILE_NAME, FILE_BODY, null, Setup.TEST_BOX1);
             TResponse resp = theReq.returns()
                     .statusCode(HttpStatus.SC_CREATED);
 
-            // Etag取得
+            // retrieve Etag header
             String etag = resp.getHeader(HttpHeaders.ETAG);
             assertNotNull(etag);
 

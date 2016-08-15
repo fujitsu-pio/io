@@ -34,7 +34,6 @@ import org.apache.wink.webdav.WebDAVMethod;
 
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.annotations.ACL;
-import com.fujitsu.dc.core.annotations.RequirePrivilege;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavMoveResource;
@@ -89,7 +88,7 @@ public class DavFileResource {
         // Access Control
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.READ);
 
-        ResponseBuilder rb = this.davRsCmp.getDavCmp().get(ifNoneMatch, rangeHeaderField);
+        ResponseBuilder rb = this.davRsCmp.get(ifNoneMatch, rangeHeaderField);
         return rb.build();
     }
 

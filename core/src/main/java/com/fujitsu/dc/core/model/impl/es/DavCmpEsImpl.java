@@ -781,15 +781,8 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
     }
 
     @Override
-    public final ResponseBuilder get(final String ifNoneMatch, final String rangeHeaderField) {
-        String storedEtag = this.getEtag();
-        // ifNoneMatchヘッダの内容がマッチしたら Not-Modifiedを返す.
-        if (storedEtag.equals(ifNoneMatch)) {
-            return javax.ws.rs.core.Response.notModified().header(HttpHeaders.ETAG, storedEtag);
-        }
-
-        Map<String, Object> data = (Map<String, Object>) this.davNode.getFile();
-        String contentType = (String) data.get(KEY_CONTENT_TYPE);
+    public final ResponseBuilder get(final String rangeHeaderField) {
+        String contentType = this.getContentType();
 
         BinaryDataAccessor accessor = getBinaryDataAccessor();
         ResponseBuilder res = null;

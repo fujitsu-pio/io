@@ -621,12 +621,7 @@ public class DavCmpFsImpl implements DavCmp {
     }
 
     @Override
-    public final ResponseBuilder get(final String ifNoneMatch, final String rangeHeaderField) {
-        String storedEtag = this.getEtag();
-        // return "Not-Modified" if "If-None-Match" header matches.
-        if (storedEtag.equals(ifNoneMatch)) {
-            return javax.ws.rs.core.Response.notModified().header(HttpHeaders.ETAG, storedEtag);
-        }
+    public final ResponseBuilder get(final String rangeHeaderField) {
 
         String contentType = this.getContentType();
 
