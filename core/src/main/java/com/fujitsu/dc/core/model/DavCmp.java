@@ -287,12 +287,6 @@ public interface DavCmp {
      */
     String getEtag();
 
-    /**
-     * @return Weak ETag String.
-     */
-    default String getWeakEtag() {
-        return "W/" + this.getEtag();
-    }
 
     /**
      * MOVE処理を行う.
