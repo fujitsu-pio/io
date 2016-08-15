@@ -37,22 +37,16 @@ import com.fujitsu.dc.core.DcCoreMessageUtils;
 import com.fujitsu.dc.core.auth.OAuth2Helper.Key;
 
 /**
- * HTMLによるエラーレスポンス処理を司るJAX-RSリソース.
+ * JAX-RS resource for HTML error response.
  */
 public class ErrorHtmlResource {
     static Logger log = LoggerFactory.getLogger(ErrorHtmlResource.class);
 
     /**
-     * constructor.
-     */
-    public ErrorHtmlResource() {
-    }
-
-    /**
-     * ImplicitFlow認証エラーのエンドポイント.
-     * @param host Hostヘッダ
-     * @param code クエリパラメタ
-     * @param uriInfo コンテキスト
+     * GET request.
+     * @param host Host header
+     * @param code query parameter
+     * @param uriInfo context
      * @return JAX-RS Response Object
      */
     @GET
@@ -61,40 +55,30 @@ public class ErrorHtmlResource {
             @Context final UriInfo uriInfo) {
 
         // エラーHTMLの返却
-        return returnError(code);
+        ResponseBuilder rb = Response.ok().type(MediaType.TEXT_HTML);
+        return rb.entity(this.htmlForCode(code))
+                .header("Content-Type", "text/html; charset=UTF-8").build();
     }
 
     /**
-     * ImplicitFlowパスワード認証フォーム.
-     * @param code メッセージコード
-     * @return
+     * returns HTML string for error code.
+     * @param code message code
+     * @return HTML string
      */
-    private String createFrom(String code) {
-        String params0 = DcCoreMessageUtils.getMessage("PS-ER-0001");
-        String params1 = DcCoreMessageUtils.getMessage("PS-ER-0001");
-        String params2 = DcCoreMessageUtils.getMessage("PS-ER-0002");
-        String params3 = null;
+    private String htmlForCode(String code) {
+        String title = DcCoreMessageUtils.getMessage("PS-ER-0001");
+        String msg = null;
         try {
-            params3 = DcCoreMessageUtils.getMessage(code);
+            msg = DcCoreMessageUtils.getMessage(code);
         } catch (Exception e) {
             log.info(e.getMessage());
-            params3 = DcCoreMessageUtils.getMessage("PS-ER-0003");
+            msg = DcCoreMessageUtils.getMessage("PS-ER-0002");
         }
 
         String html = DcCoreUtils.readStringResource("html/error.html", CharEncoding.UTF_8);
-        html = MessageFormat.format(html, params0, params1, params2, params3);
+        html = MessageFormat.format(html, title, msg);
         return html;
     }
 
-    /**
-     * ImplicitFlow_cookieでの認証時のエラー処理.
-     * @param code メッセージコード
-     * @return
-     */
-    private Response returnError(String code) {
-        ResponseBuilder rb = Response.ok().type(MediaType.TEXT_HTML);
-        return rb.entity(this.createFrom(code))
-                .header("Content-Type", "text/html; charset=UTF-8").build();
-    }
 
 }
