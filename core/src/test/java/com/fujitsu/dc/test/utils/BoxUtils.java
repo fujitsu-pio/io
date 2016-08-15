@@ -133,7 +133,7 @@ public class BoxUtils {
      * @param cellName cellName
      * @param boxName boxName
      * @param token token
-     * @param scheme scheme
+     * @param schema schema
      */
     public static void createWithSchema(final String cellName, final String boxName,
             final String token, final String schema) {

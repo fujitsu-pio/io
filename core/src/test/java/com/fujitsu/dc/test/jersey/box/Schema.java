@@ -76,10 +76,10 @@ public class Schema {
         Schema schema = (Schema) obj;
         for (EntityType entityType : schema.entityTypes) {
             if (!this.checkEntityType.get(entityType.name).equals(entityType)) {
-                Edmx.printResult(this
-                        , "EntityType"
-                        , entityType.toString()
-                        , this.checkEntityType.get(entityType.name).toString());
+                Edmx.printResult(this,
+                       "EntityType",
+                       entityType.toString(),
+                       this.checkEntityType.get(entityType.name).toString());
                 return false;
             }
         }

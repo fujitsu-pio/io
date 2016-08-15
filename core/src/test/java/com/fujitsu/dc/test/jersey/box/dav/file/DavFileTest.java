@@ -44,7 +44,7 @@ import com.fujitsu.dc.test.utils.TResponse;
 import com.sun.jersey.test.framework.JerseyTest;
 
 /**
- * MKCOLのテスト.
+ * DAV File related tests.
  */
 @RunWith(DcRunner.class)
 @Category({Unit.class, Integration.class, Regression.class })
@@ -56,7 +56,7 @@ public class DavFileTest extends JerseyTest {
     private static final String FILE_BODY2 = "testFileBody2";
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     public DavFileTest() {
         super("com.fujitsu.dc.core.rs");

@@ -102,7 +102,7 @@ public abstract class AbstractODataResource {
      */
     private DcODataProducer odataProducer;
 
-    /** $formatのjson. */
+    /** $formatのJSON. */
     public static final String FORMAT_JSON = "json";
     /** $formatのatom. */
     public static final String FORMAT_ATOM = "atom";
@@ -689,7 +689,7 @@ public abstract class AbstractODataResource {
                     validatePropertyCellUrl(propName, op);
                 } else if (dcFormat.startsWith(Common.DC_FORMAT_PATTERN_USUSST)) {
                     validatePropertyUsusst(propName, op, dcFormat);
-                } 
+                }
             }
         }
     }
@@ -815,7 +815,8 @@ public abstract class AbstractODataResource {
 
         String[] allowedTokens = dcFormat.split(", ");
         for (int i = 0; i < allowedTokens.length; i++) {
-            allowedTokens[i] = allowedTokens[i].replaceAll("\'(.+)\'", "$1");//remove single quotations.
+            //remove single quotations.
+            allowedTokens[i] = allowedTokens[i].replaceAll("\'(.+)\'", "$1");
         }
         List<String> allowedTokenList = Arrays.asList(allowedTokens);
 

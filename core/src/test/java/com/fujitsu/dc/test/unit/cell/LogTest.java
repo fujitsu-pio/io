@@ -55,7 +55,7 @@ public class LogTest {
      * テスト用LogResourceクラス.
      */
     private class TestLogResource extends LogResource {
-        public TestLogResource() {
+        TestLogResource() {
             super(null, null, null);
         }
 
