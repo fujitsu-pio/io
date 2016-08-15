@@ -221,8 +221,8 @@ public class AuthzEndPointResource {
         // clientIdで指定されたセルURLをスキーマに持つBoxが存在するかチェック
         // TODO Boxインポートが実装されたら、ボックスの存在チェック⇒ある場合：トークン返却、ない場合：ボックス作成（権限チェック⇒Boxインポート実行）
         if (!checkAuthorization(normalizedClientId)) {
-            log.debug(DcCoreMessageUtils.getMessage("PS-ER-0004"));
-            return this.returnErrorRedirect(cell.getUrl() + "__html/error", "PS-ER-0004");
+            log.debug(DcCoreMessageUtils.getMessage("PS-ER-0003"));
+            return this.returnErrorRedirect(cell.getUrl() + "__html/error", "PS-ER-0003");
         }
 
         // clientIdとredirectUriパラメタチェック

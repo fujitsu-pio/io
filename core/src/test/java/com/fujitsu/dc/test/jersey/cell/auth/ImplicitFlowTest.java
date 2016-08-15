@@ -188,7 +188,7 @@ public class ImplicitFlowTest extends JerseyTest {
         DcResponse res = requesttoAuthz(null, Setup.TEST_CELL1, clientId, null);
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, res.getStatusCode());
 
-        assertEquals(UrlUtils.cellRoot(Setup.TEST_CELL1) + "__html/error?code=PS-ER-0004",
+        assertEquals(UrlUtils.cellRoot(Setup.TEST_CELL1) + "__html/error?code=PS-ER-0003",
                 res.getFirstHeader(HttpHeaders.LOCATION));
     }
 
@@ -208,7 +208,7 @@ public class ImplicitFlowTest extends JerseyTest {
             DcResponse res = requesttoAuthz(null, cellName, clientId, null);
             assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, res.getStatusCode());
 
-            assertEquals(UrlUtils.cellRoot(cellName) + "__html/error?code=PS-ER-0004",
+            assertEquals(UrlUtils.cellRoot(cellName) + "__html/error?code=PS-ER-0003",
                     res.getFirstHeader(HttpHeaders.LOCATION));
         } finally {
             CellUtils.delete(AbstractCase.MASTER_TOKEN_NAME, cellName);
