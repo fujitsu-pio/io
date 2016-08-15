@@ -43,7 +43,7 @@ public class EventResourceTest {
      * テスト用LogResourceクラス.
      */
     private class TestEventResource extends EventResource {
-        public TestEventResource() {
+        TestEventResource() {
             super(null, null, null);
         }
 

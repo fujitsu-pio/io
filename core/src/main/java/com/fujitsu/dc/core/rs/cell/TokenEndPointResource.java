@@ -83,9 +83,6 @@ import com.fujitsu.dc.core.odata.OEntityWrapper;
  */
 public class TokenEndPointResource {
 
-    /**
-     * ログ.
-     */
     static Logger log = LoggerFactory.getLogger(TokenEndPointResource.class);
 
     private final Cell cell;
@@ -96,7 +93,7 @@ public class TokenEndPointResource {
     private String accountId;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param cell Cell
      * @param davRsCmp davRsCmp
      */

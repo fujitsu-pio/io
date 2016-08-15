@@ -90,7 +90,7 @@ public class ODataEntityAccessorTest {
      */
     class JdbcAdsMock extends JdbcAds {
 
-        public JdbcAdsMock() throws Exception {
+        JdbcAdsMock() throws Exception {
             super();
         }
 

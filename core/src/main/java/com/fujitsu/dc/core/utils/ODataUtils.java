@@ -42,10 +42,6 @@ import com.fujitsu.dc.core.model.impl.es.doc.EntitySetDocHandler;
  * OData系ユーティリティ関数を集めたクラス.
  */
 public final class ODataUtils {
-
-    /**
-     * ログ.
-     */
     static Logger log = LoggerFactory.getLogger(ODataUtils.class);
 
     /** URI最大長. */

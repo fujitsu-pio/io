@@ -71,10 +71,10 @@ public class EntityContainer {
         }
 
         if (!isDefaultEntityContainer.equals(entityContainer.isDefaultEntityContainer)) {
-            Edmx.printResult(this
-                    , "IsDefaultEntityContainer"
-                    , entityContainer.isDefaultEntityContainer
-                    , isDefaultEntityContainer);
+            Edmx.printResult(this,
+                    "IsDefaultEntityContainer",
+                    entityContainer.isDefaultEntityContainer,
+                    isDefaultEntityContainer);
             return false;
         }
 
@@ -84,10 +84,10 @@ public class EntityContainer {
         assertEquals(entitySets, entityContainer.entitySets);
 
         if (associationSets.size() != entityContainer.associationSets.size()) {
-            Edmx.printResult(this
-                    , "AssociationSet"
-                    , entityContainer.associationSets.toString()
-                    , associationSets.toString());
+            Edmx.printResult(this,
+                "AssociationSet",
+                entityContainer.associationSets.toString(),
+                associationSets.toString());
         }
         if (!associationSets.equals(entityContainer.associationSets)) {
             return false;

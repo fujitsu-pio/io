@@ -45,7 +45,7 @@ public class BoxUrlResource {
     private DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param cell Cell
      * @param davRsCmp DavRsCmp
      */

@@ -31,6 +31,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import com.fujitsu.dc.common.auth.token.Role;
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreException;
@@ -123,6 +127,8 @@ public final class Acl {
             throw DcCoreException.Server.DATA_STORE_UNKNOWN_ERROR.reason(e);
         }
     }
+    static final String KEY_REQUIRE_SCHEMA_AUTHZ = "@requireSchemaAuthz";
+
     /**
      * @param jsonString acl json
      * @return Acl obj
@@ -130,10 +136,17 @@ public final class Acl {
     public static Acl fromJson(final String jsonString) {
         StringReader sr = new StringReader(jsonString);
         try {
-            return ObjectIo.fromJson(sr, Acl.class);
+            Acl ret = ObjectIo.fromJson(sr, Acl.class);
+            //  attr somehow not unmarshalled so manually fix the object
+            JSONParser parser = new JSONParser();
+            JSONObject j = (JSONObject) parser.parse(jsonString);
+            ret.setRequireSchemaAuthz((String) j.get(KEY_REQUIRE_SCHEMA_AUTHZ));
+            return ret;
         } catch (IOException e) {
             throw DcCoreException.Server.DATA_STORE_UNKNOWN_ERROR.reason(e);
         } catch (JAXBException e) {
+            throw DcCoreException.Server.DATA_STORE_UNKNOWN_ERROR.reason(e);
+        } catch (ParseException e) {
             throw DcCoreException.Server.DATA_STORE_UNKNOWN_ERROR.reason(e);
         }
     }

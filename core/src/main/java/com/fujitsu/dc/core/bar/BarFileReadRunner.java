@@ -96,10 +96,10 @@ import com.fujitsu.dc.core.bar.jackson.JSONUserDataLinks;
 import com.fujitsu.dc.core.eventbus.DcEventBus;
 import com.fujitsu.dc.core.eventbus.JSONEvent;
 import com.fujitsu.dc.core.model.Box;
+import com.fujitsu.dc.core.model.BoxCmp;
 import com.fujitsu.dc.core.model.Cell;
 import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavCommon;
-import com.fujitsu.dc.core.model.DavNode;
 import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.AssociationEnd;
 import com.fujitsu.dc.core.model.ctl.ComplexType;
@@ -112,8 +112,6 @@ import com.fujitsu.dc.core.model.ctl.ExtRole;
 import com.fujitsu.dc.core.model.ctl.Property;
 import com.fujitsu.dc.core.model.ctl.Relation;
 import com.fujitsu.dc.core.model.ctl.Role;
-import com.fujitsu.dc.core.model.impl.es.BoxCmpEsImpl;
-import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
 import com.fujitsu.dc.core.model.impl.es.doc.EntitySetDocHandler;
 import com.fujitsu.dc.core.model.impl.es.odata.UserDataODataProducer;
 import com.fujitsu.dc.core.model.impl.es.odata.UserSchemaODataProducer;
@@ -183,8 +181,8 @@ public class BarFileReadRunner implements Runnable {
     private Cell cell;
     private Box box;
     private String schemaUrl; // ACL名前空間チェック用
-    private BoxCmpEsImpl boxCmp;
-    private Map<String, DavCmpEsImpl> davCmpMap;
+    private BoxCmp boxCmp;
+    private Map<String, DavCmp> davCmpMap;
     private Map<String, String> davFileMap = new HashMap<String, String>();
     private long linksOutputStreamSize = Long.parseLong(DcCoreConfig
             .get(DcCoreConfig.BAR.BAR_USERDATA_LINKS_OUTPUT_STREAM_SIZE));
@@ -223,7 +221,7 @@ public class BarFileReadRunner implements Runnable {
         this.cell = cell;
         this.box = null;
         this.boxCmp = null;
-        this.davCmpMap = new HashMap<String, DavCmpEsImpl>();
+        this.davCmpMap = new HashMap<String, DavCmp>();
         this.requestKey = requestKey;
         setupBarFileOrder();
     }
@@ -489,11 +487,11 @@ public class BarFileReadRunner implements Runnable {
     protected boolean createContents() {
         boolean isSuccess = true;
         // CollectionタイプごとのMapを作成しておく
-        Map<String, DavCmpEsImpl> odataCols = getCollections(DavCmp.TYPE_COL_ODATA);
-        Map<String, DavCmpEsImpl> webdavCols = getCollections(DavCmp.TYPE_COL_WEBDAV);
-        Map<String, DavCmpEsImpl> serviceCols = getCollections(DavCmp.TYPE_COL_SVC);
+        Map<String, DavCmp> odataCols = getCollections(DavCmp.TYPE_COL_ODATA);
+        Map<String, DavCmp> webdavCols = getCollections(DavCmp.TYPE_COL_WEBDAV);
+        Map<String, DavCmp> serviceCols = getCollections(DavCmp.TYPE_COL_SVC);
 
-        DavCmpEsImpl davCmp = null;
+        DavCmp davCmp = null;
         List<String> doneKeys = new ArrayList<String>();
         try {
             ZipArchiveEntry zae = null;
@@ -517,7 +515,7 @@ public class BarFileReadRunner implements Runnable {
                 // ODataCollectionからDav/ServiceCollection/別ODataCollectionのリソースに対する処理に変わった際に
                 // ユーザデータの登録やリンクの登録をする必要があれば、処理を実行する
                 if (currentPath != null && !entryName.startsWith(currentPath)) {
-                    if (!execBulkRequest(davCmp.getCellId(), bulkRequests, fileNameMap, producer)) {
+                    if (!execBulkRequest(davCmp.getCell().getId(), bulkRequests, fileNameMap, producer)) {
                         return false;
                     }
                     if (!createUserdataLinks(producer, userDataLinks)) {
@@ -571,7 +569,8 @@ public class BarFileReadRunner implements Runnable {
                             doneKeys.add(entryName);
 
                             if ((userDataCount % bulkSize) == 0
-                                    && !execBulkRequest(davCmp.getCellId(), bulkRequests, fileNameMap, producer)) {
+                                    && !execBulkRequest(davCmp.getCell().getId(),
+                                            bulkRequests, fileNameMap, producer)) {
                                 return false;
                             }
                             continue;
@@ -616,7 +615,7 @@ public class BarFileReadRunner implements Runnable {
 
             // ODataCollectionのリソースに対する処理に終わった際に、ユーザデータの登録やリンクの登録をする必要があれば実行する
             if (currentPath != null) {
-                if (!execBulkRequest(davCmp.getCellId(), bulkRequests, fileNameMap, producer)) {
+                if (!execBulkRequest(davCmp.getCell().getId(), bulkRequests, fileNameMap, producer)) {
                     return false;
                 }
                 if (!createUserdataLinks(producer, userDataLinks)) {
@@ -636,7 +635,7 @@ public class BarFileReadRunner implements Runnable {
         return isSuccess;
     }
 
-    private boolean checkNecessaryFile(boolean isSuccess, Map<String, DavCmpEsImpl> odataCols, List<String> doneKeys) {
+    private boolean checkNecessaryFile(boolean isSuccess, Map<String, DavCmp> odataCols, List<String> doneKeys) {
         Set<String> colList = odataCols.keySet();
         for (String colName : colList) {
             String filename = colName + METADATA_XML;
@@ -649,7 +648,7 @@ public class BarFileReadRunner implements Runnable {
         return isSuccess;
     }
 
-    private boolean installSvcCollection(Map<String, DavCmpEsImpl> webdavCols, String entryName) {
+    private boolean installSvcCollection(Map<String, DavCmp> webdavCols, String entryName) {
         // bar/90_contents/{svccol_name}配下のエントリを1つずつWebDAV/サービスとして登録する
         // {serviceCollection}/{scriptName}を{serviceCollection}/__src/{scriptName}に変換
         int lastSlashIndex = entryName.lastIndexOf("/");
@@ -779,9 +778,9 @@ public class BarFileReadRunner implements Runnable {
      * @return エントリのタイプ
      */
     protected int getEntryType(String entryName,
-            Map<String, DavCmpEsImpl> odataCols,
-            Map<String, DavCmpEsImpl> webdavCols,
-            Map<String, DavCmpEsImpl> serviceCols,
+            Map<String, DavCmp> odataCols,
+            Map<String, DavCmp> webdavCols,
+            Map<String, DavCmp> serviceCols,
             Map<String, String> davFiles) {
 
         if (odataCols.containsKey(entryName)) {
@@ -794,14 +793,14 @@ public class BarFileReadRunner implements Runnable {
             return TYPE_DAV_FILE;
         }
 
-        for (Entry<String, DavCmpEsImpl> entry : odataCols.entrySet()) {
+        for (Entry<String, DavCmp> entry : odataCols.entrySet()) {
             String odataColPath = entry.getKey();
             if (entryName.startsWith(odataColPath)) {
                 return TYPE_ODATA_COLLECTION;
             }
         }
 
-        for (Entry<String, DavCmpEsImpl> entry : serviceCols.entrySet()) {
+        for (Entry<String, DavCmp> entry : serviceCols.entrySet()) {
             String serviceColPath = entry.getKey();
             if (entryName.startsWith(serviceColPath)) {
                 return TYPE_SVC_FILE;
@@ -819,15 +818,14 @@ public class BarFileReadRunner implements Runnable {
      * @return true: 登録成功、false:登録失敗
      */
     protected boolean registWebDavFile(String entryName, InputStream inputStream,
-            Map<String, DavCmpEsImpl> webdavCols) {
+            Map<String, DavCmp> webdavCols) {
 
         // 登録先のファイルパス・コレクション名を取得
         String filePath = entryName.replaceAll(CONTENTS_DIR, "");
         String colPath = entryName.substring(0, entryName.lastIndexOf("/") + 1);
 
         // DavCmp作成
-        DavCmpEsImpl parentCmp = webdavCols.get(colPath);
-        String parentId = parentCmp.getId();
+        DavCmp parentCmp = webdavCols.get(colPath);
 
         // 親コレクション内のコレクション・ファイル数のチェック
         int maxChildResource = DcCoreConfig.getMaxChildResourceCount();
@@ -840,21 +838,13 @@ public class BarFileReadRunner implements Runnable {
         }
 
         // 新しいノードを作成
-        DavNode davNode = new DavNode(this.cell.getId(), this.box.getId(), DavCmp.TYPE_DAV_FILE);
-        davNode.setParentId(parentId);
 
         // 親ノードにポインタを追加
         String fileName = "";
         fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
 
-        String davNodeId = davNode.getId();
-
-        DavCmpEsImpl fileCmp = new DavCmpEsImpl(
-                fileName,
-                parentCmp,
-                this.cell,
-                this.box,
-                davNodeId);
+        // 実装依存排除
+        DavCmp fileCmp = parentCmp.getChild(fileName);
 
         // Content-Typeのチェック
         String contentType = null;
@@ -1353,10 +1343,10 @@ public class BarFileReadRunner implements Runnable {
      * @param doneKeys 処理済みのODataコレクション用エントリリスト
      * @return 判定処理結果
      */
-    protected boolean isValidODataContents(String entryName, Map<String, DavCmpEsImpl> colMap, List<String> doneKeys) {
+    protected boolean isValidODataContents(String entryName, Map<String, DavCmp> colMap, List<String> doneKeys) {
 
         String odataColPath = "";
-        for (Map.Entry<String, DavCmpEsImpl> entry : colMap.entrySet()) {
+        for (Map.Entry<String, DavCmp> entry : colMap.entrySet()) {
             if (entryName.startsWith(entry.getKey())) {
                 odataColPath = entry.getKey();
                 break;
@@ -1777,7 +1767,7 @@ public class BarFileReadRunner implements Runnable {
 
         // Davの登録
         Box newBox = new Box(odataEntityResource.getAccessContext().getCell(), oew);
-        this.boxCmp = (BoxCmpEsImpl) ModelFactory.boxCmp(newBox);
+        this.boxCmp = ModelFactory.boxCmp(newBox);
 
         this.box = newBox;
         this.schemaUrl = (String) json.get("Schema");
@@ -1950,20 +1940,20 @@ public class BarFileReadRunner implements Runnable {
         String type = "";
         switch (collectionType) {
         case TYPE_WEBDAV_COLLECTION:
-            type = "col.webdav";
+            type = DavCmp.TYPE_COL_WEBDAV;
             break;
         case TYPE_ODATA_COLLECTION:
-            type = "col.odata";
+            type = DavCmp.TYPE_COL_ODATA;
             break;
         case TYPE_SERVICE_COLLECTION:
-            type = "col.svc";
+            type = DavCmp.TYPE_COL_SVC;
             break;
         default:
             break;
         }
 
         String parenEntryName = "";
-        DavCmpEsImpl parentCmp = null;
+        DavCmp parentCmp = null;
         String tmp = entryName.replace(CONTENTS_DIR, "/");
         String[] slash = tmp.split("/");
         if (slash.length == 2) {
@@ -1983,50 +1973,39 @@ public class BarFileReadRunner implements Runnable {
                 }
             }
         }
-        String parentId = parentCmp.getId();
+  //      String parentId = parentCmp.getId();
 
-        // コレクションの階層数のチェック
-        DavCmpEsImpl current = parentCmp;
+//        // コレクションの階層数のチェック
+//        DavCmp current = parentCmp;
+//
+//        // currentがすでに親をさし示しているためdepthの初期値は1
+//        int depth = 1;
+//        int maxDepth = DcCoreConfig.getMaxCollectionDepth();
+//        while (null != current.getParent()) {
+//            current = (DavCmp) current.getParent();
+//            depth++;
+//        }
+//        if (depth > maxDepth) {
+//            // コレクション数の制限を超えたため、400エラーとする
+//            throw DcCoreException.Dav.COLLECTION_DEPTH_ERROR;
+//        }
+//
+//        // 親コレクション内のコレクション・ファイル数のチェック
+//        int maxChildResource = DcCoreConfig.getMaxChildResourceCount();
+//        if (parentCmp.getChildrenCount() >= maxChildResource) {
+//            // コレクション内に作成可能なコレクション・ファイル数の制限を超えたため、400エラーとする
+//            throw DcCoreException.Dav.COLLECTION_CHILDRESOURCE_ERROR;
+//        }
 
-        // currentがすでに親をさし示しているためdepthの初期値は1
-        int depth = 1;
-        int maxDepth = DcCoreConfig.getMaxCollectionDepth();
-        while (null != current.getParent()) {
-            current = (DavCmpEsImpl) current.getParent();
-            depth++;
-        }
-        if (depth > maxDepth) {
-            // コレクション数の制限を超えたため、400エラーとする
-            throw DcCoreException.Dav.COLLECTION_DEPTH_ERROR;
-        }
 
-        // 親コレクション内のコレクション・ファイル数のチェック
-        int maxChildResource = DcCoreConfig.getMaxChildResourceCount();
-        if (parentCmp.getChildrenCount() >= maxChildResource) {
-            // コレクション内に作成可能なコレクション・ファイル数の制限を超えたため、400エラーとする
-            throw DcCoreException.Dav.COLLECTION_CHILDRESOURCE_ERROR;
-        }
-
-        // 新しいノードを作成
-        DavNode davNode = new DavNode(parentCell.getId(), parentBox.getId(), type);
-        davNode.setParentId(parentId);
-
-        // 新しいノードを保存
-        parentCmp.getEsColType().create(davNode);
-
-        // 親ノードにポインタを追加
+//        // 親ノードにポインタを追加
         String collectionName = "";
         index = collectionUrl.lastIndexOf("/");
         collectionName = collectionUrl.substring(index + 1);
 
-        String collectionId = davNode.getId();
-        parentCmp.linkChild(collectionName, collectionId, davNode.getPublished());
-        DavCmpEsImpl collectionCmp = new DavCmpEsImpl(
-                collectionName,
-                parentCmp,
-                parentCell,
-                parentBox,
-                collectionId);
+        DavCmp collectionCmp = parentCmp.getChild(collectionName);
+        collectionCmp.mkcol(type);
+
         this.davCmpMap.put(entryName, collectionCmp);
 
         // ACL登録
@@ -2090,11 +2069,11 @@ public class BarFileReadRunner implements Runnable {
      * barファイル内で定義されているコレクションのMap<key, DavCmpEsImpl>を取得する.
      * @return コレクションのMapDavCmpEsImplオブジェクト
      */
-    private Map<String, DavCmpEsImpl> getCollections(String colType) {
-        Map<String, DavCmpEsImpl> map = new HashMap<String, DavCmpEsImpl>();
+    private Map<String, DavCmp> getCollections(String colType) {
+        Map<String, DavCmp> map = new HashMap<String, DavCmp>();
         Set<String> keySet = davCmpMap.keySet();
         for (String key : keySet) {
-            DavCmpEsImpl davCmp = davCmpMap.get(key);
+            DavCmp davCmp = davCmpMap.get(key);
             if (davCmp != null && colType.equals(davCmp.getType())) {
                 map.put(key, davCmp);
             }
@@ -2108,7 +2087,7 @@ public class BarFileReadRunner implements Runnable {
      * @param collections コレクションのMapオブジェクト
      * @return コレクションのMapDavCmpEsImplオブジェクト
      */
-    private DavCmpEsImpl getCollection(String entryName, Map<String, DavCmpEsImpl> collections) {
+    private DavCmp getCollection(String entryName, Map<String, DavCmp> collections) {
         int pos = entryName.lastIndexOf("/");
         if (pos == entryName.length() - 1) {
             return collections.get(entryName);
@@ -2124,7 +2103,7 @@ public class BarFileReadRunner implements Runnable {
      * @param davCmp Collection操作用オブジェクト
      * @return 正常終了した場合はtrue
      */
-    protected boolean registUserSchema(String entryName, InputStream inputStream, DavCmpEsImpl davCmp) {
+    protected boolean registUserSchema(String entryName, InputStream inputStream, DavCmp davCmp) {
         EdmDataServices metadata = null;
         // XMLパーサ(StAX,SAX,DOM)にInputStreamをそのまま渡すとファイル一覧の取得処理が
         // 中断してしまうため暫定対処としてバッファに格納してからパースする
@@ -2175,7 +2154,7 @@ public class BarFileReadRunner implements Runnable {
      * @param davCmp Collection操作用オブジェクト
      */
     @SuppressWarnings("unchecked")
-    protected void createEntityTypes(EdmDataServices metadata, DavCmpEsImpl davCmp) {
+    protected void createEntityTypes(EdmDataServices metadata, DavCmp davCmp) {
         // DeclaredPropertyはEntityTypeに紐付いているため、EntityTypeごとにPropertyを登録する
         Iterable<EdmEntityType> entityTypes = metadata.getEntityTypes();
         UserSchemaODataProducer producer = null;
@@ -2214,7 +2193,7 @@ public class BarFileReadRunner implements Runnable {
      * @param producer ODataプロデューサー
      */
     @SuppressWarnings("unchecked")
-    protected void createProperties(EdmStructuralType entity, DavCmpEsImpl davCmp, DcODataProducer producer) {
+    protected void createProperties(EdmStructuralType entity, DavCmp davCmp, DcODataProducer producer) {
         Iterable<EdmProperty> properties = entity.getDeclaredProperties();
         EdmDataServices userMetadata = null;
         String edmTypeName = Property.EDM_TYPE_NAME;
@@ -2265,7 +2244,7 @@ public class BarFileReadRunner implements Runnable {
      * @param metadata Edmxのメタデータ
      * @param davCmp Collection操作用オブジェクト
      */
-    protected void createAssociations(EdmDataServices metadata, DavCmpEsImpl davCmp) {
+    protected void createAssociations(EdmDataServices metadata, DavCmp davCmp) {
         Iterable<EdmAssociation> associations = metadata.getAssociations();
         DcODataProducer producer = null;
         EdmDataServices userMetadata = null;
@@ -2348,7 +2327,7 @@ public class BarFileReadRunner implements Runnable {
      * @param davCmp Collection操作用オブジェクト
      */
     @SuppressWarnings("unchecked")
-    protected void createComplexTypes(EdmDataServices metadata, DavCmpEsImpl davCmp) {
+    protected void createComplexTypes(EdmDataServices metadata, DavCmp davCmp) {
         // DeclaredPropertyはComplexTypeに紐付いているため、ComplexTypeごとにComplexTypePropertyを登録する
         Iterable<EdmComplexType> complexTypes = metadata.getComplexTypes();
         DcODataProducer producer = null;

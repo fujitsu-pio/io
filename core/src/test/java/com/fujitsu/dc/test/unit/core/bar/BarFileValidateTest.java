@@ -53,8 +53,8 @@ import com.fujitsu.dc.core.bar.BarFileInstaller;
 import com.fujitsu.dc.core.bar.BarFileReadRunner;
 import com.fujitsu.dc.core.bar.jackson.JSONManifest;
 import com.fujitsu.dc.core.bar.jackson.JSONMappedObject;
+import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.impl.es.CellEsImpl;
-import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
 import com.fujitsu.dc.test.categories.Unit;
 
 /**
@@ -69,7 +69,7 @@ public class BarFileValidateTest {
      * .
      */
     private class TestBarRunner extends BarFileReadRunner {
-        public TestBarRunner() {
+        TestBarRunner() {
             super(null, null, null, null, null, null, null, null);
         }
 
@@ -135,7 +135,7 @@ public class BarFileValidateTest {
          * @param davCmp Collection操作用オブジェクト
          * @return 正常終了した場合はtrue
          */
-        protected boolean registUserSchema(String entryName, InputStream inputStream, DavCmpEsImpl davCmp) {
+        protected boolean registUserSchema(String entryName, InputStream inputStream, DavCmp davCmp) {
             return super.registUserSchema(entryName, inputStream, davCmp);
         }
 
@@ -401,10 +401,10 @@ public class BarFileValidateTest {
     @Test
     public void バリデートテスト_70_link_jsonに必須項目がない場合_DcCoreExceptionが返却されること() {
 
-        String[] files = {"/70_$links_no_fromtype.json"
-                , "/70_$links_no_fromname.json"
-                , "/70_$links_no_totype.json"
-                , "/70_$links_no_toname.json"};
+        String[] files = {"/70_$links_no_fromtype.json",
+                "/70_$links_no_fromname.json",
+                "/70_$links_no_totype.json",
+                "/70_$links_no_toname.json"};
         for (String filename : files) {
             URL fileUrl = ClassLoader.getSystemResource(RESOURCE_PATH + filename);
             File file = new File(fileUrl.getPath());
@@ -436,9 +436,9 @@ public class BarFileValidateTest {
     @Test
     public void バリデートテスト_70_link_jsonのToTypeにAccount_ExtCell_Boxを指定した場合_DcCoreExceptionが返却されること() {
 
-        String[] files = {"/70_$links_totype_Account.json"
-                , "/70_$links_totype_ExtCell.json"
-                , "/70_$links_totype_Box.json"};
+        String[] files = {"/70_$links_totype_Account.json",
+               "/70_$links_totype_ExtCell.json",
+               "/70_$links_totype_Box.json"};
         for (String filename : files) {
             URL fileUrl = ClassLoader.getSystemResource(RESOURCE_PATH + filename);
             File file = new File(fileUrl.getPath());
@@ -1664,7 +1664,7 @@ public class BarFileValidateTest {
      * @author Administrator
      */
     private class TestBarInstaller extends BarFileInstaller {
-        public TestBarInstaller() {
+        TestBarInstaller() {
             super(null, null, null, null);
         }
 
@@ -1745,7 +1745,8 @@ public class BarFileValidateTest {
             Method method = BarFileInstaller.class.getDeclaredMethod(
                     "storeTemporaryBarFile", new Class<?>[] {InputStream.class});
             method.setAccessible(true);
-            method.invoke(bfi, new FileInputStream("pom.xml"));//any file
+            //any file
+            method.invoke(bfi, new FileInputStream("pom.xml"));
             Mockito.verify(bfi, Mockito.atLeast(1)).sync((FileDescriptor) Mockito.anyObject());
         } finally {
             DcCoreConfig.set(BinaryData.FSYNC_ENABLED, String.valueOf(fsyncEnabled));
@@ -1768,7 +1769,8 @@ public class BarFileValidateTest {
             Method method = BarFileInstaller.class.getDeclaredMethod(
                     "storeTemporaryBarFile", new Class<?>[] {InputStream.class});
             method.setAccessible(true);
-            method.invoke(bfi, new FileInputStream("pom.xml"));//any file
+            //any file
+            method.invoke(bfi, new FileInputStream("pom.xml"));
             Mockito.verify(bfi, Mockito.never()).sync((FileDescriptor) Mockito.anyObject());
         } finally {
             DcCoreConfig.set(BinaryData.FSYNC_ENABLED, String.valueOf(fsyncEnabled));

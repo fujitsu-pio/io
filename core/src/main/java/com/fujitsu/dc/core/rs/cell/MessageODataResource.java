@@ -102,7 +102,7 @@ public final class MessageODataResource extends AbstractODataResource {
     private static final int MAX_SENT_NUM = 1000;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param odataResource ODataリソース
      * @param producer ODataプロデューサ
      * @param entityTypeName エンティティタイプ名
@@ -114,7 +114,7 @@ public final class MessageODataResource extends AbstractODataResource {
     }
 
     /**
-     * PCS Version情報のセット.
+     * personium Version情報のセット.
      * @param version セットする version
      */
     public void setVersion(String version) {

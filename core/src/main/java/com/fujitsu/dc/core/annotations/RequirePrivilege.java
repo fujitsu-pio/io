@@ -22,13 +22,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * メソッド呼び出しにどのようなPrivilegeが必要かを表すアノテーション.
+ * annotation to mark what Privilege is necessary to invoke a method.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface RequirePrivilege {
     /**
-     * メソッド実行に必要なPrivilege.
+     * Privilege required for method invocation.
+     * @return value
      */
     String value();
 }

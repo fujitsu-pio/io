@@ -72,7 +72,7 @@ public final class ODataSvcSchemaResource extends ODataResource {
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param davRsCmp このスキーマが担当するユーザデータのResource
      */
     ODataSvcSchemaResource(
@@ -167,7 +167,7 @@ public final class ODataSvcSchemaResource extends ODataResource {
     }
 
     /**
-     * OPTIONSメソッド.
+     * OPTIONS Method.
      * @return JAX-RS Response
      */
     @Override

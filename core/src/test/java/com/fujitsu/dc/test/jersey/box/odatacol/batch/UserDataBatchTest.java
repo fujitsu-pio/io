@@ -16,8 +16,14 @@
  */
 package com.fujitsu.dc.test.jersey.box.odatacol.batch;
 
-import static com.fujitsu.dc.test.utils.BatchUtils.*;
-import static org.junit.Assert.*;
+import static com.fujitsu.dc.test.utils.BatchUtils.BOUNDARY;
+import static com.fujitsu.dc.test.utils.BatchUtils.START_BOUNDARY;
+import static com.fujitsu.dc.test.utils.BatchUtils.END_BOUNDARY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +58,7 @@ import com.fujitsu.dc.test.jersey.ODataCommon;
 import com.fujitsu.dc.test.jersey.box.odatacol.schema.property.PropertyUtils;
 import com.fujitsu.dc.test.setup.Setup;
 import com.fujitsu.dc.test.unit.core.UrlUtils;
+import com.fujitsu.dc.test.utils.BatchUtils;
 import com.fujitsu.dc.test.utils.EntityTypeUtils;
 import com.fujitsu.dc.test.utils.Http;
 import com.fujitsu.dc.test.utils.TResponse;
@@ -77,7 +84,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     @Test
     public final void $batchの登録でID指定なしのデータを指定した場合に201返却されること() {
         try {
-            String body = START_BOUNDARY + retrievePostBodyNoId("Supplier", HttpMethod.POST)
+            String body = START_BOUNDARY + BatchUtils.retrievePostBodyNoId("Supplier", HttpMethod.POST)
                     + END_BOUNDARY;
             TResponse response = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -129,8 +136,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             bodySecond.put("dynamicProperty", null);
             bodySecond.put("Second", "Second");
 
-            String body = START_BOUNDARY + retrievePostWithBody(entityTypeName, bodyFirst)
-                    + START_BOUNDARY + retrievePostWithBody(entityTypeName, bodySecond)
+            String body = START_BOUNDARY + BatchUtils.retrievePostWithBody(entityTypeName, bodyFirst)
+                    + START_BOUNDARY + BatchUtils.retrievePostWithBody(entityTypeName, bodySecond)
                     + END_BOUNDARY;
             Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -181,8 +188,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     @Test
     public final void $batchで登録直後に登録データの参照を行いレスポンスが返却されること() {
         try {
-            String body = START_BOUNDARY + retrievePostBody("Supplier", "refresh")
-                    + START_BOUNDARY + retrieveGetBody("Supplier('refresh')")
+            String body = START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "refresh")
+                    + START_BOUNDARY + BatchUtils.retrieveGetBody("Supplier('refresh')")
                     + END_BOUNDARY;
             TResponse response = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -196,7 +203,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
 
             // レスポンスボディのチェック
             String expectedBody = START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "refresh")
-                    + START_BOUNDARY + retrieveGetResBody("Supplier", "refresh") + END_BOUNDARY;
+                    + START_BOUNDARY + BatchUtils.retrieveGetResBody("Supplier", "refresh") + END_BOUNDARY;
             checkBatchResponseBody(response, expectedBody);
         } finally {
             deleteUserData(cellName, boxName, colName, "Supplier", "refresh", DcCoreConfig.getMasterToken(),
@@ -220,7 +227,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             String expPublished = ODataCommon.getPublished(response);
 
             // $batchのリクエスト(ユーザデータを更新する)
-            String body = START_BOUNDARY + retrievePutBody("Category('pubTest')")
+            String body = START_BOUNDARY + BatchUtils.retrievePutBody("Category('pubTest')")
                     + END_BOUNDARY;
             TResponse bulkResponse = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -241,7 +248,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             assertEquals(expPublished, published);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrievePutResBody() + END_BOUNDARY;
+            String expectedBody = START_BOUNDARY + BatchUtils.retrievePutResBody() + END_BOUNDARY;
             checkBatchResponseBody(bulkResponse, expectedBody);
         } finally {
             deleteUserData(cellName, boxName, colName, "Category", "pubTest", DcCoreConfig.getMasterToken(),
@@ -254,17 +261,17 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
      */
     @Test
     public final void $batchで登録直後に取得更新削除を行いレスポンスが返却されること() {
-        String body = START_BOUNDARY + retrievePostBody("Supplier", "testBatch1")
-                + START_BOUNDARY + retrieveGetBody("Supplier('testBatch1')")
-                + START_BOUNDARY + retrievePostBody("Supplier", "testBatch2")
-                + START_BOUNDARY + retrievePutBody("Supplier('testBatch2')")
-                + START_BOUNDARY + retrievePostBody("Supplier", "testBatch3")
-                + START_BOUNDARY + retrieveListBody("Supplier")
-                + START_BOUNDARY + retrievePostBody("Supplier", "testBatch4")
-                + START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch4')")
-                + START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch3')")
-                + START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch2')")
-                + START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch1')")
+        String body = START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "testBatch1")
+                + START_BOUNDARY + BatchUtils.retrieveGetBody("Supplier('testBatch1')")
+                + START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "testBatch2")
+                + START_BOUNDARY + BatchUtils.retrievePutBody("Supplier('testBatch2')")
+                + START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "testBatch3")
+                + START_BOUNDARY + BatchUtils.retrieveListBody("Supplier")
+                + START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "testBatch4")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch4')")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch3')")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch2')")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch1')")
                 + END_BOUNDARY;
 
         // リクエスト実行
@@ -286,16 +293,16 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
 
         // レスポンスボディのチェック
         String expectedBody = START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "testBatch1")
-                + START_BOUNDARY + retrieveGetResBody("Supplier", "testBatch1")
+                + START_BOUNDARY + BatchUtils.retrieveGetResBody("Supplier", "testBatch1")
                 + START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "testBatch2")
-                + START_BOUNDARY + retrievePutResBody()
+                + START_BOUNDARY + BatchUtils.retrievePutResBody()
                 + START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "testBatch3")
-                + START_BOUNDARY + retrieveListSupplierResBody(listIds)
+                + START_BOUNDARY + BatchUtils.retrieveListSupplierResBody(listIds)
                 + START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "testBatch4")
-                + START_BOUNDARY + retrieveDeleteResBody()
-                + START_BOUNDARY + retrieveDeleteResBody()
-                + START_BOUNDARY + retrieveDeleteResBody()
-                + START_BOUNDARY + retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
                 + END_BOUNDARY;
         checkBatchResponseBody(response, expectedBody);
     }
@@ -307,7 +314,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void UserDataを$batch経由で正常に登録及び削除できること() {
 
         try {
-            String body = START_BOUNDARY + retrievePostBody("Supplier", "testBatch1") + END_BOUNDARY;
+            String body = START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "testBatch1") + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
                     .with("box", boxName)
@@ -328,7 +335,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             checkBatchResponseBody(res, expectedBody);
 
         } finally {
-            String body = START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch1')") + END_BOUNDARY;
+            String body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch1')") + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
                     .with("box", boxName)
@@ -344,7 +351,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             checkBatchResponseHeaders(res);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveDeleteResBody() + END_BOUNDARY;
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveDeleteResBody() + END_BOUNDARY;
             checkBatchResponseBody(res, expectedBody);
         }
     }
@@ -366,7 +373,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             JSONObject batchBody = new JSONObject();
             batchBody.put("__id", userOdataId);
             batchBody.put(propName, 1.23);
-            String body = START_BOUNDARY + retrievePostWithBody("Supplier", batchBody) + END_BOUNDARY;
+            String body = START_BOUNDARY + BatchUtils.retrievePostWithBody("Supplier", batchBody) + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
                     .with("box", boxName)
@@ -422,7 +429,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             nameSpace = getNameSpace("Supplier");
             ODataCommon.checkResponseBodyList(res.bodyAsJson(), uri, nameSpace, additionalMap, "__id", null, null);
         } finally {
-            String body = START_BOUNDARY + retrieveDeleteBody("Supplier('" + userOdataId + "')") + END_BOUNDARY;
+            String body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('" + userOdataId + "')")
+                + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
                     .with("box", boxName)
@@ -440,7 +448,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             checkBatchResponseHeaders(res);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveDeleteResBody() + END_BOUNDARY;
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveDeleteResBody() + END_BOUNDARY;
             checkBatchResponseBody(res, expectedBody);
         }
     }
@@ -475,7 +483,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             JSONObject batchBody = new JSONObject();
             batchBody.put("__id", userOdataIdDouble);
             batchBody.put(propName, 1.23);
-            String reqBody = START_BOUNDARY + retrievePostWithBody("Supplier", batchBody) + END_BOUNDARY;
+            String reqBody = START_BOUNDARY + BatchUtils.retrievePostWithBody("Supplier", batchBody) + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
                     .with("box", boxName)
@@ -524,7 +532,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             String nameSpace = getNameSpace("Supplier");
             ODataCommon.checkResponseBodyList(res.bodyAsJson(), uri, nameSpace, additionalMap, "__id", null, null);
         } finally {
-            String body = START_BOUNDARY + retrieveDeleteBody("Supplier('" + userOdataIdInt + "')") + END_BOUNDARY;
+            String body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('" + userOdataIdInt + "')")
+                + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
                     .with("box", boxName)
@@ -536,7 +545,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                     .statusCode(HttpStatus.SC_ACCEPTED)
                     .debug();
 
-            body = START_BOUNDARY + retrieveDeleteBody("Supplier('" + userOdataIdDouble + "')") + END_BOUNDARY;
+            body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('" + userOdataIdDouble + "')")
+                + END_BOUNDARY;
             res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
                     .with("box", boxName)
@@ -554,7 +564,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             checkBatchResponseHeaders(res);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveDeleteResBody() + END_BOUNDARY;
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveDeleteResBody() + END_BOUNDARY;
             checkBatchResponseBody(res, expectedBody);
         }
     }
@@ -564,7 +574,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
      */
     @Test
     public final void UserDataを$batch経由で正常に取得できること() {
-        String body = START_BOUNDARY + retrieveGetBody("SalesDetail('userdata005')") + END_BOUNDARY;
+        String body = START_BOUNDARY + BatchUtils.retrieveGetBody("SalesDetail('userdata005')") + END_BOUNDARY;
         TResponse res = Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
                 .with("box", boxName)
@@ -580,7 +590,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         checkBatchResponseHeaders(res);
 
         // レスポンスボディのチェック
-        String expectedBody = START_BOUNDARY + retrieveGetResBody("SalesDetail", "userdata005") + END_BOUNDARY;
+        String expectedBody = START_BOUNDARY + BatchUtils.retrieveGetResBody("SalesDetail", "userdata005")
+            + END_BOUNDARY;
 
         checkBatchResponseBody(res, expectedBody);
     }
@@ -598,9 +609,9 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                     entityTypeName,
                     HttpStatus.SC_CREATED);
 
-            String body = START_BOUNDARY + retrievePostBody(entityTypeName, "testBatch1")
-                    + START_BOUNDARY + retrievePostBody(entityTypeName, "testBatch2")
-                    + START_BOUNDARY + retrieveListBody(entityTypeName)
+            String body = START_BOUNDARY + BatchUtils.retrievePostBody(entityTypeName, "testBatch1")
+                    + START_BOUNDARY + BatchUtils.retrievePostBody(entityTypeName, "testBatch2")
+                    + START_BOUNDARY + BatchUtils.retrieveListBody(entityTypeName)
                     + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -622,7 +633,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             listRes1.add("testBatch");
             String expectedBody = START_BOUNDARY + retrievePostResBodyToSetODataCol(entityTypeName, "testBatch1")
                     + START_BOUNDARY + retrievePostResBodyToSetODataCol(entityTypeName, "testBatch2")
-                    + START_BOUNDARY + retrieveListResBody(listRes1)
+                    + START_BOUNDARY + BatchUtils.retrieveListResBody(listRes1)
                     + END_BOUNDARY;
             checkBatchResponseBody(res, expectedBody);
         } finally {
@@ -655,8 +666,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             super.createUserData(srcBody, HttpStatus.SC_CREATED, cellName, boxName, colName, "SalesDetail");
 
             // $batch
-            String body = START_BOUNDARY + retrieveGetBody("Sales('id0001')")
-                    + START_BOUNDARY + retrieveGetBody("SalesDetail('id0001')")
+            String body = START_BOUNDARY + BatchUtils.retrieveGetBody("Sales('id0001')")
+                    + START_BOUNDARY + BatchUtils.retrieveGetBody("SalesDetail('id0001')")
                     + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -673,8 +684,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             checkBatchResponseHeaders(res);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveGetResBody("Sales", "id0001")
-                    + START_BOUNDARY + retrieveGetResBody("SalesDetail", "id0001")
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveGetResBody("Sales", "id0001")
+                    + START_BOUNDARY + BatchUtils.retrieveGetResBody("SalesDetail", "id0001")
                     + END_BOUNDARY;
 
             checkBatchResponseBody(res, expectedBody);
@@ -704,7 +715,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             super.createUserData(srcBody, HttpStatus.SC_CREATED, cellName, boxName, colName, "SalesDetail");
 
             // $batch
-            String body = START_BOUNDARY + retrieveDeleteBody("SalesDetail('id0001')")
+            String body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("SalesDetail('id0001')")
                     + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -721,7 +732,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             checkBatchResponseHeaders(res);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveDeleteResBody()
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
                     + END_BOUNDARY;
             checkBatchResponseBody(res, expectedBody);
 
@@ -765,7 +776,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             // $batch
             JSONObject batchBody = new JSONObject();
             batchBody.put("Name", "updated");
-            String body = START_BOUNDARY + retrievePutBody("SalesDetail('id0001')", batchBody)
+            String body = START_BOUNDARY + BatchUtils.retrievePutBody("SalesDetail('id0001')", batchBody)
                     + END_BOUNDARY;
             TResponse res = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -782,7 +793,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             checkBatchResponseHeaders(res);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrievePutResBody()
+            String expectedBody = START_BOUNDARY + BatchUtils.retrievePutResBody()
                     + END_BOUNDARY;
             checkBatchResponseBody(res, expectedBody);
 
@@ -814,18 +825,18 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     @Ignore
     @Test
     public final void UserDataを$batchに複数リクエスト指定で正常に処理ができること() {
-        String body = START_BOUNDARY + retrieveMultiRequestBody("Supplier", "testBatch1")
-                + START_BOUNDARY + retrieveGetBody("Supplier('testBatch1')")
-                + START_BOUNDARY + retrievePostBody("Supplier", "testBatch2")
-                + START_BOUNDARY + retrieveListBody("Supplier")
-                + START_BOUNDARY + retrievePostBody("Supplier('testBatch2')/_Product", "id0001")
-                + START_BOUNDARY + retrieveGetBody("Product('id0001')")
-                + START_BOUNDARY + retrieveDeleteBody("Product('id0001')")
-                + START_BOUNDARY + retrievePutBody("Supplier('testBatch1')")
-                + START_BOUNDARY + retrieveGetBody("Supplier('testBatch1')")
-                + START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch1')")
-                + START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch2')")
-                + START_BOUNDARY + retrieveListBody("Supplier")
+        String body = START_BOUNDARY + BatchUtils.retrieveMultiRequestBody("Supplier", "testBatch1")
+                + START_BOUNDARY + BatchUtils.retrieveGetBody("Supplier('testBatch1')")
+                + START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "testBatch2")
+                + START_BOUNDARY + BatchUtils.retrieveListBody("Supplier")
+                + START_BOUNDARY + BatchUtils.retrievePostBody("Supplier('testBatch2')/_Product", "id0001")
+                + START_BOUNDARY + BatchUtils.retrieveGetBody("Product('id0001')")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Product('id0001')")
+                + START_BOUNDARY + BatchUtils.retrievePutBody("Supplier('testBatch1')")
+                + START_BOUNDARY + BatchUtils.retrieveGetBody("Supplier('testBatch1')")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch1')")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch2')")
+                + START_BOUNDARY + BatchUtils.retrieveListBody("Supplier")
                 + END_BOUNDARY;
         TResponse res = Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -850,18 +861,18 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         String id = "testBatch1";
         String uri = UrlUtils
                 .userData(Setup.TEST_CELL1, Setup.TEST_BOX1, Setup.TEST_ODATA, "Supplier" + "\\('" + id + "'\\)");
-        String expectedBody = START_BOUNDARY + retrieveMultiRequestResBody(id, uri)
-                + START_BOUNDARY + retrieveGetResBody("Supplier", "testBatch1")
+        String expectedBody = START_BOUNDARY + BatchUtils.retrieveMultiRequestResBody(id, uri)
+                + START_BOUNDARY + BatchUtils.retrieveGetResBody("Supplier", "testBatch1")
                 + START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "testBatch2")
-                + START_BOUNDARY + retrieveListSupplierResBody(listRes1)
+                + START_BOUNDARY + BatchUtils.retrieveListSupplierResBody(listRes1)
                 + START_BOUNDARY + retrievePostResBodyToSetODataCol("Product", "id0001", true)
-                + START_BOUNDARY + retrieveGetResBody("Product", "id0001")
-                + START_BOUNDARY + retrieveDeleteResBody()
-                + START_BOUNDARY + retrievePutResBody()
-                + START_BOUNDARY + retrieveGetResBody("Supplier", "testBatch1")
-                + START_BOUNDARY + retrieveDeleteResBody()
-                + START_BOUNDARY + retrieveDeleteResBody()
-                + START_BOUNDARY + retrieveListSupplierResBody(listRes2)
+                + START_BOUNDARY + BatchUtils.retrieveGetResBody("Product", "id0001")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrievePutResBody()
+                + START_BOUNDARY + BatchUtils.retrieveGetResBody("Supplier", "testBatch1")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrieveListSupplierResBody(listRes2)
                 + END_BOUNDARY;
 
         checkBatchResponseBody(res, expectedBody);
@@ -893,7 +904,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
      */
     @Test
     public final void $batchの登録で不正JSONフォーマットのデータを指定した場合に400が返却されること() {
-        String body = START_BOUNDARY + retrievePostBodyJsonFormatError("Supplier", "testBatch")
+        String body = START_BOUNDARY + BatchUtils.retrievePostBodyJsonFormatError("Supplier", "testBatch")
                 + END_BOUNDARY;
         TResponse response = Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -906,7 +917,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                 .statusCode(HttpStatus.SC_ACCEPTED);
 
         // レスポンスボディのチェック
-        String expectedBody = START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
+        String expectedBody = START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
                 + END_BOUNDARY;
         checkBatchResponseBody(response, expectedBody);
     }
@@ -918,7 +929,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void $batchの登録でバウンダリのContentTypeを指定しない場合に400が返却されること() {
         String contentType = "";
         String body = START_BOUNDARY
-                + retrievePostBodyBoundaryHeaderError("Supplier", "testBatch", contentType)
+                + BatchUtils.retrievePostBodyBoundaryHeaderError("Supplier", "testBatch", contentType)
                 + END_BOUNDARY;
         TResponse res = Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -942,7 +953,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void $batchの登録でリクエストヘッダのContentTypeに誤ったバウンダリーを指定した場合に400が返却されること() {
         String code = DcCoreException.OData.BATCH_BODY_PARSE_ERROR.getCode();
         String err = DcCoreException.OData.BATCH_BODY_PARSE_ERROR.getMessage();
-        String body = START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch1')") + END_BOUNDARY;
+        String body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch1')") + END_BOUNDARY;
         Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
                 .with("box", boxName)
@@ -964,7 +975,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void $batchの登録でリクエストボディの末尾にバウンダリーがない場合に400が返却されること() {
         String code = DcCoreException.OData.BATCH_BODY_PARSE_ERROR.getCode();
         String err = DcCoreException.OData.BATCH_BODY_PARSE_ERROR.getMessage();
-        String body = START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch1')");
+        String body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch1')");
         Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
                 .with("box", boxName)
@@ -985,7 +996,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void $batchの登録でContentTypeにmultipartを指定しバウンダリを指定しない場合に400が返却されること() {
         String contentType = "Content-Type: multipart/mixed;\n";
         String body = START_BOUNDARY
-                + retrievePostBodyBoundaryHeaderError("Supplier", "testBatch", contentType)
+                + BatchUtils.retrievePostBodyBoundaryHeaderError("Supplier", "testBatch", contentType)
                 + END_BOUNDARY;
 
         TResponse res = Http.request("box/odatacol/batch.txt")
@@ -1010,7 +1021,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void $batchの登録でバウンダリのContentTypeに許可しない文字列を指定した場合400が返却されること() {
         String contentType = "Content-Type: text/html;\n";
         String body = START_BOUNDARY
-                + retrievePostBodyBoundaryHeaderError("Supplier", "testBatch", contentType)
+                + BatchUtils.retrievePostBodyBoundaryHeaderError("Supplier", "testBatch", contentType)
                 + END_BOUNDARY;
 
         TResponse res = Http.request("box/odatacol/batch.txt")
@@ -1035,7 +1046,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void $batchの登録でchangesetのContentTypeを指定しない場合に400が返却されること() {
         String contentType = "";
         String body = START_BOUNDARY
-                + retrievePostBodyChangesetHeaderError("Supplier", "testBatch", contentType)
+                + BatchUtils.retrievePostBodyChangesetHeaderError("Supplier", "testBatch", contentType)
                 + END_BOUNDARY;
         TResponse res = Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -1059,7 +1070,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     public final void $batchの登録でchangesetのContentTypeに許可しない文字列を指定した場合400が返却されること() {
         String contentType = "Content-Type: text/html;\n";
         String body = START_BOUNDARY
-                + retrievePostBodyChangesetHeaderError("Supplier", "testBatch", contentType)
+                + BatchUtils.retrievePostBodyChangesetHeaderError("Supplier", "testBatch", contentType)
                 + END_BOUNDARY;
 
         TResponse res = Http.request("box/odatacol/batch.txt")
@@ -1083,7 +1094,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     @Test
     public final void $batchの登録でchangesetをネストで指定した場合400が返却されること() {
         String body = START_BOUNDARY
-                + retrieveNestChangesetBody("Supplier", "testBatch1")
+                + BatchUtils.retrieveNestChangesetBody("Supplier", "testBatch1")
                 + END_BOUNDARY;
 
         TResponse res = Http.request("box/odatacol/batch.txt")
@@ -1114,7 +1125,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         try {
             createUserData(createBody, HttpStatus.SC_CREATED);
 
-            String body = START_BOUNDARY + retrievePutBodyFieledInvalidError("Category('pubTest')", PUBLISHED)
+            String body = START_BOUNDARY
+                    + BatchUtils.retrievePutBodyFieledInvalidError("Category('pubTest')", PUBLISHED)
                     + END_BOUNDARY;
             TResponse response = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -1127,7 +1139,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                     .statusCode(HttpStatus.SC_ACCEPTED);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
                     + END_BOUNDARY;
             checkBatchResponseBody(response, expectedBody);
         } finally {
@@ -1149,7 +1161,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         try {
             createUserData(createBody, HttpStatus.SC_CREATED);
 
-            String body = START_BOUNDARY + retrievePutBodyFieledInvalidError("Category('pubTest')", UPDATED)
+            String body = START_BOUNDARY + BatchUtils.retrievePutBodyFieledInvalidError("Category('pubTest')", UPDATED)
                     + END_BOUNDARY;
             TResponse response = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -1162,7 +1174,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                     .statusCode(HttpStatus.SC_ACCEPTED);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
                     + END_BOUNDARY;
             checkBatchResponseBody(response, expectedBody);
         } finally {
@@ -1184,7 +1196,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         try {
             createUserData(createBody, HttpStatus.SC_CREATED);
 
-            String body = START_BOUNDARY + retrievePutBodyMetadataFieledInvalidError("Category('pubTest')")
+            String body = START_BOUNDARY + BatchUtils.retrievePutBodyMetadataFieledInvalidError("Category('pubTest')")
                     + END_BOUNDARY;
             TResponse response = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -1197,7 +1209,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                     .statusCode(HttpStatus.SC_ACCEPTED);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_BAD_REQUEST)
                     + END_BOUNDARY;
             checkBatchResponseBody(response, expectedBody);
         } finally {
@@ -1211,9 +1223,9 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
      */
     @Test
     public final void $batchで整数データ値を含むデータを登録直後に文字列値で更新を行い400エラーが返却されること() {
-        String body = START_BOUNDARY + retrievePostBodyIntData("Supplier", "testBatch1")
-                + START_BOUNDARY + retrievePutBodyIntData("Supplier('testBatch1')")
-                + START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch1')")
+        String body = START_BOUNDARY + BatchUtils.retrievePostBodyIntData("Supplier", "testBatch1")
+                + START_BOUNDARY + BatchUtils.retrievePutBodyIntData("Supplier('testBatch1')")
+                + START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch1')")
                 + END_BOUNDARY;
 
         // リクエスト実行
@@ -1235,8 +1247,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
 
         // レスポンスボディのチェック
         String expectedBody = START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "testBatch1")
-                + START_BOUNDARY + retrievePutResBody400()
-                + START_BOUNDARY + retrieveDeleteResBody()
+                + START_BOUNDARY + BatchUtils.retrievePutResBody400()
+                + START_BOUNDARY + BatchUtils.retrieveDeleteResBody()
                 + END_BOUNDARY;
         checkBatchResponseBody(response, expectedBody);
     }
@@ -1246,7 +1258,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
      */
     @Test
     public final void $batchの登録で存在しないデータを指定した場合に404が返却されること() {
-        String body = START_BOUNDARY + retrievePostBody("notExistsType", "testBatch")
+        String body = START_BOUNDARY + BatchUtils.retrievePostBody("notExistsType", "testBatch")
                 + END_BOUNDARY;
         TResponse response = Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -1259,7 +1271,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                 .statusCode(HttpStatus.SC_ACCEPTED);
 
         // レスポンスボディのチェック
-        String expectedBody = START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_NOT_FOUND)
+        String expectedBody = START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_NOT_FOUND)
                 + END_BOUNDARY;
         checkBatchResponseBody(response, expectedBody);
     }
@@ -1272,7 +1284,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         String code = DcCoreException.OData.BATCH_BODY_FORMAT_METHOD_ERROR.getCode();
         String err = DcCoreException.OData.BATCH_BODY_FORMAT_METHOD_ERROR.params("POT").getMessage();
 
-        String body = START_BOUNDARY + retrievePostBodyNoId("Supplier", "POT")
+        String body = START_BOUNDARY + BatchUtils.retrievePostBodyNoId("Supplier", "POT")
                 + END_BOUNDARY;
         Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -1298,7 +1310,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         try {
             createUserData(preRequestBody, HttpStatus.SC_CREATED, cellName, boxName, colName, "Supplier");
 
-            String body = START_BOUNDARY + retrievePostBody("Supplier", "conflict")
+            String body = START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "conflict")
                     + END_BOUNDARY;
             TResponse response = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -1311,7 +1323,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                     .statusCode(HttpStatus.SC_ACCEPTED);
 
             // レスポンスボディのチェック
-            String expectedBody = START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT)
+            String expectedBody = START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT)
                     + END_BOUNDARY;
             checkBatchResponseBody(response, expectedBody);
         } finally {
@@ -1326,8 +1338,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     @Test
     public final void $batchの登録でリクエストデータ内に存在するデータを指定した場合に409が返却されること() {
         try {
-            String body = START_BOUNDARY + retrievePostBody("Supplier", "conflict")
-                    + START_BOUNDARY + retrievePostBody("Supplier", "conflict")
+            String body = START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "conflict")
+                    + START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "conflict")
                     + END_BOUNDARY;
             TResponse response = Http.request("box/odatacol/batch.txt")
                     .with("cell", cellName)
@@ -1341,7 +1353,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
 
             // レスポンスボディのチェック
             String expectedBody = START_BOUNDARY + retrievePostResBodyToSetODataCol("Supplier", "conflict")
-                    + START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT) + END_BOUNDARY;
+                    + START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT) + END_BOUNDARY;
             checkBatchResponseBody(response, expectedBody);
         } finally {
             deleteUserData(cellName, boxName, colName, "Supplier", "conflict", DcCoreConfig.getMasterToken(),
@@ -1355,8 +1367,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     @Test
     public final void $batchの登録で異なるEntityTypeに対して同じ__idを指定して作成できること() {
         try {
-            String body = START_BOUNDARY + retrievePostBody("Sales", "id0001")
-                    + START_BOUNDARY + retrievePostBody("Supplier", "id0001")
+            String body = START_BOUNDARY + BatchUtils.retrievePostBody("Sales", "id0001")
+                    + START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "id0001")
                     + END_BOUNDARY;
 
             TResponse response = Http.request("box/odatacol/batch.txt")
@@ -1412,7 +1424,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             // レスポンスボディのチェック
             sbuf = new StringBuilder();
             for (int i = 0; i < registerNumber; i++) {
-                sbuf.append(START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT));
+                sbuf.append(START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT));
             }
             sbuf.append(END_BOUNDARY);
             checkBatchResponseBody(response, sbuf.toString());
@@ -1496,7 +1508,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
             // レスポンスボディのチェック
             sbuf = new StringBuilder();
             for (int i = offset; i < registerNumber; i++) {
-                sbuf.append(START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT));
+                sbuf.append(START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_CONFLICT));
             }
             for (int i = registerNumber; i < registerNumber + offset; i++) {
                 String id = String.format("testBatch%02d", i);
@@ -1522,13 +1534,13 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 1; i <= 500; i++) {
-            sb.append(START_BOUNDARY + retrievePostBody("Supplier", "testBatch" + i));
+            sb.append(START_BOUNDARY + BatchUtils.retrievePostBody("Supplier", "testBatch" + i));
         }
-        sb.append(START_BOUNDARY + retrievePutBody("Supplier('testBatch1')"));
+        sb.append(START_BOUNDARY + BatchUtils.retrievePutBody("Supplier('testBatch1')"));
 
         for (int i = 1; i <= 500; i++) {
 
-            sb.append(START_BOUNDARY + retrieveDeleteBody("Supplier('testBatch" + i + "')"));
+            sb.append(START_BOUNDARY + BatchUtils.retrieveDeleteBody("Supplier('testBatch" + i + "')"));
         }
         sb.append(END_BOUNDARY);
 
@@ -1553,7 +1565,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
      */
     @Test
     public final void $batchで存在しないエンティティタイプのデータを削除した場合404レスポンスが返却されること() {
-        String body = START_BOUNDARY + retrieveDeleteBody("notExists('testBatch1')")
+        String body = START_BOUNDARY + BatchUtils.retrieveDeleteBody("notExists('testBatch1')")
                 + END_BOUNDARY;
 
         // リクエスト実行
@@ -1568,7 +1580,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                 .statusCode(HttpStatus.SC_ACCEPTED);
 
         // レスポンスボディのチェック
-        String expectedBody = START_BOUNDARY + retrieveChangeSetResErrorBody(HttpStatus.SC_NOT_FOUND)
+        String expectedBody = START_BOUNDARY + BatchUtils.retrieveChangeSetResErrorBody(HttpStatus.SC_NOT_FOUND)
                 + END_BOUNDARY;
         checkBatchResponseBody(response, expectedBody);
     }
@@ -1584,7 +1596,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                 .getMessage();
 
         String body = START_BOUNDARY
-                + retrievePostBody(path, "id0001")
+                + BatchUtils.retrievePostBody(path, "id0001")
                 + END_BOUNDARY;
         Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -1610,7 +1622,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                 .getMessage();
 
         String body = START_BOUNDARY
-                + retrievePutBody(path)
+                + BatchUtils.retrievePutBody(path)
                 + END_BOUNDARY;
         Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -1636,7 +1648,7 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
                 .getMessage();
 
         String body = START_BOUNDARY
-                + retrieveDeleteBody(path)
+                + BatchUtils.retrieveDeleteBody(path)
                 + END_BOUNDARY;
         Http.request("box/odatacol/batch.txt")
                 .with("cell", cellName)
@@ -1699,7 +1711,8 @@ public class UserDataBatchTest extends AbstractUserDataBatchTest {
     private TResponse requestBatchPost(final int offset, final int count) {
         StringBuilder sbuf = new StringBuilder();
         for (int i = 0; i < count; i++) {
-            sbuf.append(START_BOUNDARY + retrievePostBody("Supplier", String.format("testBatch%02d", i + offset)));
+            sbuf.append(START_BOUNDARY
+                + BatchUtils.retrievePostBody("Supplier", String.format("testBatch%02d", i + offset)));
         }
         sbuf.append(END_BOUNDARY);
 
