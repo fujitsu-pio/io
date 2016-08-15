@@ -71,10 +71,10 @@ public class EntityContainer {
         }
 
         if (!isDefaultEntityContainer.equals(entityContainer.isDefaultEntityContainer)) {
-            Edmx.printResult(this
-                    , "IsDefaultEntityContainer"
-                    , entityContainer.isDefaultEntityContainer
-                    , isDefaultEntityContainer);
+            Edmx.printResult(this,
+                    "IsDefaultEntityContainer",
+                    entityContainer.isDefaultEntityContainer,
+                    isDefaultEntityContainer);
             return false;
         }
 

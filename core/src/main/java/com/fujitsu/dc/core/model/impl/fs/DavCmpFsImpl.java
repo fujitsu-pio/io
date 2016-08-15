@@ -267,7 +267,7 @@ public class DavCmpFsImpl implements DavCmp {
     }
 
     /**
-     * @return ETag文字列.
+     * @return ETag String with double quote signs.
      */
     @Override
     public String getEtag() {
@@ -618,16 +618,10 @@ public class DavCmpFsImpl implements DavCmp {
 
         // response
         return javax.ws.rs.core.Response.ok().status(HttpStatus.SC_NO_CONTENT).header(HttpHeaders.ETAG, this.getEtag());
-
     }
 
     @Override
-    public final ResponseBuilder get(final String ifNoneMatch, final String rangeHeaderField) {
-        String storedEtag = this.getEtag();
-        // ifNoneMatchヘッダの内容がマッチしたら Not-Modifiedを返す.
-        if (storedEtag.equals(ifNoneMatch)) {
-            return javax.ws.rs.core.Response.notModified().header(HttpHeaders.ETAG, storedEtag);
-        }
+    public final ResponseBuilder get(final String rangeHeaderField) {
 
         String contentType = this.getContentType();
 
@@ -867,7 +861,7 @@ public class DavCmpFsImpl implements DavCmp {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            // ★UNLOCK
+            // UNLOCK
             lock.release();
             log.debug("unlock");
         }

@@ -29,11 +29,11 @@ public class Account {
     }
 
     /**
-     * Type値　basic.
+     * Type値 basic.
      */
     public static final String TYPE_VALUE_BASIC = "basic";
     /**
-     * Type値　oidc:google.
+     * Type値 oidc:google.
      */
     public static final String TYPE_VALUE_OIDC_GOOGLE = "oidc:google";
 
@@ -42,7 +42,7 @@ public class Account {
      * 有効なType値の配列.
      */
     public static final String[] SUPPORTED_TYPE_VALUES = new String[] {
-    	TYPE_VALUE_BASIC, TYPE_VALUE_OIDC_GOOGLE
+        TYPE_VALUE_BASIC, TYPE_VALUE_OIDC_GOOGLE
     };
 
     /**
@@ -72,7 +72,7 @@ public class Account {
      */
     public static final EdmProperty.Builder P_TYPE = EdmProperty.newBuilder("Type").setType(EdmSimpleType.STRING)
             .setDefaultValue(TYPE_VALUE_BASIC).setAnnotations(Common.DC_FORMAT_ACCOUNT_TYPE);
-    
+
     /**
      * Cellプロパティの定義体.
      */

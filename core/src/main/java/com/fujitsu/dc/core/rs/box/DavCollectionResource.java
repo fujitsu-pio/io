@@ -49,7 +49,7 @@ public final class DavCollectionResource {
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param parent 親
      * @param davCmp 部品
      */

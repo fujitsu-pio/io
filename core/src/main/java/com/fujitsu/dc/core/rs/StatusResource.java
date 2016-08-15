@@ -37,7 +37,6 @@ import com.fujitsu.dc.core.model.impl.es.EsModel;
  * StatusResourceに対応するJAX-RS Resource クラス.
  */
 public class StatusResource {
-    /** ログ. */
     static Logger log = LoggerFactory.getLogger(StatusResource.class);
     /** リクエスト送信先URLを取得するプロパティのキー. */
     public static final String PROP_TARGET_URL = "com.fujitsu.dc.test.target";

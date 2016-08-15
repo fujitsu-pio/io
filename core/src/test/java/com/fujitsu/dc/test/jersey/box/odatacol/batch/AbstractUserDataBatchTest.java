@@ -33,7 +33,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 /**
  * UserData $batchテスト用の抽象クラス.
  */
-public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {    
+public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {
     String cellName = Setup.TEST_CELL1;
     String boxName = Setup.TEST_BOX1;
     String colName = Setup.TEST_ODATA;
@@ -68,9 +68,11 @@ public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {
         List<ODataResponse> odResAc = parser.parse(res.getBody(), arrResBody[0]);
 
         // check if # parts equals
-        assertTrue("inconsistent #Parts. #expected=" + odResEx.size() + ", while #actual=" + odResAc.size(),  odResAc.size() == odResEx.size());
+        assertTrue("inconsistent #Parts. #expected="
+            + odResEx.size()
+            + ", while #actual=" + odResAc.size(),  odResAc.size() == odResEx.size());
 
-        for (int i = 0 ; i < odResEx.size(); i++) {
+        for (int i = 0; i < odResEx.size(); i++) {
             ODataResponse resEx = odResEx.get(i);
             ODataResponse resAc = odResAc.get(i);
             // should be same status code
@@ -82,8 +84,9 @@ public abstract class AbstractUserDataBatchTest extends AbstractUserDataTest {
                 String hValueAc = resAc.getHeader(headerKey);
                 Pattern p = Pattern.compile(hValueEx);
                 Matcher m = p.matcher(hValueAc);
-                assertTrue("Header " + headerKey + " should match.\n\n Expected\n" + hValueEx + "\nActual\n" + hValueAc, 
-                        hValueEx.equals(hValueAc) || m.matches());
+                assertTrue("Header " + headerKey
+                    + " should match.\n\n Expected\n" + hValueEx + "\nActual\n" + hValueAc,
+                    hValueEx.equals(hValueAc) || m.matches());
             }
         }
         // assertFalse("res body shorter than expected", arrResBody.length < arrExpResBody.length);

@@ -50,7 +50,7 @@ public class TestMethodUtils {
      */
     public static void aclResponseTest(Element doc, String resorce,
             List<Map<String, List<String>>> list, int responseIndex, String baseUrl, String requireSchamaAuthz) {
-    	String xmlStr = DcCoreUtils.nodeToString(doc);
+        String xmlStr = DcCoreUtils.nodeToString(doc);
         NodeList response = doc.getElementsByTagName("response");
         assertEquals(responseIndex, response.getLength());
         Element node = (Element) response.item(0);

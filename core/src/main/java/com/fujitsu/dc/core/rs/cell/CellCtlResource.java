@@ -51,7 +51,7 @@ public final class CellCtlResource extends ODataResource {
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param accessContext AccessContext
      * @param dcCredHeader X-Dc-Credentialヘッダ
      * @param davRsCmp davRsCmp

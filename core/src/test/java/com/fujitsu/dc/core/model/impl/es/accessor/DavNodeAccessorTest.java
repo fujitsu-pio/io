@@ -102,7 +102,7 @@ public class DavNodeAccessorTest {
      */
     class JdbcAdsMock extends JdbcAds {
 
-        public JdbcAdsMock() throws Exception {
+        JdbcAdsMock() throws Exception {
             super();
         }
 
@@ -128,7 +128,7 @@ public class DavNodeAccessorTest {
      */
     class JdbcAdsMockDavNodeAccessor extends DavNodeAccessor {
 
-        public JdbcAdsMockDavNodeAccessor(EsIndex index, String name, String routingId) throws Exception {
+        JdbcAdsMockDavNodeAccessor(EsIndex index, String name, String routingId) throws Exception {
             super(index, name, routingId);
         }
 

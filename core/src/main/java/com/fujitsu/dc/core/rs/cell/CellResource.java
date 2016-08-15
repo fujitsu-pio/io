@@ -64,10 +64,6 @@ import com.fujitsu.dc.core.rs.box.BoxResource;
  *  logics for the url path /{cell name}.
  */
 public final class CellResource {
-
-    /**
-     * logger.
-     */
     static Logger log = LoggerFactory.getLogger(CellResource.class);
 
     Cell cell;

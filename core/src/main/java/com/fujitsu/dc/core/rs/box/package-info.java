@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 /**
- * BoxレベルのJAX-RSのResourceクラス群.
+ * Box-level JAX-RS Resource classes.
  */
 package com.fujitsu.dc.core.rs.box;

@@ -62,17 +62,13 @@ import com.fujitsu.dc.core.utils.ResourceUtils;
  * Box以下の存在しないパスを担当するJAX-RSリソース.
  */
 public class NullResource {
-
-    /**
-     * ログ.
-     */
     static Logger log = LoggerFactory.getLogger(NullResource.class);
 
     DavRsCmp davRsCmp;
     boolean isParentNull;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param parent 親リソース
      * @param davCmp バックエンド実装に依存する処理を受け持つ部品
      * @param isParentNull 親がNullResourceかを判別する

@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 /**
- * モデルオブジェクトを扱うパッケージ.
+ * Model Objects.
  */
 package com.fujitsu.dc.core.model;

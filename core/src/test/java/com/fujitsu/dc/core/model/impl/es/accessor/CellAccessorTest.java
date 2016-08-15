@@ -90,7 +90,7 @@ public class CellAccessorTest {
      */
     class JdbcAdsMock extends JdbcAds {
 
-        public JdbcAdsMock() throws Exception {
+        JdbcAdsMock() throws Exception {
             super();
         }
 

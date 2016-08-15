@@ -52,7 +52,7 @@ public class AuthzTest {
      */
     class AuthzEndPointResourceMock extends AuthzEndPointResource {
 
-        public AuthzEndPointResourceMock(Cell cell, DavRsCmp davRsCmp) {
+        AuthzEndPointResourceMock(Cell cell, DavRsCmp davRsCmp) {
             super(null, null);
         }
 

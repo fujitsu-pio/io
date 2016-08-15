@@ -33,40 +33,40 @@ import com.fujitsu.dc.core.odata.DcODataProducer;
 
 
 /**
- * JaxRS Resource オブジェクトから処理の委譲を受けてDav関連の永続化処理を行うインターフェース.
+ * An delegate object interface for JaxRS Resources handling DAV related persistence.
  */
 public interface DavCmp {
     /**
-     * 存在しないパスを表すType.
+     * Type representing non-existing path.
      */
     String TYPE_NULL = "null";
     /**
-     * プレーンなWebDAVコレクションを表すType.
+     * Type representing a plain WebDAV collection.
      */
     String TYPE_COL_WEBDAV = "col.webdav";
     /**
-     * ODataSvcとして拡張されたWebDAVコレクションを表すType.
+     * Type representing a WebDAV Collection extended as ODataSvc.
      */
     String TYPE_COL_ODATA = "col.odata";
     /**
-     * Boxとして拡張されたWebDAVコレクションを表すType.
+     * Type representing a WebDAV Collection extended as Box.
      */
     String TYPE_COL_BOX = "col.box";
     /**
-     * Engine Serviceとして拡張されたWebDAVコレクションを表すType.
+     * Type representing a WebDAV Collection extended as Engine Service.
      */
     String TYPE_COL_SVC = "col.svc";
     /**
-     * WebDAVファイルを表すType.
+     * Type representing a WebDAV file.
      */
     String TYPE_DAV_FILE = "dav.file";
     /**
-     * Cellを表すType.
+     * Type representing Cell.
      */
     String TYPE_CELL = "Cell";
 
     /**
-     * サービスのソースコレクション.
+     * source path for Engine service.
      */
     String SERVICE_SRC_COLLECTION = "__src";
 
@@ -88,25 +88,22 @@ public interface DavCmp {
     void loadAndCheckDavInconsistency();
 
     /**
-     * ACLのgetter.
      * @return acl
      */
     Acl getAcl();
 
     /**
-     * @return acl
+     * @return properties
      */
     Map<String, String> getProperties();
 
     /**
-     * Cellのgetter.
      * @return Cell
      */
     Cell getCell();
 
     /**
-     * Boxのgetter.
-     * @return Cell
+     * @return Box
      */
     Box getBox();
 
@@ -250,7 +247,7 @@ public interface DavCmp {
     ResponseBuilder unlinkChild(String name, Long asof);
 
     /**
-     * PROPPATCHメソッドの処理.
+     * process PROPPATCH method.
      * @param propUpdate PROPPATCH要求オブジェクト
      * @param url URL
      * @return 応答オブジェクト
@@ -258,7 +255,7 @@ public interface DavCmp {
     Multistatus proppatch(Propertyupdate propUpdate, String url);
 
     /**
-     * 削除処理を行う.
+     * process DELETE method.
      * @param ifMatch If-Matchヘッダ
      * @param recursive set true to process recursively
      * @return JAX-RS ResponseBuilder
@@ -266,12 +263,11 @@ public interface DavCmp {
     ResponseBuilder delete(String ifMatch, boolean recursive);
 
     /**
-     * GETメソッドを処理する.
-     * @param ifNoneMatch If-None-Matchヘッダ
+     * process GET method.
      * @param rangeHeaderField Rangeヘッダ
      * @return JAX-RS ResponseBuilder
      */
-    ResponseBuilder get(String ifNoneMatch, String rangeHeaderField);
+    ResponseBuilder get(String rangeHeaderField);
 
     /**
      * データ操作用ODataProducerを返します.
@@ -287,13 +283,14 @@ public interface DavCmp {
     DcODataProducer getSchemaODataProducer(Cell cell);
 
     /**
-     * @return ETag文字列.
+     * @return ETag String.
      */
     String getEtag();
 
+
     /**
      * MOVE処理を行う.
-     * @param etag ETag値
+     * @param etag ETag value
      * @param overwrite 移動先のリソースを上書きするかどうか
      * @param davDestination 移動先の階層情報
      * @return ResponseBuilder レスポンス

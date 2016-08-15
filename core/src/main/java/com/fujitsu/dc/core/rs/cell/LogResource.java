@@ -88,7 +88,7 @@ public class LogResource {
     static Logger log = LoggerFactory.getLogger(LogResource.class);
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param cell Cell
      * @param accessContext AccessContext
      * @param davRsCmp DavRsCmp
