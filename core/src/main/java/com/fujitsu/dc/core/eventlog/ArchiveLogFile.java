@@ -28,7 +28,7 @@ public class ArchiveLogFile {
     private String url;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param created 作成日時
      * @param updated 更新日時
      * @param size サイズ

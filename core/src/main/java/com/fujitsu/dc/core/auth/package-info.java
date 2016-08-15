@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 /**
- * 認証関連クラス.
+ * classes for authentication / authorization.
  */
 package com.fujitsu.dc.core.auth;

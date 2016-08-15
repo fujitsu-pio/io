@@ -43,7 +43,7 @@ public class DcEngineSourceCollection {
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param parent 親リソース
      * @param davCmp バックエンド実装に依存する処理を受け持つ部品
      */

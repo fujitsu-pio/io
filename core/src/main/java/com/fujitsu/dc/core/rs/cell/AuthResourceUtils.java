@@ -36,14 +36,10 @@ import com.fujitsu.dc.core.model.lock.AccountLockManager;
  * リソースクラスで汎用的に利用するメソッドを定義するユーティリティクラス.
  */
 public class AuthResourceUtils {
-
-    /**
-     * ログ.
-     */
     static Logger log = LoggerFactory.getLogger(AuthResourceUtils.class);
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     protected AuthResourceUtils() {
     }

@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 /**
- * イベントログ関連のクラス群.
+ * classes for Event Logging.
  */
 package com.fujitsu.dc.core.eventlog;

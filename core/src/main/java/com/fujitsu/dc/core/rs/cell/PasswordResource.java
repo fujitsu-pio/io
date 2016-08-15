@@ -43,9 +43,6 @@ public class PasswordResource {
     AccessContext accessContext;
     Cell cell;
 
-    /**
-     * ログ.
-     */
     static Logger log = LoggerFactory.getLogger(PasswordResource.class);
 
     private String key;
@@ -54,7 +51,7 @@ public class PasswordResource {
     private DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param accessContext accessContext
      * @param dcCredHeader dcCredHeader
      * @param cell cell

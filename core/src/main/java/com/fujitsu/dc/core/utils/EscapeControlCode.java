@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class EscapeControlCode {
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     private EscapeControlCode() {
     }

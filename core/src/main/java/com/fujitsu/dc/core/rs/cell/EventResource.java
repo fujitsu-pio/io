@@ -59,7 +59,7 @@ public class EventResource {
     static final Pattern REQUEST_KEY_PATTERN = Pattern.compile("[\\p{Alpha}\\p{Digit}_-]*");
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param cell Cell
      * @param accessContext AccessContext
      * @param davRsCmp DavRsCmp

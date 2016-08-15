@@ -56,7 +56,6 @@ import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.BoxCmp;
 import com.fujitsu.dc.core.model.BoxRsCmp;
 import com.fujitsu.dc.core.model.Cell;
-import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.Event;
@@ -79,7 +78,6 @@ public final class BoxResource {
     Box box;
     AccessContext accessContext;
     DavRsCmp davRsCmp;
-    DavCmp davCmp;
     DavRsCmp cellRsCmp; // for box Install
 
     /**
@@ -110,7 +108,7 @@ public final class BoxResource {
         this.cellRsCmp = cellRsCmp;
         if (this.box != null) {
             //BoxCmp is necessary only if this Box exists
-            this.davCmp = ModelFactory.boxCmp(this.box);
+            BoxCmp davCmp = ModelFactory.boxCmp(this.box);
             this.davRsCmp = new BoxRsCmp(davCmp, this.cell, this.accessContext, this.box);
         } else {
             //This box does not exist.
@@ -130,10 +128,6 @@ public final class BoxResource {
 
     }
 
-    /*
-     * このリソースのURLを返します. 本クラスではBoxのURLが返ります。
-     * @see com.fujitsu.dc.core.rs.box.AbstractDavResource#getPathList()
-     */
 
     /**
      * 現在のリソースの一つ下位パスを担当するJax-RSリソースを返す.
@@ -173,7 +167,7 @@ public final class BoxResource {
      * @return BoxCmp Object
      */
     public BoxCmp getCmp() {
-        return (BoxCmp) this.davCmp;
+        return (BoxCmp) this.davRsCmp.getDavCmp();
     }
 
     /**

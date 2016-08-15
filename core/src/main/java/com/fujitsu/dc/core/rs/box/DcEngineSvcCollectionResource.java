@@ -71,9 +71,6 @@ import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
  * DcEngineSvcCollectionResourceを担当するJAX-RSリソース.
  */
 public final class DcEngineSvcCollectionResource {
-    /**
-     * ログ用オブジェクト.
-     */
     private static Logger log = LoggerFactory.getLogger(DcEngineSvcCollectionResource.class);
 
     DavCmp davCmp = null;
@@ -81,7 +78,7 @@ public final class DcEngineSvcCollectionResource {
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param parent DavRsCmp
      * @param davCmp DavCmp
      */

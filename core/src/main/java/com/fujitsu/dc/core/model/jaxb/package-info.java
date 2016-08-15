@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * 本アプリで扱うJAXBオブジェクトを格納するパッケージ.
+ * package to store JAXB objects.
  */
 // Package level annotation
 // このアノテーションで以下の名前空間のプレフィックスのマッピング設定する

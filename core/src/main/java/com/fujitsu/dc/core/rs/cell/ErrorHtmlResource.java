@@ -40,14 +40,10 @@ import com.fujitsu.dc.core.auth.OAuth2Helper.Key;
  * HTMLによるエラーレスポンス処理を司るJAX-RSリソース.
  */
 public class ErrorHtmlResource {
-
-    /**
-     * ログ.
-     */
     static Logger log = LoggerFactory.getLogger(ErrorHtmlResource.class);
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     public ErrorHtmlResource() {
     }
