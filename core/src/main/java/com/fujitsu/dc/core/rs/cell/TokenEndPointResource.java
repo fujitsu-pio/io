@@ -16,7 +16,7 @@
  */
 package com.fujitsu.dc.core.rs.cell;
 
-import static com.fujitsu.dc.common.auth.token.AbstractOAuth2Token.*;
+import static com.fujitsu.dc.common.auth.token.AbstractOAuth2Token.MILLISECS_IN_AN_HOUR;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -120,6 +120,7 @@ public class TokenEndPointResource {
      * @param clientId クエリパラメタ
      * @param clientSecret クエリパラメタ
      * @param dcCookie クエリパラメタ
+     * @param idToken IDトークン
      * @param host Hostヘッダ
      * @return JAX-RS Response Object
      */
@@ -182,7 +183,7 @@ public class TokenEndPointResource {
         }
     }
 
-	private String checkDcTarget(final String dcTarget) {
+    private String checkDcTarget(final String dcTarget) {
         String target = dcTarget;
         if (target != null) {
             try {
@@ -257,7 +258,7 @@ public class TokenEndPointResource {
         if (!id.equals(tcToken.getIssuer())) {
             throw DcCoreAuthnException.CLIENT_SERCRET_ISSUER_MISMATCH.realm(cell.getUrl());
         }
-        
+
         // トークンのターゲットが自分でない場合はエラー応答
         if (!tcToken.getTarget().equals(cell.getUrl())) {
             throw DcCoreAuthnException.CLIENT_SERCRET_TARGET_WRONG.realm(cell.getUrl());
@@ -507,14 +508,14 @@ public class TokenEndPointResource {
         if (oew == null) {
             throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
         }
-        
+
         // Typeの値確認
         if (!AuthUtils.isAccountTypeBasic(oew)) {
-        	//アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
-        	DcCoreLog.Auth.UNSUPPORTED_ACCOUNT_GRANT_TYPE.params(Account.TYPE_VALUE_BASIC, username).writeLog();;
+            //アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
+            DcCoreLog.Auth.UNSUPPORTED_ACCOUNT_GRANT_TYPE.params(Account.TYPE_VALUE_BASIC, username).writeLog();
             throw DcCoreAuthnException.AUTHN_FAILED.realm(this.cell.getUrl());
-        }        
-        
+        }
+
         // 最終ログイン時刻を更新するために、UUIDをクラス変数にひかえておく
         accountId = (String) oew.getUuid();
 
@@ -537,9 +538,9 @@ public class TokenEndPointResource {
         return issueToken(target, owner, host, schema, username);
     }
 
-	private Response issueToken(final String target, final String owner,
-			final String host, final String schema, final String username) {
-		long issuedAt = new Date().getTime();
+    private Response issueToken(final String target, final String owner,
+        final String host, final String schema, final String username) {
+        long issuedAt = new Date().getTime();
 
         if (Key.TRUE_STR.equals(owner)) {
             // ユニット昇格権限設定のチェック
@@ -578,7 +579,7 @@ public class TokenEndPointResource {
                     target, roleList, schema);
             return this.responseAuthSuccess(tcToken, rToken);
         }
-	}
+    }
 
     /**
      * OPTIONSメソッド.
@@ -601,64 +602,65 @@ public class TokenEndPointResource {
      */
 
     private Response receiveIdTokenGoogle(String target, String dcOwner,
-			String schema, String username, String idToken, String host) {
+        String schema, String username, String idToken, String host) {
 
-    	// usernameのCheck処理
-    	//　暫定的にインターフェースとしてusernameを無視する仕様とした
+        // usernameのCheck処理
+        // 暫定的にインターフェースとして(username)を無視する仕様とした
         /*if (username == null) {
             throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.USERNAME);
         }*/
-    	// id_tokenのCheck処理
+        // id_tokenのCheck処理
         if (idToken == null) {
             throw DcCoreAuthnException.REQUIRED_PARAM_MISSING.realm(this.cell.getUrl()).params(Key.ID_TOKEN);
         }
+
         // id_tokenをパースする
         IdToken idt = IdToken.parse(idToken);
-        
+
         // Tokenに有効期限(exp)があるかnullチェック
-        if (idt.exp == null) {
-    		throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN.params("ID Token expiration time null.");  	
+        if (idt.getExp() == null) {
+            throw DcCoreAuthnException.OIDC_INVALID_ID_TOKEN.params("ID Token expiration time null.");
         }
-        
+
         // Tokenの検証。検証失敗したらDcCoreAuthnExceptionが投げられる
         idt.verify();
-        
+
         // Token検証成功時
-    	String mail = idt.email;
-    	String aud  = idt.audience;
-    	String issuer = idt.issuer;
+        String mail = idt.getEmail();
+        String aud  = idt.getAudience();
+        String issuer = idt.getIssuer();
 
-    	// issuerがGoogleが認めたものであるかどうか
-    	if (!issuer.equals("accounts.google.com") && !issuer.equals("https://accounts.google.com")) {
-        	DcCoreLog.OIDC.INVALID_ISSUER.params(issuer).writeLog();
-    		throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
-    	}
-    	
-    	// Googleに登録したサービス/アプリのClientIDかを確認
-    	// DcConfigPropatiesに登録したClientIdに一致していればOK
-    	if (!OIDC.isGoogleClientIdTrusted(aud)) {
-        	throw DcCoreAuthnException.OIDC_WRONG_AUDIENCE.params(aud);    		
-    	}
+        // issuerがGoogleが認めたものであるかどうか
+        if (!issuer.equals("accounts.google.com") && !issuer.equals("https://accounts.google.com")) {
+            DcCoreLog.OIDC.INVALID_ISSUER.params(issuer).writeLog();
+            throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
+        }
 
-    	// このユーザー名がアカウント登録されているかを確認
-    	// IDtokenの中に示されているAccountが存在しない場合
+        // Googleに登録したサービス/アプリのClientIDかを確認
+        // DcConfigPropatiesに登録したClientIdに一致していればOK
+        if (!OIDC.isGoogleClientIdTrusted(aud)) {
+            throw DcCoreAuthnException.OIDC_WRONG_AUDIENCE.params(aud);
+        }
+
+        // このユーザー名がアカウント登録されているかを確認
+        // IDtokenの中に示されているAccountが存在しない場合
         OEntityWrapper idTokenUserOew = this.cell.getAccount(mail);
         if (idTokenUserOew == null) {
-        	//アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
-        	DcCoreLog.OIDC.NO_SUCH_ACCOUNT.params(mail).writeLog();
-            throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
-        }
-                
-    	// アカウントタイプがoidc:googleになっているかを確認。
-        // Account があるけどTypeにOidCが含まれていない
-        if (!AuthUtils.isAccountTypeOidcGoogle(idTokenUserOew)) {
-        	//アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
-           	DcCoreLog.OIDC.UNSUPPORTED_ACCOUNT_GRANT_TYPE.params(Account.TYPE_VALUE_OIDC_GOOGLE, mail).writeLog();
+            //アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
+            DcCoreLog.OIDC.NO_SUCH_ACCOUNT.params(mail).writeLog();
             throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
         }
 
-    	// トークンを発行
+        // アカウントタイプがoidc:googleになっているかを確認。
+        // Account があるけどTypeにOidCが含まれていない
+        if (!AuthUtils.isAccountTypeOidcGoogle(idTokenUserOew)) {
+            //アカウントの存在確認に悪用されないように、失敗の旨のみのエラー応答
+            DcCoreLog.OIDC.UNSUPPORTED_ACCOUNT_GRANT_TYPE.params(Account.TYPE_VALUE_OIDC_GOOGLE, mail).writeLog();
+            throw DcCoreAuthnException.OIDC_AUTHN_FAILED;
+        }
+
+        // トークンを発行
         return this.issueToken(target, dcOwner, host, schema, mail);
-	}
+    }
 
 }

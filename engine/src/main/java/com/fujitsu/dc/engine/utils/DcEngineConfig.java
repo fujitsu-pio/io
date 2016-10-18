@@ -35,13 +35,13 @@ public class DcEngineConfig {
     /**
      * dc-config.propertiesの設定ファイルパスキー.
      */
-    static final String KEY_CONFIG_FILE = "com.fujitsu.dc.configurationFile";
+    static final String KEY_CONFIG_FILE = "io.personium.configurationFile";
 
     /**
      * 本アプリで使うプロパティキーのプレフィクス.
      */
-    static final String KEY_ROOT = "com.fujitsu.dc.core.";
-    static final String COMPATIBLE_KEY_ROOT = "com.fujitsu.dc.engine.";
+    static final String KEY_ROOT = "io.personium.core.";
+    static final String COMPATIBLE_KEY_ROOT = "io.personium.engine.";
 
     // For property compatibility.
     // Previous version of personium.io engine module had been used property names

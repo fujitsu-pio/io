@@ -11,7 +11,7 @@ Authorization: Bearer ${token}
     xmlns:dc="urn:x-dc1:xmlns"
     dc:requireSchemaAuthz="${level}">
     <D:ace>
-    	<D:principal>
+        <D:principal>
             <D:href>${role}</D:href>
         </D:principal>
         <D:grant>

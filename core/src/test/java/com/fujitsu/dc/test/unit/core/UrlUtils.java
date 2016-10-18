@@ -32,7 +32,7 @@ import com.fujitsu.dc.core.model.ctl.SentMessage;
 public final class UrlUtils {
 
     /** リクエスト送信先URLを取得するプロパティのキー. */
-    public static final String PROP_TARGET_URL = "com.fujitsu.dc.test.target";
+    public static final String PROP_TARGET_URL = "io.personium.test.target";
     /** デフォルトのリクエスト送信先URL. */
     public static final String DEFAULT_TARGET_URL = "http://localhost:9998";
 

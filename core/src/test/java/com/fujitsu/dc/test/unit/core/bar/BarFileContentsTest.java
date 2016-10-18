@@ -104,7 +104,7 @@ public class BarFileContentsTest {
         Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
 
-        
+
         String key = "bar/90_contents/" + ODATA_COL_NAME;
         odataCols.put(key, odataCol);
 
@@ -140,7 +140,7 @@ public class BarFileContentsTest {
         Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
-        
+
         String entryName = "bar/90_contents/odataCol/90_data/entityType/1.json";
 
         String key = "bar/90_contents/" + odatacolName;
@@ -177,7 +177,7 @@ public class BarFileContentsTest {
         Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
 
-        
+
         String entryName = "bar/90_contents/davCol/" + odatacolName;
 
         String key = "bar/90_contents/davCol/" + odatacolName;
@@ -215,7 +215,7 @@ public class BarFileContentsTest {
         Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
-        
+
         String key = "bar/90_contents/" + odatacolName;
         odataCols.put(key, odataCol);
 
@@ -247,11 +247,11 @@ public class BarFileContentsTest {
         DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
         DavCmp webDavCol = newDavCmp(WEBDAV_COL_NAME);
         DavCmp svcCol = newDavCmp(SVC_COL_NAME);
-        
+
         Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
-        
+
         String key = "bar/90_contents/" + odatacolName;
         odataCols.put(key, odataCol);
 
@@ -289,7 +289,7 @@ public class BarFileContentsTest {
         Map<String, DavCmp> odataCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> webDavCols = new HashMap<String, DavCmp>();
         Map<String, DavCmp> svcCols = new HashMap<String, DavCmp>();
-        
+
         String key = "bar/90_contents/" + odatacolName;
         odataCols.put(key, odataCol);
 
@@ -388,7 +388,7 @@ public class BarFileContentsTest {
 
         String key = "bar/90_contents/odataCol/";
         DavCmp odataCol = newDavCmp(ODATA_COL_NAME);
-        
+
         Map<String, DavCmp> odataCols = new HashMap<>();
         odataCols.put(key, odataCol);
 

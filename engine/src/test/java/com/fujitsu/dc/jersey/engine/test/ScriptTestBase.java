@@ -55,23 +55,23 @@ public abstract class ScriptTestBase extends JerseyTest {
     /** デフォルトのリクエスト送信先URL. */
     public static final String DEFAULT_TARGET_URL = "http://localhost:8080/dc1-core";
     /** リクエスト送信先URLを取得するプロパティのキー. */
-    public static final String PROP_TARGET_URL = "com.fujitsu.dc.test.target";
+    public static final String PROP_TARGET_URL = "io.personium.test.target";
     /** システムプロパティから接続先のURLを取得する。 指定がない場合はデフォルトのURLを使用する. */
     static String baseUrl = System.getProperty(PROP_TARGET_URL, DEFAULT_TARGET_URL);
     /** サービステスト実施フラグ. */
-    public static final String PROP_SERVICE_CALL_TEST_FLAG = "com.fujitsu.dc.test.service";
+    public static final String PROP_SERVICE_CALL_TEST_FLAG = "io.personium.test.service";
     /** システムプロパティからサービステストの実施フラグを取得する。 指定がない場合はFalseを使用する. */
     static boolean isServiceTest = Boolean.parseBoolean(System.getProperty(PROP_SERVICE_CALL_TEST_FLAG, "false"));
     /** マスタートークン無し運用時、最初のCellは、ユニットユーザー管理Cellにて発行したトークンを利用. */
-    public static final String PROP_UNITUSER_CELL = "com.fujitsu.dc.test.unituser.cell";
+    public static final String PROP_UNITUSER_CELL = "io.personium.test.unituser.cell";
     /** システムプロパティからユニットユーザーCell(URL)を取得する。 指定がない場合は未指定を意味する空文字をセットする. */
     private static String unitUserCell = System.getProperty(PROP_UNITUSER_CELL, "");
     /** ユニットユーザー管理Cellのアカウント. */
-    public static final String PROP_UNITUSER_CELL_ACCOUNT = "com.fujitsu.dc.test.unituser.account";
+    public static final String PROP_UNITUSER_CELL_ACCOUNT = "io.personium.test.unituser.account";
     /** システムプロパティからユニットユーザーCell(URL)を取得する。 指定がない場合は未指定を意味する空文字をセットする. */
     private static String unitUserAccount = System.getProperty(PROP_UNITUSER_CELL_ACCOUNT, "");
     /** ユニットユーザー管理Cellのパスワード. */
-    public static final String PROP_UNITUSER_CELL_PASSWORD = "com.fujitsu.dc.test.unituser.password";
+    public static final String PROP_UNITUSER_CELL_PASSWORD = "io.personium.test.unituser.password";
     /** システムプロパティからユニットユーザーCell(URL)を取得する。 指定がない場合は未指定を意味する空文字をセットする. */
     private static String unitUserPassword = System.getProperty(PROP_UNITUSER_CELL_PASSWORD, "");
     /** 基底URLが格納されているヘッダ名. */

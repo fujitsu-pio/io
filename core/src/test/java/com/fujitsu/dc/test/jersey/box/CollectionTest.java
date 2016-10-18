@@ -1524,8 +1524,7 @@ public class CollectionTest extends JerseyTest {
 
                     // ACLの設定
                     DavResourceUtils.setACLwithBox(testcell, token, HttpStatus.SC_OK,
-                            path, "", "box/acl-setting.txt", role, path, "<D:write/>"
-                            , "");
+                            path, "", "box/acl-setting.txt", role, path, "<D:write/>", "");
 
                     // ACLの確認
                     TResponse tresponseWebDav = CellUtils.propfind(testcell + "/" + path,

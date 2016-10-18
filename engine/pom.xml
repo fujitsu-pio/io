@@ -21,8 +21,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <com.fujitsu.dc.engine.jerseyTest.baseUrl>http://localhost:9998/test/</com.fujitsu.dc.engine.jerseyTest.baseUrl>
         <com.fujitsu.dc.engine.jerseyTest.useCouchdb>false</com.fujitsu.dc.engine.jerseyTest.useCouchdb>
-                <java.source.version>1.7</java.source.version>
-                <java.target.version>1.7</java.target.version>
+                <java.source.version>1.8</java.source.version>
+                <java.target.version>1.8</java.target.version>
                 <logback.version>1.0.13</logback.version>
                 <slf4j.version>1.7.6</slf4j.version>
                 <esapi.version>1_2</esapi.version>

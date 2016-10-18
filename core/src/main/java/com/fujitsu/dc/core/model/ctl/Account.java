@@ -37,7 +37,10 @@ public class Account {
      */
     public static final String TYPE_VALUE_OIDC_GOOGLE = "oidc:google";
 
-    // TODO: 対応するID providerが増えた場合は追加する
+    /**
+     * 対応するID providerが増えた場合は追加する
+     */
+
     /**
      * 有効なType値の配列.
      */

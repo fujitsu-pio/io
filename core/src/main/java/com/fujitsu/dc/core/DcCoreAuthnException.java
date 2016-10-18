@@ -138,8 +138,7 @@ public final class DcCoreAuthnException extends DcCoreException {
      * IDTokenの有効期限切れ.
      */
     public static final DcCoreAuthnException OIDC_EXPIRED_ID_TOKEN = create("PR400-AN-0033", Error.INVALID_GRANT);
-    
-    
+
     /**
      * インナークラスを強制的にロードする.
      */

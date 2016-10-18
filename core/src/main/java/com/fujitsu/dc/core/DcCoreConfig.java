@@ -39,12 +39,12 @@ public class DcCoreConfig {
     /**
      * dc-config.propertiesの設定ファイルパスキー.
      */
-    static final String KEY_CONFIG_FILE = "com.fujitsu.dc.configurationFile";
+    static final String KEY_CONFIG_FILE = "io.personium.configurationFile";
 
     /**
      * 本アプリで使うプロパティキーのプレフィクス.
      */
-    static final String KEY_ROOT = "com.fujitsu.dc.core.";
+    static final String KEY_ROOT = "io.personium.core.";
 
     /**
      * Core version設定のキー.
@@ -648,15 +648,15 @@ public class DcCoreConfig {
          * Google OpenID Connectにおいて、このユニットが信頼するClientIDを指定するためのキー.
          */
         public static final String OIDC_GOOGLE_TRUSTED_CLIENTIDS = KEY_ROOT + "oidc.google.trustedClientIds";
-        
+
         /**
          * 引数のGoogleClientIDがこのユニットが信頼するリストに含まれるかどうか判定する.
          * @param clientId ClientID
          * @return boolean 含まれる場合：True
          */
         public static boolean isGoogleClientIdTrusted(String clientId) {
-        	String val = get(OIDC_GOOGLE_TRUSTED_CLIENTIDS);
-        	//アスタリスクが指定されていたら無条件にtrue 
+            String val = get(OIDC_GOOGLE_TRUSTED_CLIENTIDS);
+            //アスタリスクが指定されていたら無条件にtrue
             return isAstarisk(val) || isSpaceSeparatedValueIncluded(val, clientId);
         }
     }
@@ -731,7 +731,7 @@ public class DcCoreConfig {
     }
 
     private static boolean isSpaceSeparatedValueIncluded(String spaceSeparatedValue, String testValue) {
-    	if (testValue == null || spaceSeparatedValue == null) {
+        if (testValue == null || spaceSeparatedValue == null) {
             return false;
         }
         String[] values = spaceSeparatedValue.split(" ");
@@ -740,16 +740,16 @@ public class DcCoreConfig {
                 return true;
             }
         }
-        return false;	
+        return false;
     }
-    
+
     private static boolean isAstarisk(String val) {
-    	if (val == null) {
+        if (val == null) {
             return false;
-        }else if ("*".equals(val)) {
-                return true;   
+        } else if ("*".equals(val)) {
+                return true;
         }
-        return false;	
+        return false;
     }
     /**
      * dc-config-default.propertiesファイルを読み込む.
@@ -1515,9 +1515,9 @@ public class DcCoreConfig {
      * @return boolean 含まれる場合：True
      */
     public static boolean checkUnitUserIssuers(String url) {
-    	return isSpaceSeparatedValueIncluded(getUnitUserIssuers(), url);    	
+        return isSpaceSeparatedValueIncluded(getUnitUserIssuers(), url);
     }
-    
+
     /**
      * EntityTypeの最大制限数を取得.
      * @return EntityTypeの最大数
@@ -1616,5 +1616,4 @@ public class DcCoreConfig {
         }
         return new int[] {};
     }
-
 }
