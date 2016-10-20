@@ -85,6 +85,6 @@ public class DcCoreConfigTest {
         } catch (IOException e) {
             fail("properties load failuer");
         }
-        assertNotNull(properties.getProperty("com.fujitsu.dc.core.masterToken"));
+        assertNotNull(properties.getProperty("io.personium.core.masterToken"));
     }
 }

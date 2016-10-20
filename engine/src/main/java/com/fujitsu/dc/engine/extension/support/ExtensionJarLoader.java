@@ -53,7 +53,7 @@ public class ExtensionJarLoader {
 
     /** Extension用 jarファイルの格納パスの基底部分を定義しているシステムプロパティキー.
      * 実際のパスはこれに、"/dc-engine/extensions"が加えられる。 */
-    public static final String ENGINE_EXTENSION_DIR_KEY = "com.fujitsu.dc.environment";
+    public static final String ENGINE_EXTENSION_DIR_KEY = "io.personium.environment";
     /** 上記システムプロパティが指定されていない場合の、既定の Extension用 jarファイルの格納パス. */
     public static final String DEFAULT_EXTENSION_DIR = "/fj";
 
