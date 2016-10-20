@@ -91,7 +91,10 @@ public class CrossDomainTest extends JerseyTest {
                         .debug();
         String body = response.getBody();
         assertNotNull(body);
-        assertEquals(CROSSDOMAIN_XML, body.replaceFirst("<!-- .*-->", ""));
+        String xml = CROSSDOMAIN_XML.replaceAll(">[\\s]*<", "><");
+        body = body.replaceFirst("<!-- .*-->", "");
+        body = body.replaceAll(">[\\s]*<", "><");
+        assertEquals(xml, body);
     }
 
     /**
