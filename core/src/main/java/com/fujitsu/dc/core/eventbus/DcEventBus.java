@@ -36,7 +36,7 @@ public class DcEventBus {
     private Logger logger;
 
     private DcEventBus() {
-        this.logger = LoggerFactory.getLogger("io.personium.core.eventbus");
+        this.logger = LoggerFactory.getLogger("com.fujitsu.dc.core.eventbus");
     }
 
     /**
