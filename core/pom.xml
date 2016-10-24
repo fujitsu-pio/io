@@ -20,7 +20,7 @@
 		<java.source.version>1.8</java.source.version>
 		<java.target.version>1.8</java.target.version>
 		<logback.version>1.0.12</logback.version>
-		<slf4j.version>1.7.4</slf4j.version>
+		<slf4j.version>1.7.6</slf4j.version>
 		<jacoco.include.package>com.fujitsu.*</jacoco.include.package>
 	</properties>
 
@@ -288,6 +288,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
 				<configuration>
 					<source>${java.source.version}</source>
 					<target>${java.target.version}</target>
