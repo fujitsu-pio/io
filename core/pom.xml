@@ -17,8 +17,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<final.name>dc1-core</final.name>
 		<esapi.version>1_2</esapi.version>
-		<java.source.version>1.7</java.source.version>
-		<java.target.version>1.7</java.target.version>
+		<java.source.version>1.8</java.source.version>
+		<java.target.version>1.8</java.target.version>
 		<logback.version>1.0.12</logback.version>
 		<slf4j.version>1.7.4</slf4j.version>
 		<jacoco.include.package>com.fujitsu.*</jacoco.include.package>
