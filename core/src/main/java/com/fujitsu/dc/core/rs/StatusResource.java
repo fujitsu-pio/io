@@ -39,7 +39,7 @@ import com.fujitsu.dc.core.model.impl.es.EsModel;
 public class StatusResource {
     static Logger log = LoggerFactory.getLogger(StatusResource.class);
     /** リクエスト送信先URLを取得するプロパティのキー. */
-    public static final String PROP_TARGET_URL = "com.fujitsu.dc.test.target";
+    public static final String PROP_TARGET_URL = "io.personium.test.target";
 
     /**
      * GETメソッドに対する処理.

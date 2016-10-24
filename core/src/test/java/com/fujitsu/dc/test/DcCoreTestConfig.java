@@ -23,7 +23,7 @@ import com.fujitsu.dc.core.DcCoreConfig;
  */
 public class DcCoreTestConfig {
 
-    private static final String PROP_TARGET_VERSION = "com.fujitsu.dc.test.target.version";
+    private static final String PROP_TARGET_VERSION = "io.personium.test.target.version";
 
     private DcCoreTestConfig() {
     }

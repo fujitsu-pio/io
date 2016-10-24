@@ -97,19 +97,33 @@ public final class AuthUtils {
         return null;
     }
 
+    /**
+     * getAccountType.
+     * @param oew oew
+     * @return List<String>
+     */
     public static List<String> getAccountType(OEntityWrapper oew) {
-    	String typeStr =  (String) oew.getProperty(Account.P_TYPE.getName()).getValue();
-    	String[] typeAry = typeStr.split(" ");
-    	return Arrays.asList(typeAry);
+        String typeStr =  (String) oew.getProperty(Account.P_TYPE.getName()).getValue();
+        String[] typeAry = typeStr.split(" ");
+        return Arrays.asList(typeAry);
     }
 
+    /**
+     * isAccountTypeBasic.
+     * @param oew oew
+     * @return List<String>
+    */
     public static boolean isAccountTypeBasic(OEntityWrapper oew) {
         return getAccountType(oew).contains(Account.TYPE_VALUE_BASIC);
     }
 
+    /**
+     * isAccountTypeOidcGoogle.
+     * @param oew oew
+     * @return List<String>
+    */
     public static boolean isAccountTypeOidcGoogle(OEntityWrapper oew) {
-    	return getAccountType(oew).contains(Account.TYPE_VALUE_OIDC_GOOGLE);
+        return getAccountType(oew).contains(Account.TYPE_VALUE_OIDC_GOOGLE);
     }
-
 
 }

@@ -300,7 +300,7 @@ public class BoxCrudTest extends ODataCommon {
         // 400になることを確認
         assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
     }
-    
+
     /**
      * BOX新規登録時にSchamaに正規化されていないパスを含むURL形式文字_http_を指定した場合_400になることを確認.
      */
@@ -316,8 +316,6 @@ public class BoxCrudTest extends ODataCommon {
         assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
     }
 
-    
-    
     /**
      * BOX新規登録時にSchemaをURL形式文字_http_を指定して場合_201になることを確認.
      */

@@ -104,7 +104,7 @@ public final class DcCoreLog {
          */
         public static final DcCoreLog UNSUPPORTED_ACCOUNT_GRANT_TYPE = create("PL-AU-0005");
     }
-    
+
     /**
      * OIDC認証関連.
      */
@@ -124,13 +124,12 @@ public final class DcCoreLog {
          * {0}：詳細メッセージ
          */
         public static final DcCoreLog INVALID_ACCOUNT = create("PL-OI-0003");
-        /**
+        /** .
          * IssuerがGoogleではない
          * {0}：詳細メッセージ
          */
         public static final DcCoreLog INVALID_ISSUER = create("PL-OI-0004");
     }
-    
 
     /**
      * サーバ内部エラー.

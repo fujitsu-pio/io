@@ -70,7 +70,7 @@ public class DcEngineConfigTest {
         } catch (IOException e) {
             fail("properties load failuer");
         }
-        assertEquals("unitTest", properties.getProperty("com.fujitsu.dc.engine.testkey"));
+        assertEquals("unitTest", properties.getProperty("io.personium.engine.testkey"));
     }
 
     /**
@@ -86,7 +86,7 @@ public class DcEngineConfigTest {
         } catch (IOException e) {
             fail("properties load failuer");
         }
-        assertEquals("unitTestDefault", properties.getProperty("com.fujitsu.dc.engine.testkey"));
+        assertEquals("unitTestDefault", properties.getProperty("io.personium.engine.testkey"));
     }
 
     /**
@@ -94,13 +94,13 @@ public class DcEngineConfigTest {
      */
     @Test
     public void com_fujitsu_dc_engnie系プロパティで定義された内容が_com_fujitsu_dc_coreプロパティとして取得できること() {
-        System.setProperty("com.fujitsu.dc.configurationFile", "src/test/resources/dc-config.properties.unit");
+        System.setProperty("io.personium.configurationFile", "src/test/resources/dc-config.properties.unit");
         DcEngineConfig.reload();
-        assertEquals("unitTest", DcEngineConfig.get("com.fujitsu.dc.engine.testkey"));
-        assertEquals("unitTest", DcEngineConfig.get("com.fujitsu.dc.core.testkey"));
+        assertEquals("unitTest", DcEngineConfig.get("io.personium.engine.testkey"));
+        assertEquals("unitTest", DcEngineConfig.get("io.personium.core.testkey"));
 
-        assertEquals("keyWithCorePrefix", DcEngineConfig.get("com.fujitsu.dc.core.testKey2"));
-        assertEquals("keyWithEnginePrefix", DcEngineConfig.get("com.fujitsu.dc.engine.testKey3"));
-        assertEquals("keyWithEnginePrefix", DcEngineConfig.get("com.fujitsu.dc.core.testKey3"));
+        assertEquals("keyWithCorePrefix", DcEngineConfig.get("io.personium.core.testKey2"));
+        assertEquals("keyWithEnginePrefix", DcEngineConfig.get("io.personium.engine.testKey3"));
+        assertEquals("keyWithEnginePrefix", DcEngineConfig.get("io.personium.core.testKey3"));
     }
 }
