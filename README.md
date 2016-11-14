@@ -1,19 +1,19 @@
 
-personium.io
+Personium
 ====
 
-An interconnectable open source BaaS(Backend as a Service) / PDS (Personal Data Store) server.
+An open source PDS (Personal Data Store) server software.
 
 http://personium.io/
 
 ## Components
 
-	core                    - Core module of personium.io
+	core                    - Core module of Personium
 	engine                  - Module to enable server-side JS execution.
 	cell-sweeper            - A batch program to delete the cells that are marked to be deleted.
 	logback                 - A logback customization to rotate the event logs.
 	logback-settings        - A shell command to run logback as a daemon process .
-	es-api-1.2              - Abstraction layer to absorb version incompatibilities of ElasticSearch.
+	es-api-2.4              - Abstraction layer to absorb version incompatibilities of ElasticSearch.
 	common                  - Common modules used in the above modules.
 	engine-extension-common - Common modules for implementing Engine Extension.
 	client-java             - Java client. Engine internally uses it.
@@ -40,16 +40,14 @@ https://github.com/personium/io/wiki
 
 ## Set up
 
-1. Try personium.io  on your machine !
+1. Try Personium  on your machine !
 
 	Please refer __io-vagrant-ansible__ page. ([io-vagrant-ansible](https://github.com/personium/io-vagrant-ansible))
 
-2. Try personium.io on your cloud !
+2. Try Personium on your cloud !
 
-	**On AWS**
-
-	Now preparing
-
+	Please refer __io-setup-ansible__ page. ([io-setup-ansible](https://github.com/personium/io-setup-ansible))
+	
 ## License
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,4 +62,4 @@ https://github.com/personium/io/wiki
 	See the License for the specific language governing permissions and
 	limitations under the License.
 
-	Copyright 2015 FUJITSU LIMITED
+	Copyright 2016 FUJITSU LIMITED
