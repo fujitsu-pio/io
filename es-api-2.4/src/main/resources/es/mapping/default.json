@@ -1,0 +1,103 @@
+{
+  "_default_": {
+    "date_detection": false,
+    "dynamic_templates": [
+      {
+        "links": {
+          "path_match": "l.*",
+          "mapping": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "match_mapping_type": "string"
+        }
+      },
+      {
+        "properties": {
+          "match": "*",
+          "mapping": {
+            "fields": {
+              "untouched": {
+                "store": true,
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            },
+            "type": "string"
+          },
+          "match_mapping_type": "string"
+        }
+      },
+      {
+        "properties_long": {
+          "match": "*",
+          "mapping": {
+            "fields": {
+              "untouched": {
+                "store": true,
+                "type": "long"
+              }
+            },
+            "index": "no",
+            "type": "long"
+          },
+          "match_mapping_type": "long"
+        }
+      },
+      {
+        "properties_double": {
+          "match": "*",
+          "mapping": {
+            "fields": {
+              "untouched": {
+                "store": true,
+                "type": "double"
+              }
+            },
+            "index": "no",
+            "type": "double"
+          },
+          "match_mapping_type": "double"
+        }
+      },
+      {
+        "properties_boolean": {
+          "match": "*",
+          "mapping": {
+            "fields": {
+              "untouched": {
+                "store": true,
+                "type": "boolean"
+              }
+            },
+            "index": "no",
+            "type": "boolean"
+          },
+          "match_mapping_type": "boolean"
+        }
+      }
+    ],
+    "properties": {
+      "b": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "n": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "c": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "p": {
+        "store": true,
+        "type": "long"
+      },
+      "u": {
+        "store": true,
+        "type": "long"
+      }
+    }
+  }
+}

@@ -658,8 +658,8 @@ public class UserDataODataProducer extends EsODataProducer {
 
     @Override
     public Map<String, Object> getLinkFieldsQuery(String entityTypeId, String id) {
-        // { "term" : { "l" : "EntityTypeの内部ID:UserDataの内部ID" }}
-        return QueryMapFactory.termQuery(OEntityDocHandler.KEY_LINK,
+        // { "term" : { "ll" : "EntityTypeの内部ID:UserDataの内部ID" }}
+        return QueryMapFactory.termQuery("ll",
                 String.format("%s:%s", entityTypeId, id));
     }
 

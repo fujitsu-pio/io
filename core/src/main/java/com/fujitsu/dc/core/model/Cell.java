@@ -56,44 +56,46 @@ public interface Cell {
     String getUrl();
 
     /**
-     * CellのOwner Unit User URIを取得します.
-     * @return Cell名
+     * It gets the URI of the Cell of the Owner Unit User.
+     * @return Cell name
      */
     String getOwner();
 
     /**
-     * CellのプレフィックスなしのUnit User名を取得します.
+     * It gets the prefix without Unit User name of the Cell.
      * @return .
      */
     String getDataBundleNameWithOutPrefix();
 
     /**
-     * CellのUnit User名を取得します.
-     * @return ユニットユーザ名
+     * It gets the Unit User name of the Cell.
+     * @return Unit User name
      */
     String getDataBundleName();
 
     /**
-     * CellのEventBusを取得します.
+     * It gets the EventBus of the Cell.
      * @return EventBus
      */
     EventBus getEventBus();
 
     /**
-     * Cellの作成時間を取得します.
+     * It gets the Cell of creation time.
      * @return time stamp of this cell creation.
      */
     long getPublished();
 
     /**
-     * 配下にデータや制御オブジェクト(Box,Account等)がない場合はtrueを返す.
-     * デフォルトボックスはあってもよい。
-     * @return 配下にデータや制御オブジェクト(Box,Account等)がない場合はtrue.
+     * Data and control objects under (Box, Account, etc.) if there is no return true..
+     * The default box may be.
+     * @return It is true if there is no data and control objects under
+     * (Box, Account, etc.).
      */
     boolean isEmpty();
 
     /**
-     * 配下にあるデータや制御オブジェクト(Box,Account等)をすべて削除する.
+     * To delete all the data and control objects in the underlying
+     * (Box, Account, etc.).
      */
     void makeEmpty();
 
@@ -105,22 +107,22 @@ public interface Cell {
     void delete(boolean recursive, String unitUserName);
 
     /**
-     * Box名を指定してBoxを取得します.
-     * @param boxName Box名
+     * Specify the Box name to get the Box.
+     * @param boxName Box name
      * @return Box
      */
     Box getBoxForName(String boxName);
 
     /**
-     * Box名を指定してBoxを取得します.
+     * Specify the Box schema to get the Box.
      * @param boxSchema box schema uri
      * @return Box
      */
     Box getBoxForSchema(String boxSchema);
 
     /**
-     * Account名を指定してAccountを取得します.
-     * @param username Account名
+     * It gets the Accounts to specify the Account name.
+     * @param username Account name
      * @return Account
      */
     OEntityWrapper getAccount(final String username);
@@ -141,9 +143,9 @@ public interface Cell {
     List<Role> getRoleListForAccount(String username);
 
     /**
-     * このCellで与えられるべきロールリストを返します.
-     * @param token トランスセルアクセストークン
-     * @return ロールリスト
+     * Returns a list of roles should be given in this cell.
+     * @param token Transformer cell access token
+     * @return Role List
      */
     List<Role> getRoleListHere(IExtRoleContainingToken token);
 
@@ -163,12 +165,12 @@ public interface Cell {
     String roleResourceUrlToId(String roleUrl, String baseUrl);
 
     /**
-     * Edm.Entity Type名.
+     * Edm.Entity Type Name.
      */
     String EDM_TYPE_NAME = "Cell";
 
     /**
-     * Nameプロパティの定義体.
+     * Name Definition of property.
      */
     EdmProperty.Builder P_PATH_NAME = EdmProperty.newBuilder("Name")
             .setNullable(false)
@@ -176,21 +178,21 @@ public interface Cell {
             .setType(EdmSimpleType.STRING);
 
     /**
-     * プロパティ一覧.
+     * Property List.
      */
     List<EdmProperty.Builder> PROPS = Collections.unmodifiableList(Arrays.asList(
             new EdmProperty.Builder[] {
                     P_PATH_NAME, Common.P_PUBLISHED, Common.P_UPDATED}
             ));
     /**
-     * キー一覧.
+     * Key List.
      */
     List<String> KEYS = Collections.unmodifiableList(Arrays.asList(
             new String[] {P_PATH_NAME.getName()}
             ));;
 
     /**
-     * Cellのエンティティタイプビルダー.
+     * EntityType Builder of the Cell.
      */
     EdmEntityType.Builder EDM_TYPE_BUILDER = EdmEntityType.newBuilder().setNamespace(Common.EDM_NS_UNIT_CTL)
             .setName(EDM_TYPE_NAME).addProperties(Enumerable.create(PROPS).toList()).addKeys(KEYS);

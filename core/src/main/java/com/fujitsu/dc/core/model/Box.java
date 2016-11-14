@@ -55,11 +55,11 @@ public final class Box {
     public Box(final Cell cell, final OEntity entity) {
         this.cell = cell;
         if (entity == null) {
-            // MAIN BOX 用の処理
+            // Process for the MAIN BOX
             this.name = Box.DEFAULT_BOX_NAME;
-            // MAIN BOX のスキーマURLは自セルのURLになる
+            // Schema URL of MAIN BOX is the URL of its own cell
             this.schema = cell.getUrl();
-            // MAIN BOX の内部IDはセルのIDと一緒にする。
+            // Internal ID of MAIN BOX will be together with the ID of the cell.
             this.id = cell.getId();
             return;
         }
@@ -75,11 +75,11 @@ public final class Box {
 
     /**
      * constructor.
-     * @param cell cellオブジェクト
-     * @param name Box名
-     * @param schema Boxスキーマ
-     * @param id Boxの内部ID
-     * @param published 作成日時
+     * @param cell Cell object
+     * @param name Box name
+     * @param schema Box schema
+     * @param id Box Internal ID
+     * @param published Date and time of creation
      */
     public Box(final Cell cell, final String name,
             final String schema, final String id, final Long published) {
@@ -91,7 +91,7 @@ public final class Box {
     }
 
     /**
-     * このBoxが属すCellを返す.
+     * It returns the Cell that this Box belongs.
      * @return Cell
      */
     public Cell getCell() {
@@ -100,23 +100,23 @@ public final class Box {
 
 
     /**
-     * このBoxのパス名を返す.
-     * @return パス名
+     * It returns the path name of this Box.
+     * @return Path name
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * このBoxのSchema URLを返す.
-     * @return Schema URL文字列
+     * It returns the Schema URL of this Box.
+     * @return Schema URL String
      */
     public String getSchema() {
         return this.schema;
     }
     /**
-     * このBoxの管理用内部IDを返す.
-     * @return ID文字列
+     * It returns the internal ID for the management of this Box.
+     * @return ID String
      */
     public String getId() {
         return this.id;
@@ -157,17 +157,17 @@ public final class Box {
         return published;
     }
 
-    // スキーマ情報
+    // Schema information
 
     /**
-     * Edm.Entity Type名.
+     * Edm.Entity Type name.
      */
     public static final String EDM_TYPE_NAME = "Box";
 
     /**
-     * Schema用のAnnotationを取得する.
-     * @param name UK名
-     * @return Annotationのリスト
+     * To get the Annotation for Schema.
+     * @param name UK Name
+     * @return Annotation List
      */
     public static List<EdmAnnotation<?>> createSchemaAnnotation(final String name) {
         List<EdmAnnotation<?>> schemaAnnotation = CtlSchema.createNamedUkAnnotation(name);
@@ -176,13 +176,13 @@ public final class Box {
     }
 
     /**
-     * Schema プロパティの定義体.
+     * Schema Definition of property.
      */
     public static final EdmProperty.Builder P_SCHEMA = EdmProperty.newBuilder("Schema").setType(EdmSimpleType.STRING)
             .setAnnotations(createSchemaAnnotation("uk_box_schema"))
             .setNullable(true).setDefaultValue("null");
     /**
-     * Nameプロパティの定義体.
+     * Name Definition of property.
      */
     public static final EdmProperty.Builder P_PATH_NAME = EdmProperty.newBuilder("Name")
             .setAnnotations(Common.DC_FORMAT_NAME)
