@@ -4,7 +4,7 @@
 	<artifactId>dc1-client</artifactId>
 	<packaging>jar</packaging>
 	<!-- changes required of Jenkins -->
-	<version>1.4.0-SNAPSHOT</version>
+	<version>1.4.0</version>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
