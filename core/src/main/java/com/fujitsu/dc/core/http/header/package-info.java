@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * httpヘッダーの解釈や生成を行うクラス群です.
+ * classes for parsing / generating HTTP headers.
  */
 package com.fujitsu.dc.core.http.header;
 

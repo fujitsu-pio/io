@@ -219,10 +219,10 @@ public class AuthzEndPointResource {
 
         // 認可処理
         // clientIdで指定されたセルURLをスキーマに持つBoxが存在するかチェック
-        // TODO Boxインポートが実装されたら、ボックスの存在チェック⇒ある場合：トークン返却、ない場合：ボックス作成（権限チェック⇒Boxインポート実行）
+        //
         if (!checkAuthorization(normalizedClientId)) {
-            log.debug(DcCoreMessageUtils.getMessage("PS-ER-0004"));
-            return this.returnErrorRedirect(cell.getUrl() + "__html/error", "PS-ER-0004");
+            log.debug(DcCoreMessageUtils.getMessage("PS-ER-0003"));
+            return this.returnErrorRedirect(cell.getUrl() + "__html/error", "PS-ER-0003");
         }
 
         // clientIdとredirectUriパラメタチェック
@@ -827,8 +827,7 @@ public class AuthzEndPointResource {
         // 認証を行うセルでのみ有効なcookieを返却する
         URL cellUrl = new URL(cell.getUrl());
         NewCookie cookies = null;
-        Cookie cookie = new Cookie(OAuth2Helper.Key.SESSION_ID, refreshTokenStr
-                , cellUrl.getPath(), null);
+        Cookie cookie = new Cookie(OAuth2Helper.Key.SESSION_ID, refreshTokenStr, cellUrl.getPath(), null);
         if (refreshTokenStr != null) {
             // リフレッシュトークンの有効期限と同じSSLのみで使用出来るCookieを作成
             // 実行環境がhttpsの場合のみ、secureフラグを立てる

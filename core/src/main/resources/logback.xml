@@ -19,105 +19,104 @@
 -->
 <!DOCTYPE logback:configuration>
 <configuration>
-	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{0} %msg%n</pattern>
-		</encoder>
-	</appender>
-	<!-- EventAPIの出力先を別ファイルに分けるための暫定対応 -->
-	<appender name="FILE_USER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>dc1-user.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-		<!-- daily rollover -->
-		<fileNamePattern>dc1-user.log.%d{yyyy-MM-dd}</fileNamePattern>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{0} %msg%n</pattern>
-		</encoder>
-	</appender>
-	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>dc1-core.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-		<!-- daily rollover -->
-		<fileNamePattern>dc1-core.log.%d{yyyy-MM-dd}</fileNamePattern>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{0} %msg%n</pattern>
-		</encoder>
-	</appender>
-	<appender name="socket" class="ch.qos.logback.classic.net.SocketAppender">
-		<remoteHost>localhost</remoteHost>
-		<port>6000</port>
-		<reconnectionDelay>10000</reconnectionDelay>
-		<!-- <includeCallerData>${includeCallerData}</includeCallerData> -->
-	</appender>
-	<appender name='SIFT' class='ch.qos.logback.classic.sift.SiftingAppender'>
-		<discriminator>
-			<key>eventlog_path</key>
-			<defaultValue>unknown</defaultValue>
-		</discriminator>
-		<sift>
-			<appender name="FILE-${eventlog_path}" class="ch.qos.logback.core.rolling.RollingFileAppender">
-				<file>/personium_nfs/dc-core/eventlog/${eventlog_path}/current/default.log</file>
-				<rollingPolicy class="com.fujitsu.dc.logging.rolling.DcFixedWindowRollingPolicy">
-					<fileNamePattern>/personium_nfs/dc-core/eventlog/${eventlog_path}/archive/default.log.%i.zip</fileNamePattern>
-					<minIndex>1</minIndex>
-					<maxIndex>12</maxIndex>
-				</rollingPolicy>
-				<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-					<maxFileSize>1MB</maxFileSize>
-				</triggeringPolicy>
-				<layout class='ch.qos.logback.classic.PatternLayout'>
-					<pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",UTC},[%-5level],%msg%n</pattern>
-				</layout>
-			</appender>
-		</sift>
-	</appender>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{0} %msg%n</pattern>
+               </encoder>
+    </appender>
+    <!-- EventAPIの出力先を別ファイルに分けるための暫定対応 -->
+    <appender name="FILE_USER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>dc1-user.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <!-- daily rollover -->
+        <fileNamePattern>dc1-user.log.%d{yyyy-MM-dd}</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{0} %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>dc1-core.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <!-- daily rollover -->
+        <fileNamePattern>dc1-core.log.%d{yyyy-MM-dd}</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{0} %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="socket" class="ch.qos.logback.classic.net.SocketAppender">
+        <remoteHost>localhost</remoteHost>
+        <port>6000</port>
+        <reconnectionDelay>10000</reconnectionDelay>
+        <!-- <includeCallerData>${includeCallerData}</includeCallerData> -->
+    </appender>
+    <appender name='SIFT' class='ch.qos.logback.classic.sift.SiftingAppender'>
+        <discriminator>
+            <key>eventlog_path</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${eventlog_path}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>/personium_nfs/dc-core/eventlog/${eventlog_path}/current/default.log</file>
+                <rollingPolicy class="com.fujitsu.dc.logging.rolling.DcFixedWindowRollingPolicy">
+                    <fileNamePattern>/personium_nfs/dc-core/eventlog/${eventlog_path}/archive/default.log.%i.zip</fileNamePattern>
+                    <minIndex>1</minIndex>
+                    <maxIndex>12</maxIndex>
+                </rollingPolicy>
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                    <maxFileSize>1MB</maxFileSize>
+                </triggeringPolicy>
+                <layout class='ch.qos.logback.classic.PatternLayout'>
+                    <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",UTC},[%-5level],%msg%n</pattern>
+                </layout>
+            </appender>
+        </sift>
+    </appender>
 
-	<appender name="FILE_LOGBACK" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>/personium/logback/log/logback.log</file>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!-- daily rollover -->
-			<fileNamePattern>/personium/logback/log/logback.log.%d{yyyyMMdd}.gz</fileNamePattern>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]  %logger{0} %msg%n</pattern>
-		</encoder>
-	</appender>
+    <appender name="FILE_LOGBACK" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/personium/logback/log/logback.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+    <fileNamePattern>/personium/logback/log/logback.log.%d{yyyyMMdd}.gz</fileNamePattern>
+    </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level]  %logger{0} %msg%n</pattern>
+        </encoder>
+    </appender>
 
-	<logger  name="com.fujitsu.dc.core.event" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="FILE_USER" />
-		<appender-ref ref="stdout" />
-	</logger>
-
-	<logger  name="com.fujitsu.dc">
-		<level value="DEBUG" />
-		<appender-ref ref="file" />
-		<appender-ref ref="stdout" />
-	</logger>
-
-	<logger  name="org.elasticsearch">
-		<level value="DEBUG" />
-		<appender-ref ref="file" />
-		<appender-ref ref="stdout" />
-	</logger>
-
-	<logger  name="netty">
-		<level value="DEBUG" />
-		<appender-ref ref="file" />
-		<appender-ref ref="stdout" />
-	</logger>
-	<logger name="com.fujitsu.dc.core.eventbus" additivity="false">
-		<level value="INFO" />
-		<appender-ref ref="SIFT" />
+     <logger  name="com.fujitsu.dc.core.event" additivity="false">
+        <level value="DEBUG" />
+        <appender-ref ref="FILE_USER" />
         <appender-ref ref="stdout" />
-	</logger>
+    </logger>
 
-	<logger name="com.fujitsu.dc.logging" additivity="false">
-		<level value="INFO" />
-		<appender-ref ref="FILE_LOGBACK" />
+    <logger  name="com.fujitsu.dc">
+        <level value="DEBUG" />
+        <appender-ref ref="file" />    <appender-ref ref="stdout" />
+    </logger>
+
+    <logger  name="org.elasticsearch">
+        <level value="DEBUG" />
+        <appender-ref ref="file" />
         <appender-ref ref="stdout" />
-	</logger>
+    </logger>
+
+    <logger  name="netty">
+       <level value="DEBUG" />
+       <appender-ref ref="file" />
+       <appender-ref ref="stdout" />
+    </logger>
+    <logger name="com.fujitsu.dc.core.eventbus" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="SIFT" />
+        <appender-ref ref="stdout" />
+    </logger>
+
+    <logger name="com.fujitsu.dc.logging" additivity="false">
+        <level value="INFO" />
+        <appender-ref ref="FILE_LOGBACK" />
+        <appender-ref ref="stdout" />
+    </logger>
 
 </configuration>

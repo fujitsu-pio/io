@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * Cellレベル APIで用いるOData情報のモデル群.
+ * Model classes of OData information used in Cell-level APIs.
  */
 package com.fujitsu.dc.core.model.ctl;
 

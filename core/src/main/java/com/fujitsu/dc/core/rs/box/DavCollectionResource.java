@@ -49,7 +49,7 @@ public final class DavCollectionResource {
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param parent 親
      * @param davCmp 部品
      */
@@ -85,10 +85,20 @@ public final class DavCollectionResource {
 
     /**
      * DELETEメソッドを処理してこのリソースを削除します.
+     * @param recursiveHeader recursive header
      * @return JAX-RS応答オブジェクト
      */
     @DELETE
-    public Response delete() {
+    public Response delete(@HeaderParam(DcCoreUtils.HttpHeaders.X_DC_RECURSIVE) final String recursiveHeader) {
+        boolean recursive = false;
+        // X-Dc-Recursive Header
+        if (recursiveHeader != null) {
+            try {
+                recursive = Boolean.valueOf(recursiveHeader);
+            } catch (Exception e) {
+                throw DcCoreException.Misc.PRECONDITION_FAILED.params(DcCoreUtils.HttpHeaders.X_DC_RECURSIVE);
+            }
+        }
         // アクセス制御(親の権限をチェックする)
         // DavCollectionResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
         this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
@@ -96,7 +106,7 @@ public final class DavCollectionResource {
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             return Response.status(HttpStatus.SC_CONFLICT).entity("delete children first").build();
         }
-        return this.davRsCmp.getDavCmp().delete(null).build();
+        return this.davRsCmp.getDavCmp().delete(null, recursive).build();
     }
 
     /**

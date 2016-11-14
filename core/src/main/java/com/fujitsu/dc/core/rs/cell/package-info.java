@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * CellレベルのJAX-RS Resourceクラス群.
+ * Cell-level JAX-RS Resource classes.
  */
 package com.fujitsu.dc.core.rs.cell;
 

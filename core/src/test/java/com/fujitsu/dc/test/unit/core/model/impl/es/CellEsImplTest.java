@@ -27,7 +27,7 @@ import com.fujitsu.dc.core.model.impl.es.CellEsImpl;
 import com.fujitsu.dc.test.categories.Unit;
 
 /**
- * EsModelユニットテストクラス.
+ * Unit Test class for CellEsImpl.
  */
 @Category({ Unit.class })
 public class CellEsImplTest {

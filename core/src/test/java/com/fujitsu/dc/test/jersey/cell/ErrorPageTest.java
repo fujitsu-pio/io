@@ -44,14 +44,14 @@ import com.fujitsu.dc.test.unit.core.UrlUtils;
 import com.sun.jersey.test.framework.JerseyTest;
 
 /**
- * ImplicitFlow認証のテスト.
+ * Test for Error Page.
  */
 @RunWith(DcRunner.class)
 @Category({Unit.class, Integration.class, Regression.class })
 public class ErrorPageTest extends JerseyTest {
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     public ErrorPageTest() {
         super("com.fujitsu.dc.core.rs");
@@ -77,7 +77,7 @@ public class ErrorPageTest extends JerseyTest {
     }
 
     /**
-     * personiumで定義されていないコードを指定してエラーページを取得しundefinedとなること.
+     * 定義されていないコードを指定してエラーページを取得しundefinedとなること.
      */
     @Test
     public final void personiumで定義されていないコードを指定してエラーページを取得しundefinedとなること() {
@@ -234,8 +234,9 @@ public class ErrorPageTest extends JerseyTest {
     public static void checkResponseBody(DcResponse res, String expectedCode) {
         String body = null;
         String expectedMessage = null;
+        String expectedTitle = DcCoreMessageUtils.getMessage("PS-ER-0001");
         if (expectedCode == null) {
-            expectedMessage = DcCoreMessageUtils.getMessage("PS-ER-0003");
+            expectedMessage = DcCoreMessageUtils.getMessage("PS-ER-0002");
         } else {
             expectedMessage = DcCoreMessageUtils.getMessage(expectedCode);
         }
@@ -243,7 +244,7 @@ public class ErrorPageTest extends JerseyTest {
             body = res.bodyAsString();
             System.out.println(body);
             assertEquals(
-                    "<html><head><title>ERROR</title></head><body><h1>ERROR</h1></br><p>PCS ERROR</p><p>"
+                    "<html><head><title>" + expectedTitle + "</title></head><body><h1>" + expectedTitle + "</h1><p>"
                             + expectedMessage + "</p></body></html>",
                     body.replaceFirst("<!-- .*-->", ""));
         } catch (DaoException e) {

@@ -140,6 +140,7 @@ public class CellCtlODataProducer extends EsODataProducer {
         if (!Box.EDM_TYPE_NAME.equals(entitySetName)) {
             return;
         }
+        // Boxの削除時のみ、Dav管理データを削除
         // entitySetがBoxの場合のみの処理
         EntityResponse er = this.getEntity(entitySetName, oEntityKey, new EntityQueryInfo.Builder().build());
 
@@ -152,8 +153,7 @@ public class CellCtlODataProducer extends EsODataProducer {
         if (!davCmp.isEmpty()) {
             throw DcCoreException.OData.CONFLICT_HAS_RELATED;
         }
-        // Boxの削除時のみ、Dav管理データを削除
-        davCmp.delete(null);
+        davCmp.delete(null, false);
         // BoxのCacheクリア
         BoxCache.clear(oEntityKey.asSingleValue().toString(), this.cell);
     }

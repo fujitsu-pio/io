@@ -63,7 +63,7 @@ public class DcJsonFeedFormatParser extends DcJsonFormatParser {
         List<OLink> links;
         OEntity oentity;
 
-        public JsonEntry(EdmEntitySet eset) {
+        JsonEntry(EdmEntitySet eset) {
             this.entityType = eset.getType();
         }
 

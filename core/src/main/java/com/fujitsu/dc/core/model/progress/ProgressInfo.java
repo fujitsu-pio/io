@@ -26,7 +26,7 @@ public interface ProgressInfo {
     /**
      * 処理状況（ステータス）.
      */
-    public static enum STATUS {
+    enum STATUS {
         /** 処理中. */
         PROCESSING("installation in progress"),
         /** 処理完了（正常終了）. **/

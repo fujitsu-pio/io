@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * 本アプリで使用するアノテーションは、ここにまとめて定義しています.
+ * package for annotation definitions.
  */
 package com.fujitsu.dc.core.annotations;
 

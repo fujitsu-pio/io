@@ -39,24 +39,23 @@ import com.fujitsu.dc.core.auth.Privilege;
 import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavMoveResource;
 import com.fujitsu.dc.core.model.DavRsCmp;
+import com.fujitsu.dc.core.model.jaxb.Acl;
 import com.fujitsu.dc.core.rs.odata.ODataResource;
 
 /**
  * ODataSvcResourceを担当するJAX-RSリソース.
  */
 public final class ODataSvcCollectionResource extends ODataResource {
-    DavCmp davCmp;
     // DavCollectionResourceとしての機能を使うためこれをWRAPしておく。
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param parent DavRsCmp
      * @param davCmp DavCmp
      */
     public ODataSvcCollectionResource(final DavRsCmp parent, final DavCmp davCmp) {
         super(parent.getAccessContext(), parent.getUrl() + davCmp.getName() + "/", davCmp.getODataProducer());
-        this.davCmp = davCmp;
         this.davRsCmp = new DavRsCmp(parent, davCmp);
     }
 
@@ -102,7 +101,7 @@ public final class ODataSvcCollectionResource extends ODataResource {
     public Response acl(final Reader reader) {
         // アクセス制御
         this.checkAccessContext(this.getAccessContext(), BoxPrivilege.WRITE_ACL);
-        return this.davCmp.acl(reader).build();
+        return this.davRsCmp.getDavCmp().acl(reader).build();
     }
 
     /**
@@ -119,7 +118,7 @@ public final class ODataSvcCollectionResource extends ODataResource {
         if (!this.davRsCmp.getDavCmp().isEmpty()) {
             throw DcCoreException.Dav.HAS_CHILDREN;
         }
-        return this.davCmp.delete(null).build();
+        return this.davRsCmp.getDavCmp().delete(null, false).build();
     }
 
     /**
@@ -175,10 +174,12 @@ public final class ODataSvcCollectionResource extends ODataResource {
      */
     @Override
     public boolean hasPrivilegeForBatch(AccessContext ac) {
-        if (ac.requirePrivilege(this.davCmp.getAcl(), BoxPrivilege.READ, this.davRsCmp.getCell().getUrl())) {
+        Acl acl = this.davRsCmp.getDavCmp().getAcl();
+        String url = this.davRsCmp.getCell().getUrl();
+        if (ac.requirePrivilege(acl, BoxPrivilege.READ, url)) {
             return true;
         }
-        if (ac.requirePrivilege(this.davCmp.getAcl(), BoxPrivilege.WRITE, this.davRsCmp.getCell().getUrl())) {
+        if (ac.requirePrivilege(acl, BoxPrivilege.WRITE, url)) {
             return true;
         }
         return false;

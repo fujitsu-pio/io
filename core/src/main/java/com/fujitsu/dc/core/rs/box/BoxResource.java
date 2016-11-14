@@ -56,7 +56,6 @@ import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.BoxCmp;
 import com.fujitsu.dc.core.model.BoxRsCmp;
 import com.fujitsu.dc.core.model.Cell;
-import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.Event;
@@ -69,7 +68,7 @@ import com.fujitsu.dc.core.rs.cell.EventResource;
 import com.fujitsu.dc.core.rs.odata.ODataEntityResource;
 
 /**
- * Boxを担当するJAX-RSリソース.
+ * JAX-RS Resource for Box root URL.
  */
 public final class BoxResource {
     static Logger log = LoggerFactory.getLogger(BoxResource.class);
@@ -79,11 +78,10 @@ public final class BoxResource {
     Box box;
     AccessContext accessContext;
     DavRsCmp davRsCmp;
-    DavCmp davCmp;
     DavRsCmp cellRsCmp; // for box Install
 
     /**
-     * コンストラクタ.
+     * Constructor.
      * @param cell CELL Object
      * @param boxName Box Name
      * @param cellRsCmp cellRsCmp
@@ -109,10 +107,11 @@ public final class BoxResource {
         // boxインストールではCellレベルで動作させる必要がある。
         this.cellRsCmp = cellRsCmp;
         if (this.box != null) {
-            // このBoxが存在するときのみBoxCmpが必要
-            this.davCmp = ModelFactory.boxCmp(this.box);
+            //BoxCmp is necessary only if this Box exists
+            BoxCmp davCmp = ModelFactory.boxCmp(this.box);
             this.davRsCmp = new BoxRsCmp(davCmp, this.cell, this.accessContext, this.box);
         } else {
+            //This box does not exist.
             String reqPathInfo = request.getPathInfo();
             if (!reqPathInfo.endsWith("/")) {
                 reqPathInfo += "/";
@@ -121,6 +120,7 @@ public final class BoxResource {
             if (!pathForBox.endsWith("/")) {
                 pathForBox += "/";
             }
+            // Unless the HTTP method is MKCOL, respond with 404.
             if (!("MKCOL".equals(jaxRsRequest.getMethod()) && reqPathInfo.endsWith(pathForBox))) {
                 throw DcCoreException.Dav.BOX_NOT_FOUND.params(this.cell.getUrl() + boxName);
             }
@@ -128,10 +128,6 @@ public final class BoxResource {
 
     }
 
-    /*
-     * このリソースのURLを返します. 本クラスではBoxのURLが返ります。
-     * @see com.fujitsu.dc.core.rs.box.AbstractDavResource#getPathList()
-     */
 
     /**
      * 現在のリソースの一つ下位パスを担当するJax-RSリソースを返す.
@@ -154,28 +150,28 @@ public final class BoxResource {
 
     /**
      * Boxのパス名を返します.
-     * @return Boxのパス名
+     * @return path component name for the Box
      */
     public String getName() {
         return this.boxName;
     }
 
     /**
-     * @return Box オブジェクト
+     * @return Box object
      */
     public Box getBox() {
         return this.box;
     }
 
     /**
-     * @return BoxCmp オブジェクト.
+     * @return BoxCmp Object
      */
     public BoxCmp getCmp() {
-        return (BoxCmp) this.davCmp;
+        return (BoxCmp) this.davRsCmp.getDavCmp();
     }
 
     /**
-     * @return AccessContext オブジェクト
+     * @return AccessContext Object
      */
     public AccessContext getAccessContext() {
         return accessContext;

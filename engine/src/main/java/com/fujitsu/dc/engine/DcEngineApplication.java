@@ -38,7 +38,7 @@ import com.fujitsu.dc.engine.utils.DcEngineConfig;
 public class DcEngineApplication extends Application {
     static Logger log = LoggerFactory.getLogger(DcEngineApplication.class);
     /** デバッグフラグ. */
-    // private static final String KEY_DCENGINE_DEBUG = "com.fujitsu.dc.engine.debug";
+    // private static final String KEY_DCENGINE_DEBUG = "io.personium.engine.debug";
     static {
         try {
         TransCellAccessToken.configureX509(DcEngineConfig.getX509PrivateKey(), DcEngineConfig.getX509Certificate(),

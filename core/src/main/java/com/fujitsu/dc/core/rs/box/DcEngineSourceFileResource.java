@@ -32,7 +32,7 @@ import com.fujitsu.dc.core.model.DavRsCmp;
 public final class DcEngineSourceFileResource extends DavFileResource {
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param parent 親
      * @param davCmp 部品
      */

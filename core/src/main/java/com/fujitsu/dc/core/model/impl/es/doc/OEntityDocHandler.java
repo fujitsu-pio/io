@@ -223,10 +223,10 @@ public class OEntityDocHandler implements EntitySetDocHandler {
         if (source != null) {
             this.parseSource(source);
         }
-        Map<String, DcSearchHitField> fields = searchHit.getFields();
-        if (fields.size() > 0) {
-            this.parseFields(fields);
-        }
+//        Map<String, DcSearchHitField> fields = searchHit.getFields();
+//        if (fields.size() > 0) {
+//            this.parseFields(fields);
+//        }
         this.resolveUnitUserName();
     }
 

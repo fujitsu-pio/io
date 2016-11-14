@@ -48,7 +48,7 @@ public class RoleResource {
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param cell Cell
      * @param davRsCmp DavRsCmp
      */

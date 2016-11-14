@@ -572,11 +572,11 @@ public class SchemaAuthTest extends JerseyTest {
 
             // ACLの設定（今回テストではACL設定は無関係のため、ALLで設定）
             DavResourceUtils.setACL(cell02, MASTER_TOKEN, HttpStatus.SC_OK, cell02 + "/" + testbox03,
-                    "box/acl-setting-all.txt", role, "<D:read/></D:privilege><D:privilege><D:write/>"
-                    , OAuth2Helper.SchemaLevel.PUBLIC);
+                    "box/acl-setting-all.txt", role, "<D:read/></D:privilege><D:privilege><D:write/>",
+                    OAuth2Helper.SchemaLevel.PUBLIC);
             DavResourceUtils.setACL(cell02, MASTER_TOKEN, HttpStatus.SC_OK, cell02 + "/" + testbox04,
-                    "box/acl-setting-all.txt", role, "<D:read/></D:privilege><D:privilege><D:write/>"
-                    , OAuth2Helper.SchemaLevel.PUBLIC);
+                    "box/acl-setting-all.txt", role, "<D:read/></D:privilege><D:privilege><D:write/>",
+                    OAuth2Helper.SchemaLevel.PUBLIC);
 
             // スキーマ認証用トランスセルトークンの取得
             JSONObject appAuthJson = getTransTokenByAppAuth(schema01, user, pass, UrlUtils.cellRoot(cell02));

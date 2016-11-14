@@ -703,9 +703,9 @@ public class UserDataLinkQueryTest extends AbstractUserDataTest {
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    private void linkUserData(String toEntity, String toUserId
-            , String fromEntity
-            , String fromUserId) {
+    private void linkUserData(String toEntity, String toUserId,
+           String fromEntity,
+           String fromUserId) {
 
         // ユーザデータ-ユーザデータの$links作成
         String targetUri = UrlUtils.cellRoot(Setup.TEST_CELL1) + Setup.TEST_BOX1 + "/"

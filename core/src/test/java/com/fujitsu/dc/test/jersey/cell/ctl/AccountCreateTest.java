@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
-import org.junit.Ignore;
+//import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -265,14 +265,14 @@ public class AccountCreateTest extends ODataCommon {
             }
         }
     }
-    
+
     /**
      * Account新規登録時にPasswordなしでTypeに"oidc:google"を指定して登録できること.
      */
     @Test
     public final void Account新規登録時にPasswordなしでTypeにoidcコロンgoogleを指定して登録できること() {
         String testAccountName = "personium.io\\@gmail.com";
-    	String testAccountType = "oidc:google";
+        String testAccountType = "oidc:google";
         String accLocHeader = null;
 
         try {
@@ -290,9 +290,9 @@ public class AccountCreateTest extends ODataCommon {
     @Test
     public final void Account新規登録時にPasswordありでTypeにoidcコロンgoogleを指定して登録できること() {
         String testAccountName = "personium.io\\@gmail.com";
-    	String testAccountType = "oidc:google";
-       	String testAccountPass = "password1234";
-    	String accLocHeader = null;
+        String testAccountType = "oidc:google";
+        String testAccountPass = "password1234";
+        String accLocHeader = null;
 
         try {
             accLocHeader = createAccount(testAccountName, testAccountPass, testAccountType, HttpStatus.SC_CREATED);
@@ -309,7 +309,7 @@ public class AccountCreateTest extends ODataCommon {
     @Test
     public final void Account新規登録時にパスワードなしでTypeにbasicスペースoidcコロンgoogleを指定して登録できること() {
         String testAccountName = "personium.io\\@gmail.com";
-    	String testAccountType = "basic oidc:google";
+        String testAccountType = "basic oidc:google";
         String accLocHeader = null;
 
         try {
@@ -321,16 +321,14 @@ public class AccountCreateTest extends ODataCommon {
         }
     }
 
-    
-    
     /**
      * Account新規登録時にパスワードありでTypeに"basic oidc:google"を指定して登録できること.
      */
     @Test
     public final void Account新規登録時にパスワードありでTypeにbasicスペースoidcコロンgoogleを指定して登録できること() {
         String testAccountName = "personium.io\\@gmail.com";
-    	String testAccountType = "basic oidc:google";
-    	String testAccountPass = "password1234";
+        String testAccountType = "basic oidc:google";
+        String testAccountPass = "password1234";
         String accLocHeader = null;
 
         try {
@@ -371,8 +369,6 @@ public class AccountCreateTest extends ODataCommon {
         }
     }
 
-    
-    
     /**
      * Account新規登録時にLastAuthenticatedに時刻を指定して登録できること.
      */
@@ -604,7 +600,7 @@ public class AccountCreateTest extends ODataCommon {
             }
         }
     }
-  
+
     private String createAccount(String testAccountName, String testAccountPass, int code) {
         String accLocHeader;
         TResponse res = Http.request("account-create.txt")
@@ -618,7 +614,7 @@ public class AccountCreateTest extends ODataCommon {
         res.statusCode(code);
         return accLocHeader;
     }
-    
+
     /**
      *  @Overload
      * Typeを指定してAccountを登録する場合
@@ -637,12 +633,12 @@ public class AccountCreateTest extends ODataCommon {
         res.statusCode(code);
         return accLocHeader;
     }
-    
+
     /**
-     *  Typeを指定してAccountを登録、かつ、パスワードを登録しない場合
+     *  Typeを指定してAccountを登録、かつ、パスワードを登録しない場合.
      */
     private String createNoPassAccount(String testAccountName, String testAccountType, int code) {
-    	String accLocHeader;
+        String accLocHeader;
         TResponse res = Http.request("account-create-Non-Credential-with-type.txt")
                 .with("token", AbstractCase.MASTER_TOKEN_NAME)
                 .with("cellPath", cellName)
@@ -652,9 +648,9 @@ public class AccountCreateTest extends ODataCommon {
                 .debug();
         accLocHeader = res.getLocationHeader();
         res.statusCode(code);
-        return accLocHeader;        	
+        return accLocHeader;
     }
-  
+
     private void deleteAccount(String accountUrl) {
         DcRequest req = DcRequest.delete(accountUrl)
                 .header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN)

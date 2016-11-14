@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.fujitsu.dc.common.es.util.DcUUID;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.Cell;
-import com.fujitsu.dc.core.model.DavNode;
+import com.fujitsu.dc.core.model.impl.es.DavNode;
 import com.fujitsu.dc.core.model.impl.es.doc.LinkDocHandler;
 import com.fujitsu.dc.core.model.impl.es.doc.OEntityDocHandler;
 import com.fujitsu.dc.test.categories.Unit;

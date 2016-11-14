@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 /**
- * OData APIを提供するJAX-RS Resourceクラス群.
+ * JAX-RS resource classes to provide OData APIs.
  */
 package com.fujitsu.dc.core.rs.odata;

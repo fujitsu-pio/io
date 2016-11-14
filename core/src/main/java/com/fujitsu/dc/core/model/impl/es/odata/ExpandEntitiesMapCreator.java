@@ -435,7 +435,7 @@ public final class ExpandEntitiesMapCreator {
                 List<Map<String, Object>> mustQueries = new ArrayList<Map<String, Object>>();
                 if (producer instanceof UserDataODataProducer) {
                     mustQueries.add(QueryMapFactory.termQuery(OEntityDocHandler.KEY_ENTITY_ID, entityType));
-                    mustQueries.add(QueryMapFactory.termQuery(OEntityDocHandler.KEY_LINK,
+                    mustQueries.add(QueryMapFactory.termQuery("ll",
                             baseEntityLinksKey + ":" + baseDataId));
                     source.put("query", QueryMapFactory.filteredQuery(null, QueryMapFactory.mustQuery(mustQueries)));
                 } else {

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * OData4Jの機能不足を補うためのクラス群.
+ * classes to supplement lacking functionalities of OData4J.
  */
 package com.fujitsu.dc.core.odata;
 
