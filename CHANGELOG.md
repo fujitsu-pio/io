@@ -3,22 +3,24 @@
 BREAKING CHANGES:
   - core, engine *[dc-config-default.properties]*:<br>
 
-   Changed the Personium configuration document format. Need to replace all keys which start from `com.fujitsu.dc.*` to `io.personium.*` in `dc-config.properties` file.
+   Changed unit configuration file keys' prefixes from `com.fujitsu.dc.*` to `io.personium.*`. It is necessary for V1.3.X users to replace all keys' prefixes in `dc-config.properties` file.
 
 IMPROVEMENTS:
   - core *[CellCmpFsImpl.java, BoxCmpFsImpl.java, DavCmpFsImpl.java etc]*, es-api-2.4 *[userdata.json etc]*:<br>
 
    Supports [elasticsearch v2.4.1](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/release-notes-2.4.1.html). <br>
-   * The `es-api-2.4` module is newly developed for elasticsearch v2.4.1 support.
-   * For the incompatibilities between elasticsearch v1.3.X and v2.4.1, the registration formats of data (OData / WebDAV) were changed. (Show in details below.)
+   * The `es-api-2.4` module is newly developed for elasticsearch v2.4.X support.
+   * Personium V1.4.0 (or later) must run with es-api-2.4 module.
+   * Current es-api-2.4 supports ElasticSearch v2.4.1.
+   * For the incompatibilities between elasticsearch v1.3.X and v2.4.X, the registration formats of data (OData / WebDAV) were changed. (Show in details below.)
 
 BACKWARD INCOMPATIBILITIES:
   - core *[CellCmpFsImpl.java, BoxCmpFsImpl.java, DavCmpFsImpl.java etc]*, es-api-2.4 *[userdata.json etc]*:<br>
    For supporting [elasticsearch v2.4.1](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/release-notes-2.4.1.html), the registration formats of inner data (OData / WebDAV) were changed. <br>
-   For this incompatibilities, not be able to upgrade to V1.4.0 with the same data construction (directories and documents) as V1.3.X in server. To upgrade version from V1.3.X, the data must be converted in new rules below.
+   For these incompatibilities, V1.4.0 cannot run with the same data construction in server as V1.3.X. To upgrade version from V1.3.X, inner data must be converted in new rules below.
 
    * The WebDAV data is stored in file system. <br>
-     Stored directories is set by `dc-config.properties`,  the default is `/personium_nfs/dc-core/dav`.
+     Stored directory is set by `dc-config.properties`,  the default is `/personium_nfs/dc-core/dav`.
    * Elasticsearch mapping definition key `"l"` was replaced to `"ll"` in `UserData` object.<br>
      (The other objects which have `"l.*"` mapping keys are not changed.)
 
