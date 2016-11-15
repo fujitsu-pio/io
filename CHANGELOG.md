@@ -19,8 +19,8 @@ BACKWARD INCOMPATIBILITIES:
    For supporting [elasticsearch v2.4.1](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/release-notes-2.4.1.html), the registration formats of inner data (OData / WebDAV) were changed. <br>
    For these incompatibilities, V1.4.0 cannot run with the same data construction in server as V1.3.X. To upgrade version from V1.3.X, inner data must be converted in new rules below.
 
-   * The WebDAV data is stored in file system. <br>
-     Stored directory is set by `dc-config.properties`,  the default is `/personium_nfs/dc-core/dav`.
+   * The WebDAV data are stored in file system. <br>
+     Stored directory path is set by `dc-config.properties`,  the default path is `/personium_nfs/dc-core/dav`.
    * Elasticsearch mapping definition key `"l"` was replaced to `"ll"` in `UserData` object.<br>
      (The other objects which have `"l.*"` mapping keys are not changed.)
 
