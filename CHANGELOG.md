@@ -10,7 +10,7 @@ IMPROVEMENTS:
 
    Supports [elasticsearch v2.4.1](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/release-notes-2.4.1.html). <br>
    * The `es-api-2.4` module is newly developed for elasticsearch v2.4.1 support.
-   * For the incompatibilities between elasticsearch v1.3.X and v2.4.1, the registration  format of data (OData / WebDAV) was changed. (Show in details below.)
+   * For the incompatibilities between elasticsearch v1.3.X and v2.4.1, the registration formats of data (OData / WebDAV) were changed. (Show in details below.)
 
 BACKWARD INCOMPATIBILITIES:
   - core *[CellCmpFsImpl.java, BoxCmpFsImpl.java, DavCmpFsImpl.java etc]*, es-api-2.4 *[userdata.json etc]*:<br>
@@ -19,7 +19,7 @@ BACKWARD INCOMPATIBILITIES:
 
    * The WebDAV data is stored in file system. <br>
      Stored directories is set by `dc-config.properties`,  the default is `/personium_nfs/dc-core/dav`.
-   * The OData mapping definition key `"l"` was replaced to `"ll"` in `UserData` object.<br>
+   * Elasticsearch mapping definition key `"l"` was replaced to `"ll"` in `UserData` object.<br>
      (The other objects which have `"l.*"` mapping keys are not changed.)
 
 
