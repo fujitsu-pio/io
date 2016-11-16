@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * ユーティリティクラス群.
+ * utility classes.
  */
 package com.fujitsu.dc.core.utils;
 

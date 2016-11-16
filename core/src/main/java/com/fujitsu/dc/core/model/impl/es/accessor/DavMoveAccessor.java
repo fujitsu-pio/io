@@ -31,9 +31,9 @@ import com.fujitsu.dc.common.es.response.EsClientException;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.DcCoreLog;
-import com.fujitsu.dc.core.model.DavNode;
 import com.fujitsu.dc.core.model.file.BinaryDataAccessException;
 import com.fujitsu.dc.core.model.file.BinaryDataAccessor;
+import com.fujitsu.dc.core.model.impl.es.DavNode;
 import com.fujitsu.dc.core.model.impl.es.ads.AdsException;
 import com.fujitsu.dc.core.model.lock.Lock;
 import com.fujitsu.dc.core.model.lock.LockKeyComposer;
@@ -257,7 +257,7 @@ public class DavMoveAccessor extends DavNodeAccessor {
 
     /**
      * マスターデータを一括更新する.
-     * @param davNode 更新データ
+     * @param metaFile 更新データ
      * @param response Elasticsearchのバルク更新レスポンス（Ads書込み失敗ログ出力用）
      * @param responseIndex Elasticsearchのバルク更新レスポンスのインデックス
      */

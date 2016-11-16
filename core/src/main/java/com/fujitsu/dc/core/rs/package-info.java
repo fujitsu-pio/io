@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * 本アプリを構成するJAX-RSの基本クラス群.
+ * JAX-RS base resource classes.
  */
 package com.fujitsu.dc.core.rs;
 

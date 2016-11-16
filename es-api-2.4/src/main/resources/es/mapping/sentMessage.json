@@ -1,0 +1,152 @@
+{
+  "SentMessage": {
+    "properties": {
+      "c": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "s": {
+        "properties": {
+          "__id": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "InReplyTo": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "To": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "ToRelation": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "Type": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "Title": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "Body": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed",
+                "ignore_above": 4096
+              }
+            }
+          },
+          "Priority": {
+            "type": "long",
+            "index": "no",
+            "fields": {
+              "untouched": {
+                "type": "long"
+              }
+            }
+          },
+          "RequestRelation": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "RequestRelationTarget": {
+            "type": "string",
+            "fields": {
+              "untouched": {
+                "type": "string",
+                "index": "not_analyzed"
+              }
+            }
+          },
+          "Result": {
+            "properties": {
+              "To": {
+                "type": "string",
+                "fields": {
+                  "untouched": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                  }
+                }
+              },
+              "Code": {
+                "type": "string",
+                "fields": {
+                  "untouched": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                  }
+                }
+              },
+              "Reason": {
+                "type": "string",
+                "fields": {
+                  "untouched": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "l": {
+        "properties": {
+          "Box": {
+            "type": "string",
+            "index": "not_analyzed"
+          }
+        }
+      },
+      "u": {
+        "type": "long",
+        "store": true
+      },
+      "p": {
+        "type": "long",
+        "store": true
+      }
+    }
+  }
+}

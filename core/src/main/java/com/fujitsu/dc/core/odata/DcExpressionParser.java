@@ -1088,7 +1088,7 @@ public class DcExpressionParser {
         private final CommonExpression expression;
         private final List<Token> tokens;
 
-        public ExpressionToken(CommonExpression expression, List<Token> tokens) {
+        ExpressionToken(CommonExpression expression, List<Token> tokens) {
             super(TokenType.EXPRESSION, null);
             this.expression = expression;
             this.tokens = tokens;

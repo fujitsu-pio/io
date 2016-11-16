@@ -51,6 +51,16 @@ public final class Ace {
         return this.principal.href;
     }
     /**
+     * @param href href value to set
+     */
+    public void setPrincipalHref(String href) {
+        if (this.principal == null || this.principal.href == null) {
+        throw new IllegalStateException("This principal does not have href");
+        }
+        this.principal.href = href;
+    }
+
+    /**
      * @return Principal/all
      */
     public String getPrincipalAll() {

@@ -87,7 +87,7 @@ public class ODataLinkAccessorTest {
      */
     class JdbcAdsMock extends JdbcAds {
 
-        public JdbcAdsMock() throws Exception {
+        JdbcAdsMock() throws Exception {
             super();
         }
 

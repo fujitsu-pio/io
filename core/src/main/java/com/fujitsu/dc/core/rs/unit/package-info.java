@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 /**
- * UnitレベルのJAX-RS Resourceクラス群.
+ * Unit-level JAX-RS resource classes.
  */
 package com.fujitsu.dc.core.rs.unit;

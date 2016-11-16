@@ -170,11 +170,11 @@ class InProcessLockManager extends LockManager {
         private long createdAt;
 
         /**
-         * コンストラクタ.
+         * constructor.
          * @param value 値
          * @param expired ロックの保持期間(秒)
          */
-        public AccountLock(String value, int expired) {
+        AccountLock(String value, int expired) {
             this.value = value;
             this.expiredInSeconds = expired;
             this.createdAt = System.currentTimeMillis();

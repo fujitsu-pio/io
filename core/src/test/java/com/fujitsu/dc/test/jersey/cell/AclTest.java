@@ -325,9 +325,7 @@ public class AclTest extends AbstractCase {
      */
     @Test
     public final void CellレベルACL設定hrefにフルパス設定の確認() {
-
         try {
-
             // role4・role5を含むACLをtestcell1に設定
             Http.request("cell/acl-setting-request.txt")
                     .with("url", TEST_CELL1)

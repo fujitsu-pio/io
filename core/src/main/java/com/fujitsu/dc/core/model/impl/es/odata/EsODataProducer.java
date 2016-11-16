@@ -421,6 +421,37 @@ public abstract class EsODataProducer implements DcODataProducer {
     }
 
     /**
+     * get an Entity using internal id.
+     * @param entitySetName entity set name
+     * @param internalId internal id
+     * @return OEntity object
+     */
+    public OEntity getEntityByInternalId(final String entitySetName,
+            final String internalId) {
+        final int expandMaxNum = DcCoreConfig.getMaxExpandSizeForRetrive();
+
+        // 注）EntitySetの存在保証は予め呼び出し側で行われているため、ここではチェックしない。
+        EdmEntitySet eSet = this.getMetadata().findEdmEntitySet(entitySetName);
+        EntitySetDocHandler oedh = this.retrieveWithInternalId(eSet, internalId);
+
+        if (oedh == null) {
+            return null;
+        }
+
+
+        // NavigationTargetKeyPropertyを設定する
+        setNavigationTargetKeyProperty(eSet, oedh);
+        if (oedh instanceof OEntityDocHandler) {
+            ((OEntityDocHandler) oedh).setExpandMaxNum(expandMaxNum);
+        }
+        // ESのレスポンスから OEntityをつくる
+        OEntityWrapper entity = oedh.createOEntity(eSet, this.getMetadata(), null, null);
+        // ODataの Entity Responseを作る。
+        return entity;
+    }
+
+
+    /**
      * EntitySetDocHandlerにNavigationTargetKeyPropertyを設定する.
      * @param eSet EntitySet
      * @param oedh EntitySetDocHandler
@@ -618,6 +649,15 @@ public abstract class EsODataProducer implements DcODataProducer {
         // ここで晴れてhit数は１であることが保証されるのでその１件を返す。
         return getDocHandler(hits.getHits()[0], entitySetName);
     }
+    private EntitySetDocHandler retrieveWithInternalId(EdmEntitySet eSet, String internalId) {
+        EntitySetAccessor esType = this.getAccessorForEntitySet(eSet.getName());
+        DcGetResponse getRes = esType.get(internalId);
+        if (getRes == null) {
+            return null;
+        }
+        return this.getDocHandler(getRes, eSet.getName());
+    }
+
 
     /**
      * DocHandlerを取得する.
@@ -3377,4 +3417,5 @@ public abstract class EsODataProducer implements DcODataProducer {
      */
     protected void hasRelatedEntities(String entitySetName, OEntityKey entityKey) {
     }
+
 }

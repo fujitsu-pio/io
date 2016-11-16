@@ -302,7 +302,7 @@ public class UserDataDocHandler extends OEntityDocHandler implements EntitySetDo
 
         // UserDataはリンクフィールドに文字列配列形式("EntityTypeID:UserDataID")でデータを保持するため、文字列配列に変換する
         List<String> linkList = toArrayManyToOnelink();
-        ret.put(KEY_LINK, linkList);
+        ret.put("ll", linkList);
         return ret;
     }
 
@@ -324,7 +324,7 @@ public class UserDataDocHandler extends OEntityDocHandler implements EntitySetDo
     protected Map<String, Object> parseLinks(Map<String, Object> source) {
         // UserDataはリンクフィールドに文字列配列形式("EntityTypeID:UserDataID")でデータを保持しているため、Map形式に変換する
         Map<String, Object> linkMap = new HashMap<String, Object>();
-        List<String> linkList = (List<String>) source.get(KEY_LINK);
+        List<String>  linkList = (List<String>) source.get("ll");
         if (linkList != null) {
             for (String link : linkList) {
                 String[] tmp = link.split(":");

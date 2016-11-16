@@ -43,16 +43,13 @@ import com.fujitsu.dc.core.rs.odata.ODataCtlResource;
  * JAX-RS Resource handling DC Message Level Api. /__messageというパスにきたときの処理.
  */
 public final class MessageResource extends ODataCtlResource {
-    /**
-     * ログ用オブジェクト.
-     */
     static Logger log = LoggerFactory.getLogger(MessageResource.class);
 
     DavRsCmp davRsCmp;
     private AccessContext accessContext;
 
     /**
-     * コンストラクタ.
+     * constructor.
      * @param accessContext AccessContext
      * @param davRsCmp davRsCmp
      */

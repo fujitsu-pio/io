@@ -46,9 +46,9 @@ import com.fujitsu.dc.common.es.response.DcIndexResponse;
 import com.fujitsu.dc.common.es.response.EsClientException;
 import com.fujitsu.dc.common.es.util.DcUUID;
 import com.fujitsu.dc.core.DcCoreConfig;
-import com.fujitsu.dc.core.model.DavNode;
 import com.fujitsu.dc.core.model.file.BinaryDataAccessException;
 import com.fujitsu.dc.core.model.file.BinaryDataAccessor;
+import com.fujitsu.dc.core.model.impl.es.DavNode;
 import com.fujitsu.dc.core.model.impl.es.ads.AdsException;
 import com.fujitsu.dc.core.model.impl.es.ads.JdbcAds;
 import com.fujitsu.dc.test.categories.Unit;
@@ -102,7 +102,7 @@ public class DavNodeAccessorTest {
      */
     class JdbcAdsMock extends JdbcAds {
 
-        public JdbcAdsMock() throws Exception {
+        JdbcAdsMock() throws Exception {
             super();
         }
 
@@ -128,7 +128,7 @@ public class DavNodeAccessorTest {
      */
     class JdbcAdsMockDavNodeAccessor extends DavNodeAccessor {
 
-        public JdbcAdsMockDavNodeAccessor(EsIndex index, String name, String routingId) throws Exception {
+        JdbcAdsMockDavNodeAccessor(EsIndex index, String name, String routingId) throws Exception {
             super(index, name, routingId);
         }
 

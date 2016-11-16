@@ -37,8 +37,7 @@ public class ExtCellCreateTest extends ODataCommon {
 
     private static String cellName = "testcell1";
     private final String token = AbstractCase.MASTER_TOKEN_NAME;
-    private final String TRAILING_SLASH = "/";
-
+    private static final String TRAILING_SLASH = "/";
 
     /**
      * コンストラクタ. テスト対象のパッケージをsuperに渡す必要がある
@@ -88,7 +87,6 @@ public class ExtCellCreateTest extends ODataCommon {
         ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
     }
 
-    
     /**
      * Urlが1024文字の場合正常に作成されること.
      */
@@ -120,7 +118,7 @@ public class ExtCellCreateTest extends ODataCommon {
         String extCellUrl = "ftp://localhost:21/dc1-core/testcell1/";
         ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
     }
-    
+
     /**
      * UrlのschemeがURNの場合400エラーを返却すること.
      */

@@ -29,7 +29,7 @@ import org.json.simple.parser.ParseException;
 public class ResourceUtils {
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     private ResourceUtils() {
     }

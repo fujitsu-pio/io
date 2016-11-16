@@ -209,8 +209,8 @@ public class ResourceUtils {
      * @param targetUserId リンク先ユーザデータID
      * @param code 期待するステータスコード
      */
-    public static void linksUserData(String srcEntity, String srcUserId
-            , String targetEntity, String targetUserId, int code) {
+    public static void linksUserData(String srcEntity, String srcUserId,
+             String targetEntity, String targetUserId, int code) {
 
         // ユーザデータ-ユーザデータの$links作成
         String targetUri = UrlUtils.cellRoot(Setup.TEST_CELL1) + Setup.TEST_BOX1 + "/"

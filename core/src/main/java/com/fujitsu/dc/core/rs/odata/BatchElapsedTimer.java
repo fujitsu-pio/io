@@ -40,7 +40,7 @@ public class BatchElapsedTimer {
     /**
      * Lockを他プロセスに譲るためにスリープするか否かを指定するための列挙型.
      */
-    public static enum Lock {
+    public enum Lock {
         /** Lockを他プロセスに譲るためにスリープする. */
         YIELD,
         /** スリープせずにLockの取得を試みる. */

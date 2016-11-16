@@ -60,7 +60,7 @@ public class DcRestAdapter {
     /** ポストデータのエンコード種別. */
     private static final String ENCODE = "UTF-8";
     /** デフォルトタイムアウト値. */
-    private static final int TIMEOUT = 60000;
+    private static final int TIMEOUT = 85000;
     /** HTTPClient. */
     private HttpClient httpClient;
 

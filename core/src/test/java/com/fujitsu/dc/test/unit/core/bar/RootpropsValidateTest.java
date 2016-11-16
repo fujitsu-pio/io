@@ -40,7 +40,7 @@ public class RootpropsValidateTest {
      * .
      */
     private class TestBarRunner extends BarFileReadRunner {
-        public TestBarRunner() {
+        TestBarRunner() {
             super(null, null, null, null, null, null, null, null);
         }
 

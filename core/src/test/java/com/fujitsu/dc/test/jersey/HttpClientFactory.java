@@ -115,11 +115,11 @@ public class HttpClientFactory extends DefaultHttpClient {
                     return ret;
                 }
 
-                public final void checkClientTrusted(final X509Certificate[] certs, final String authType) {
+                public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
                     // System.out.println("checkClientTrusted =============");
                 }
 
-                public final void checkServerTrusted(final X509Certificate[] certs, final String authType) {
+                public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
                     // System.out.println("checkServerTrusted =============");
                 }
             } }, new SecureRandom());

@@ -16,7 +16,9 @@
  */
 package com.fujitsu.dc.core.model.impl.es;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,7 @@ import net.spy.memcached.internal.CheckedOperationTimeoutException;
 import org.apache.commons.lang.StringUtils;
 import org.odata4j.core.OEntity;
 import org.odata4j.core.OEntityKey;
+import org.odata4j.core.OProperty;
 import org.odata4j.expression.BoolCommonExpression;
 import org.odata4j.producer.EntitiesResponse;
 import org.odata4j.producer.EntityResponse;
@@ -51,9 +54,11 @@ import com.fujitsu.dc.common.es.response.DcSearchResponse;
 import com.fujitsu.dc.common.es.util.IndexNameEncoder;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreException;
+import com.fujitsu.dc.core.DcCoreLog;
 import com.fujitsu.dc.core.auth.AccessContext;
 import com.fujitsu.dc.core.auth.AuthUtils;
 import com.fujitsu.dc.core.event.EventBus;
+import com.fujitsu.dc.core.event.EventUtils;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.BoxCmp;
 import com.fujitsu.dc.core.model.Cell;
@@ -65,16 +70,21 @@ import com.fujitsu.dc.core.model.ctl.ExtRole;
 import com.fujitsu.dc.core.model.ctl.ReceivedMessage;
 import com.fujitsu.dc.core.model.ctl.Relation;
 import com.fujitsu.dc.core.model.ctl.SentMessage;
+import com.fujitsu.dc.core.model.file.BinaryDataAccessException;
+import com.fujitsu.dc.core.model.file.BinaryDataAccessor;
+import com.fujitsu.dc.core.model.impl.es.accessor.CellAccessor;
 import com.fujitsu.dc.core.model.impl.es.accessor.EntitySetAccessor;
 import com.fujitsu.dc.core.model.impl.es.accessor.ODataLinkAccessor;
 import com.fujitsu.dc.core.model.impl.es.cache.BoxCache;
 import com.fujitsu.dc.core.model.impl.es.cache.CellCache;
+import com.fujitsu.dc.core.model.impl.es.doc.CellDocHandler;
 import com.fujitsu.dc.core.model.impl.es.doc.OEntityDocHandler;
 import com.fujitsu.dc.core.model.impl.es.odata.CellCtlODataProducer;
+import com.fujitsu.dc.core.model.lock.CellLockManager;
 import com.fujitsu.dc.core.odata.OEntityWrapper;
 
 /**
- * CellのEs上での表現.
+ * Cell object implemented using ElasticSearch.
  */
 public final class CellEsImpl implements Cell {
     private String id;
@@ -90,14 +100,15 @@ public final class CellEsImpl implements Cell {
     private static final int TOP_NUM = DcCoreConfig.getEsTopNum();
 
     /**
-     * ログ.
+     * logger.
      */
     static Logger log = LoggerFactory.getLogger(CellEsImpl.class);
 
     /**
-     * コンストラクタ.
+     * constructor.
      */
     public CellEsImpl() {
+
     }
 
     @Override
@@ -108,22 +119,21 @@ public final class CellEsImpl implements Cell {
     @Override
     public boolean isEmpty() {
         CellCtlODataProducer producer = new CellCtlODataProducer(this);
-        // セル配下のボックスの存在を確認.
-        QueryInfo queryInfo = new QueryInfo(InlineCount.ALLPAGES, null, null,
-                null, null, null, null, null, null);
+        // check no box exists.
+        QueryInfo queryInfo = new QueryInfo(InlineCount.ALLPAGES, null, null, null, null, null, null, null, null);
         if (producer.getEntitiesCount(Box.EDM_TYPE_NAME, queryInfo).getCount() > 0) {
             return false;
         }
 
-        // デフォルトボックス配下にデータが無いことを確認
+        // check that Main Box is empty
         Box defaultBox = this.getBoxForName(Box.DEFAULT_BOX_NAME);
         BoxCmp defaultBoxCmp = ModelFactory.boxCmp(defaultBox);
         if (!defaultBoxCmp.isEmpty()) {
             return false;
         }
 
-        // セル管理リソースが配下に存在していない事を確認
-        // TODO v1.1 性能を向上させるため、Type横断でc:（セルのuuid）の値を検索して、チェックするように変更する
+        // check that no Cell Control Object exists
+        // TODO 性能を向上させるため、Type横断でc:（セルのuuid）の値を検索して、チェックするように変更する
         if (producer.getEntitiesCount(Account.EDM_TYPE_NAME, queryInfo).getCount() > 0
                 || producer.getEntitiesCount(Role.EDM_TYPE_NAME, queryInfo).getCount() > 0
                 || producer.getEntitiesCount(ExtCell.EDM_TYPE_NAME, queryInfo).getCount() > 0
@@ -133,13 +143,8 @@ public final class CellEsImpl implements Cell {
                 || producer.getEntitiesCount(ReceivedMessage.EDM_TYPE_NAME, queryInfo).getCount() > 0) {
             return false;
         }
-        // TODO v1.1 Messageが存在していたら409エラー
+        // TODO check EventLog
         return true;
-    }
-
-    @Override
-    public void makeEmpty() {
-        // TODO 実装
     }
 
     @Override
@@ -192,7 +197,8 @@ public final class CellEsImpl implements Cell {
     }
 
     /**
-     * @param uriInfo UriInfo
+     * @param uriInfo
+     *            UriInfo
      * @return Cell オブジェクト 該当するCellが存在しないときはnull
      */
     public static Cell load(final UriInfo uriInfo) {
@@ -208,18 +214,25 @@ public final class CellEsImpl implements Cell {
     }
 
     /**
-     * @param id id
-     * @param uriInfo UriInfo
+     * @param id
+     *            id
+     * @param uriInfo
+     *            UriInfo
      * @return Cell オブジェクト 該当するCellが存在しないときはnull
      */
     public static Cell load(final String id, final UriInfo uriInfo) {
+        log.debug(id);
         EntitySetAccessor esCells = EsModel.cell();
         DcGetResponse resp = esCells.get(id);
         if (resp.exists()) {
             CellEsImpl ret = new CellEsImpl();
             ret.setJson(resp.getSource());
             ret.id = resp.getId();
-            ret.url = getBaseUri(uriInfo, ret.name);
+            if (uriInfo != null) {
+                ret.url = getBaseUri(uriInfo, ret.name);
+            } else {
+                ret.url = "/" + ret.name + "/";
+            }
             return ret;
         } else {
             return null;
@@ -239,9 +252,12 @@ public final class CellEsImpl implements Cell {
 
     /**
      * ID 又はCell名Cellを検索しCellオブジェクトを返却する.
-     * @param queryKey Cellを検索する際のキー(Cell名)
-     * @param queryValue Cellを検索する際のキーに対する値
-     * @param uriInfo UriInfo
+     * @param queryKey
+     *            Cellを検索する際のキー(Cell名)
+     * @param queryValue
+     *            Cellを検索する際のキーに対する値
+     * @param uriInfo
+     *            UriInfo
      * @return Cell オブジェクト 該当するCellが存在しないとき、又はqueryKeyの値が無効な場合はnull
      */
     public static Cell findCell(String queryKey, String queryValue, UriInfo uriInfo) {
@@ -297,9 +313,10 @@ public final class CellEsImpl implements Cell {
 
     /**
      * Mapからオブジェクトのメンバを設定する.
-     * @param json 実はMap
+     * @param json
+     *            実はMap
      */
-    @SuppressWarnings({"unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void setJson(Map json) {
         this.json = json;
         if (this.json == null) {
@@ -385,8 +402,8 @@ public final class CellEsImpl implements Cell {
 
         Map<String, Object> searchRoleSource = new HashMap<String, Object>();
         searchRoleSource.put("filter", searchRoleFilter);
-        searchRoleSource.put("query", QueryMapFactory.filteredQuery(null,
-                QueryMapFactory.mustQuery(searchRoleQueries)));
+        searchRoleSource.put("query",
+                QueryMapFactory.filteredQuery(null, QueryMapFactory.mustQuery(searchRoleQueries)));
 
         // 検索結果件数設定
         searchRoleSource.put("size", TOP_NUM);
@@ -448,8 +465,10 @@ public final class CellEsImpl implements Cell {
 
     /**
      * ExtCellとRoleの突き合わせを行い払い出すRoleを決める.
-     * @param token トランスセルアクセストークン
-     * @param roles 払い出すロールのリスト。ここに追加する（破壊的メソッド）
+     * @param token
+     *            トランスセルアクセストークン
+     * @param roles
+     *            払い出すロールのリスト。ここに追加する（破壊的メソッド）
      */
     private void addRoleListExtCelltoRole(final IExtRoleContainingToken token, List<Role> roles) {
         // ExtCell-Role結びつけに対応するRoleの取得
@@ -470,8 +489,8 @@ public final class CellEsImpl implements Cell {
             QueryInfo qi = QueryInfo.newBuilder().setTop(TOP_NUM).setInlineCount(InlineCount.NONE).build();
             try {
                 // ExtCell-Roleのリンク情報取得
-                response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME, OEntityKey.create(extCell), "_"
-                        + Role.EDM_TYPE_NAME, qi);
+                response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME, OEntityKey.create(extCell),
+                        "_" + Role.EDM_TYPE_NAME, qi);
             } catch (DcCoreException dce) {
                 if (DcCoreException.OData.NO_SUCH_ENTITY != dce) {
                     throw dce;
@@ -491,11 +510,12 @@ public final class CellEsImpl implements Cell {
     }
 
     /**
-     * ExtCellとRelationとRoleの結びつけから払い出すRoleをリストアップ.
-     * と
+     * ExtCellとRelationとRoleの結びつけから払い出すRoleをリストアップ. と
      * ExtCellとRelationとExtRoleとRoleの結びつけから払い出すRoleをリストアップ.
-     * @param token トランスセルアクセストークン
-     * @param roles 払い出すロールのリスト。ここに追加する（破壊的メソッド）
+     * @param token
+     *            トランスセルアクセストークン
+     * @param roles
+     *            払い出すロールのリスト。ここに追加する（破壊的メソッド）
      */
     @SuppressWarnings("unchecked")
     private void addRoleListExtCelltoRelationAndExtRole(final IExtRoleContainingToken token, List<Role> roles) {
@@ -508,8 +528,8 @@ public final class CellEsImpl implements Cell {
             // 検索結果出力件数設定
             QueryInfo qi = QueryInfo.newBuilder().setTop(TOP_NUM).setInlineCount(InlineCount.NONE).build();
             // ExtCell-Relationのリンク情報取得
-            response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME,
-                    OEntityKey.create(extCell), "_" + Relation.EDM_TYPE_NAME, qi);
+            response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME, OEntityKey.create(extCell),
+                    "_" + Relation.EDM_TYPE_NAME, qi);
         } catch (DcCoreException dce) {
             if (DcCoreException.OData.NO_SUCH_ENTITY != dce) {
                 throw dce;
@@ -540,8 +560,8 @@ public final class CellEsImpl implements Cell {
             Map<String, Object> source = new HashMap<String, Object>();
 
             // 暗黙フィルタを指定して、検索対象を検索条件の先頭に設定する（絞りこみ）
-            List<Map<String, Object>> implicitFilters =
-                    QueryMapFactory.getImplicitFilters(this.id, null, null, null, extRoleType.getType());
+            List<Map<String, Object>> implicitFilters = QueryMapFactory.getImplicitFilters(this.id, null, null, null,
+                    extRoleType.getType());
             String linksKey = OEntityDocHandler.KEY_LINK + "." + Relation.EDM_TYPE_NAME;
             implicitFilters.add(0, QueryMapFactory.termQuery(linksKey, entRelation.getUuid()));
             Map<String, Object> query = QueryMapFactory.mustQuery(implicitFilters);
@@ -583,8 +603,10 @@ public final class CellEsImpl implements Cell {
 
     /**
      * Roleと他のエンティテセットのリンクテーブルから対応するデータを取得する.
-     * @param searchKey 検索条件のエンティティセット名
-     * @param searchValue 検索するuuid
+     * @param searchKey
+     *            検索条件のエンティティセット名
+     * @param searchValue
+     *            検索するuuid
      * @return 検索結果
      */
     private DcSearchResponse serchRoleLinks(final String searchKey, final String searchValue) {
@@ -615,8 +637,10 @@ public final class CellEsImpl implements Cell {
 
     /**
      * Roleが含まれたSearchHitの配列からロールの値を取得する.
-     * @param hits Roleを検索し結果
-     * @param roles 払い出すロールのリスト。ここに追加する（破壊的メソッド）
+     * @param hits
+     *            Roleを検索し結果
+     * @param roles
+     *            払い出すロールのリスト。ここに追加する（破壊的メソッド）
      */
     private void addRoles(DcSearchHit[] hits, List<Role> roles) {
         for (DcSearchHit hit : hits) {
@@ -630,8 +654,10 @@ public final class CellEsImpl implements Cell {
 
     /**
      * ロールの値を取得する.
-     * @param uuid RoleのUUID
-     * @param roles 払い出すロールのリスト。ここに追加する（破壊的メソッド）
+     * @param uuid
+     *            RoleのUUID
+     * @param roles
+     *            払い出すロールのリスト。ここに追加する（破壊的メソッド）
      */
     @SuppressWarnings("unchecked")
     private void addRole(String uuid, List<Role> roles) {
@@ -663,7 +689,7 @@ public final class CellEsImpl implements Cell {
     }
 
     @Override
-    public String getUnitUserNameWithOutPrefix() {
+    public String getDataBundleNameWithOutPrefix() {
         String unitUserName;
         if (this.owner == null) {
             unitUserName = AccessContext.TYPE_ANONYMOUS;
@@ -674,8 +700,8 @@ public final class CellEsImpl implements Cell {
     }
 
     @Override
-    public String getUnitUserName() {
-        String unitUserName = DcCoreConfig.getEsUnitPrefix() + "_" + getUnitUserNameWithOutPrefix();
+    public String getDataBundleName() {
+        String unitUserName = DcCoreConfig.getEsUnitPrefix() + "_" + getDataBundleNameWithOutPrefix();
         return unitUserName;
     }
 
@@ -699,7 +725,8 @@ public final class CellEsImpl implements Cell {
 
     /**
      * このCellの内部IDを設定します.
-     * @param id 内部ID文字列
+     * @param id
+     *            内部ID文字列
      */
     public void setId(String id) {
         this.id = id;
@@ -716,7 +743,8 @@ public final class CellEsImpl implements Cell {
 
     /**
      * このCellのURLを設定します.
-     * @param url URL文字列
+     * @param url
+     *            URL文字列
      */
     public void setUrl(String url) {
         this.url = url;
@@ -727,8 +755,10 @@ public final class CellEsImpl implements Cell {
 
     /**
      * プロパティ項目の値を正規表現でチェックする.
-     * @param propValue プロパティ値
-     * @param dcFormat dcFormatの値
+     * @param propValue
+     *            プロパティ値
+     * @param dcFormat
+     *            dcFormatの値
      * @return フォーマットエラーの場合、falseを返却
      */
     private static boolean validatePropertyRegEx(String propValue, String dcFormat) {
@@ -748,4 +778,192 @@ public final class CellEsImpl implements Cell {
     public long getPublished() {
         return this.published;
     }
+
+    @Override
+    public String roleIdToRoleResourceUrl(String roleId) {
+        CellCtlODataProducer ccop = new CellCtlODataProducer(this);
+        OEntity oe = ccop.getEntityByInternalId(Role.EDM_TYPE_NAME, roleId);
+        if (oe == null) {
+            // ロールが存在しない場合、nullを返す。
+            return null;
+        }
+
+        String boxName = (String) oe.getProperty("_Box.Name").getValue();
+        OProperty<?> schemaProp = oe.getProperty("_Box.Schema");
+        String schema = null;
+        if (schemaProp != null) {
+            schema = (String) schemaProp.getValue();
+        }
+        String roleName = (String) oe.getProperty("Name").getValue();
+        Role roleObj = new Role(roleName, boxName, schema, this.getUrl());
+        return roleObj.createUrl();
+    }
+
+    @Override
+    public String roleResourceUrlToId(String roleUrl, String baseUrl) {
+        EntitySetAccessor roleType = EsModel.cellCtl(this, Role.EDM_TYPE_NAME);
+
+        // roleNameがURLの対応
+        URL rUrl = null;
+        try {
+            // xml:baseの対応
+            if (baseUrl != null && !"".equals(baseUrl)) {
+                // URLの相対パス対応
+                rUrl = new URL(new URL(baseUrl), roleUrl);
+            } else {
+                rUrl = new URL(roleUrl);
+            }
+        } catch (MalformedURLException e) {
+            throw DcCoreException.Dav.ROLE_NOT_FOUND.reason(e);
+        }
+
+        Role role = null;
+        try {
+            role = new Role(rUrl);
+        } catch (MalformedURLException e) {
+            log.info("Role URL:" + rUrl.toString());
+            throw DcCoreException.Dav.ROLE_NOT_FOUND;
+        }
+
+        // ロールリソースのセルURL部分はACL設定対象のセルURLと異なるものを指定することは許さない
+        if (!(this.getUrl().equals(role.getBaseUrl()))) {
+            DcCoreLog.Dav.ROLE_NOT_FOUND.params("Cell different").writeLog();
+            throw DcCoreException.Dav.ROLE_NOT_FOUND;
+        }
+        // Roleの検索
+        List<Map<String, Object>> queries = new ArrayList<Map<String, Object>>();
+        queries.add(QueryMapFactory.termQuery("c", this.getId()));
+        queries.add(QueryMapFactory.termQuery("s." + KEY_NAME + ".untouched", role.getName()));
+
+        Map<String, Object> query = QueryMapFactory.filteredQuery(null, QueryMapFactory.mustQuery(queries));
+
+        List<Map<String, Object>> filters = new ArrayList<Map<String, Object>>();
+        if (!(Box.DEFAULT_BOX_NAME.equals(role.getBoxName()))) {
+            // Roleがボックスと紐付く場合に、検索クエリを追加
+            Box targetBox = this.getBoxForName(role.getBoxName());
+            if (targetBox == null) {
+                throw DcCoreException.Dav.BOX_LINKED_BY_ROLE_NOT_FOUND.params(baseUrl);
+            }
+            String boxId = targetBox.getId();
+            filters.add(QueryMapFactory.termQuery("l." + Box.EDM_TYPE_NAME, boxId));
+        } else {
+            // Roleがボックスと紐付かない場合にもnull検索クエリを追加
+            filters.add(QueryMapFactory.missingFilter("l." + Box.EDM_TYPE_NAME));
+        }
+
+        Map<String, Object> source = new HashMap<String, Object>();
+        if (!filters.isEmpty()) {
+            source.put("filter", QueryMapFactory.andFilter(filters));
+        }
+        source.put("query", query);
+        DcSearchHits hits = roleType.search(source).getHits();
+
+        // 対象のRoleが存在しない場合はNull
+        if (hits == null || hits.getCount() == 0) {
+            DcCoreLog.Dav.ROLE_NOT_FOUND.params("Not Hit").writeLog();
+            throw DcCoreException.Dav.ROLE_NOT_FOUND;
+        }
+        // 対象のRoleが複数件取得された場合は内部エラーとする
+        if (hits.getAllPages() > 1) {
+            DcCoreLog.OData.FOUND_MULTIPLE_RECORDS.params(hits.getAllPages()).writeLog();
+            throw DcCoreException.OData.DETECTED_INTERNAL_DATA_CONFLICT;
+        }
+
+        DcSearchHit hit = hits.getHits()[0];
+        return hit.getId();
+    }
+
+    @Override
+    public void delete(boolean recursive, String unitUserName) {
+        // Cellに対するアクセス数を確認して、アクセスをロックする
+        int maxLoopCount = Integer.valueOf(DcCoreConfig.getCellLockRetryTimes());
+        long interval = Long.valueOf(DcCoreConfig.getCellLockRetryInterval());
+        waitCellAccessible(this.id, maxLoopCount, interval);
+
+        CellLockManager.setBulkDeletionStatus(this.id);
+
+        // Cellエンティティを削除する
+        CellAccessor cellAccessor = (CellAccessor) EsModel.cell();
+        CellDocHandler docHandler = new CellDocHandler(cellAccessor.get(this.getId()));
+        try {
+            cellAccessor.delete(docHandler);
+            log.info("Cell Entity Deletion End.");
+        } finally {
+            CellCache.clear(this.getName());
+            CellLockManager.resetBulkDeletionStatus(this.getId());
+        }
+
+        // Make this cell empty asynchronously
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                makeEmpty();
+            }
+        });
+        thread.start();
+
+    }
+
+    private void waitCellAccessible(String cellId, int maxLoopCount, long interval) {
+        for (int loopCount = 0; loopCount < maxLoopCount; loopCount++) {
+            long count = CellLockManager.getReferenceCount(cellId);
+            // 自分のリクエスト分も含まれるので他のリクエストが存在する場合は１より大きくなる
+            if (count <= 1) {
+                return;
+            }
+            try {
+                Thread.sleep(interval);
+            } catch (InterruptedException e) {
+                throw DcCoreException.Misc.CONFLICT_CELLACCESS;
+            }
+        }
+        throw DcCoreException.Misc.CONFLICT_CELLACCESS;
+    }
+
+    private static final int DAVFILE_DEFAULT_FETCH_COUNT = 1000;
+
+    @Override
+    public void makeEmpty() {
+        CellAccessor cellAccessor = (CellAccessor) EsModel.cell();
+        String unitUserNameWithOutPrefix = this.getDataBundleNameWithOutPrefix();
+        String cellInfoLog = String.format(" CellId:[%s], CellName:[%s], CellUnitUserName:[%s]", this.getId(),
+                this.getName(), this.getDataBundleName());
+
+        // セルIDとタイプ情報をクエリに使用してWebDavファイルの管理情報一覧の件数を取得する
+        long davfileCount = cellAccessor.getDavFileTotalCount(this.getId(), unitUserNameWithOutPrefix);
+
+        // 1000件ずつ、WebDavファイルの管理情報件数まで以下を実施する
+        int fetchCount = DAVFILE_DEFAULT_FETCH_COUNT;
+        BinaryDataAccessor accessor = new BinaryDataAccessor(DcCoreConfig.getBlobStoreRoot(), unitUserNameWithOutPrefix,
+                DcCoreConfig.getPhysicalDeleteMode(), DcCoreConfig.getFsyncEnabled());
+        for (int i = 0; i <= davfileCount; i += fetchCount) {
+            // WebDavファイルのID一覧を取得する
+            List<String> davFileIdList = cellAccessor.getDavFileIdList(this.getId(), unitUserNameWithOutPrefix,
+                    fetchCount, i);
+            // BinaryDataAccessorのdeleteメソッドにて「.deleted」にリネームする
+            for (String davFileId : davFileIdList) {
+                try {
+                    accessor.delete(davFileId);
+                } catch (BinaryDataAccessException e) {
+                    // 削除に失敗した場合はログを出力して処理を続行する
+                    log.warn(String.format("Delete DavFile Failed DavFileId:[%s].", davFileId) + cellInfoLog, e);
+                }
+            }
+        }
+        log.info("DavFile Deletion End.");
+
+        // delete EventLog file
+        try {
+            EventUtils.deleteEventLog(this.getId(), this.getOwner());
+            log.info("EventLog Deletion End.");
+        } catch (BinaryDataAccessException e) {
+            // 削除に失敗した場合はログを出力して処理を続行する
+            log.warn("Delete EventLog Failed." + cellInfoLog, e);
+        }
+
+        // Cell配下のエンティティを削除する
+        cellAccessor.cellBulkDeletion(this.getId(), unitUserNameWithOutPrefix);
+        log.info("Cell Entity Resource Deletion End.");
+    }
+
 }

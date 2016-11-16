@@ -19,13 +19,13 @@ package com.fujitsu.dc.core.model;
 import javax.ws.rs.core.UriInfo;
 
 import com.fujitsu.dc.core.auth.AccessContext;
-import com.fujitsu.dc.core.model.impl.es.BoxCmpEsImpl;
-import com.fujitsu.dc.core.model.impl.es.CellCmpEsImpl;
 import com.fujitsu.dc.core.model.impl.es.CellEsImpl;
 import com.fujitsu.dc.core.model.impl.es.odata.CellCtlODataProducer;
 import com.fujitsu.dc.core.model.impl.es.odata.UnitCtlODataProducer;
 import com.fujitsu.dc.core.model.impl.es.odata.UserDataODataProducer;
 import com.fujitsu.dc.core.model.impl.es.odata.UserSchemaODataProducer;
+import com.fujitsu.dc.core.model.impl.fs.BoxCmpFsImpl;
+import com.fujitsu.dc.core.model.impl.fs.CellCmpFsImpl;
 import com.fujitsu.dc.core.odata.DcODataProducer;
 
 /**
@@ -66,7 +66,7 @@ public final class ModelFactory {
      * @return Boxの内部実装モデルオブジェクト
      */
     public static BoxCmp boxCmp(final Box box) {
-        return new BoxCmpEsImpl(box);
+        return new BoxCmpFsImpl(box);
     }
 
     /**
@@ -75,7 +75,7 @@ public final class ModelFactory {
      * @return Cellの内部実装モデルオブジェクト
      */
     public static CellCmp cellCmp(final Cell cell) {
-        return new CellCmpEsImpl(cell);
+        return new CellCmpFsImpl(cell);
     }
 
     /**

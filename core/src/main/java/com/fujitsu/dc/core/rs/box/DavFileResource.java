@@ -34,104 +34,99 @@ import org.apache.wink.webdav.WebDAVMethod;
 
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.annotations.ACL;
-import com.fujitsu.dc.core.annotations.RequirePrivilege;
 import com.fujitsu.dc.core.auth.BoxPrivilege;
 import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavMoveResource;
 import com.fujitsu.dc.core.model.DavRsCmp;
 
 /**
- * プレーンなWebDAVのファイルリソースに対応するJAX-RS Resource クラス.
+ * JAX-RS Resource class for a plain WebDAV file resource.
  */
 public class DavFileResource {
 
     DavRsCmp davRsCmp;
 
     /**
-     * コンストラクタ.
-     * @param parent 親
-     * @param davCmp 部品
+     * Constructor.
+     * @param parent Parent resource
+     * @param davCmp DavCmp
      */
     public DavFileResource(final DavRsCmp parent, final DavCmp davCmp) {
         this.davRsCmp = new DavRsCmp(parent, davCmp);
     }
 
     /**
-     * PUT メソッドを処理し、ファイルを更新します.
-     * @param contentType Content-Typeヘッダ
-     * @param ifMatch If-Matchヘッダ
-     * @param inputStream リクエストボディ
-     * @return JAX-RS応答オブジェクト
+     * process PUT Method and update the file.
+     * @param contentType Content-Type Header
+     * @param ifMatch If-Match Header
+     * @param inputStream Request Body
+     * @return JAX-RS response object
      */
     @PUT
     public Response put(@HeaderParam(HttpHeaders.CONTENT_TYPE) final String contentType,
             @HeaderParam(HttpHeaders.IF_MATCH) final String ifMatch,
             final InputStream inputStream) {
-
-        // アクセス制御
+        // Access Control
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
 
-        // If None Matchがあれば、それを使う 。なければ使わない
         ResponseBuilder rb = this.davRsCmp.getDavCmp().putForUpdate(contentType, inputStream, ifMatch);
         return rb.build();
     }
 
     /**
-     * GETメソッドを処理します. ファイルを取得します.
-     * @param ifNoneMatch If-None-Matchヘッダ
-     * @param rangeHeaderField Rangeヘッダ
-     * @return JAX-RS応答オブジェクト
+     * process GET Method and retrieve the file content.
+     * @param ifNoneMatch If-None-Match Header
+     * @param rangeHeaderField Range header
+     * @return JAX-RS response object
      */
     @GET
-    @RequirePrivilege("readContent")
     public Response get(
             @HeaderParam(HttpHeaders.IF_NONE_MATCH) final String ifNoneMatch,
             @HeaderParam("Range") final String rangeHeaderField
             ) {
 
-        // アクセス制御
+        // Access Control
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.READ);
 
-        ResponseBuilder rb = this.davRsCmp.getDavCmp().get(ifNoneMatch, rangeHeaderField);
+        ResponseBuilder rb = this.davRsCmp.get(ifNoneMatch, rangeHeaderField);
         return rb.build();
     }
 
     /**
-     * DELETEメソッドを処理します. このリソースを削除します.
-     * @param ifMatch If-Match ヘッダ
-     * @return JAX-RS応答オブジェクト
+     * process DELETE Method and delete this resource.
+     * @param ifMatch If-Match header
+     * @return JAX-RS response object
      */
     @DELETE
     public Response delete(@HeaderParam(HttpHeaders.IF_MATCH) final String ifMatch) {
-
-        // アクセス制御
+        // Access Control
         // DavFileResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
         this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
 
-        ResponseBuilder rb = this.davRsCmp.getDavCmp().delete(ifMatch);
+        ResponseBuilder rb = this.davRsCmp.getDavCmp().delete(ifMatch, false);
         return rb.build();
     }
 
     /**
-     * PROPPATCHの処理.
-     * @param requestBodyXml リクエストボディ
-     * @return JAX-RS応答オブジェクト
+     * process PROPPATCH Method.
+     * @param requestBodyXml request body
+     * @return JAX-RS response object
      */
     @WebDAVMethod.PROPPATCH
     public Response proppatch(final Reader requestBodyXml) {
-        // アクセス制御
+        // Access Control
         this.davRsCmp.checkAccessContext(
                 this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE_PROPERTIES);
         return this.davRsCmp.doProppatch(requestBodyXml);
     }
 
     /**
-     * PROPFINDの処理.
-     * @param requestBodyXml リクエストボディ
+     * process PROPFIND Method.
+     * @param requestBodyXml request body
      * @param depth Depth Header
      * @param contentLength Content-Length Header
      * @param transferEncoding Transfer-Encoding Header
-     * @return JAX-RS応答オブジェクト
+     * @return JAX-RS response object
      */
     @WebDAVMethod.PROPFIND
     public Response propfind(final Reader requestBodyXml,
@@ -144,39 +139,38 @@ public class DavFileResource {
     }
 
     /**
-     * ACLメソッドの処理. ACLの設定を行う.
-     * @param reader 設定XML
+     * process ACL Method and configure ACL.
+     * @param reader request body
      * @return JAX-RS Response
      */
     @ACL
     public Response acl(final Reader reader) {
-
-        // アクセス制御
+        // Access Control
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE_ACL);
         return this.davRsCmp.doAcl(reader);
     }
 
     /**
-     * MOVEメソッドの処理.
-     * @param headers ヘッダ情報
-     * @return JAX-RS応答オブジェクト
+     * process MOVE Method.
+     * @param headers Http headers
+     * @return JAX-RS response object
      */
     @WebDAVMethod.MOVE
     public Response move(
             @Context HttpHeaders headers) {
-        // 移動元に対するアクセス制御
+        // Access Control against the move source
         // DavFileResourceは必ず親(最上位はBox)を持つため、this.davRsCmp.getParent()の結果がnullになることはない
         this.davRsCmp.getParent().checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.WRITE);
         return new DavMoveResource(this.davRsCmp.getParent(), this.davRsCmp.getDavCmp(), headers).doMove();
     }
 
     /**
-     * OPTIONSメソッドの処理.
-     * @return JAX-RS応答オブジェクト
+     * process OPTIONS Method.
+     * @return JAX-RS response object
      */
     @OPTIONS
     public Response options() {
-        // 移動元に対するアクセス制御
+        // Access Control
         this.davRsCmp.checkAccessContext(this.davRsCmp.getAccessContext(), BoxPrivilege.READ);
         return DcCoreUtils.responseBuilderForOptions(
                 HttpMethod.GET,

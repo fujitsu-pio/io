@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.DcCoreConfig;
 import com.fujitsu.dc.core.DcCoreLog;
-import com.fujitsu.dc.core.model.DavNode;
+import com.fujitsu.dc.core.model.impl.es.DavNode;
 import com.fujitsu.dc.core.model.impl.es.doc.CellDocHandler;
 import com.fujitsu.dc.core.model.impl.es.doc.EntitySetDocHandler;
 import com.fujitsu.dc.core.model.impl.es.doc.LinkDocHandler;

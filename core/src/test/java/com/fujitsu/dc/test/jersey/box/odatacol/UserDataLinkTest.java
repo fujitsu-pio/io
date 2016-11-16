@@ -111,8 +111,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                   Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -177,8 +177,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -243,10 +243,10 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId + 1));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId + 1));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -313,8 +313,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                   Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -379,10 +379,10 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId + 1));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                   Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                   Setup.TEST_ODATA, targetEntityType, targetUserDataId + 1));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -449,8 +449,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -515,8 +515,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -581,10 +581,10 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId + 1));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId + 1));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -628,8 +628,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                 ResourceUtils.linksUserData(srcEntityType, srcUserDataId, targetEntityType, targetUserDataId,
                         HttpStatus.SC_NO_CONTENT);
                 // 一覧取得のExpectedリストを作成
-                expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                        , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+                expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                       Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             }
 
             // $links一覧取得
@@ -685,8 +685,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                 ResourceUtils.linksUserData(srcEntityType, srcUserDataId, targetEntityType, targetUserDataId,
                         HttpStatus.SC_NO_CONTENT);
                 // 一覧取得のExpectedリストを作成
-                expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                        , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+                expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                       Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             }
 
             // $links一覧取得
@@ -742,8 +742,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                 ResourceUtils.linksUserData(srcEntityType, srcUserDataId, targetEntityType, targetUserDataId,
                         HttpStatus.SC_NO_CONTENT);
                 // 一覧取得のExpectedリストを作成
-                expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                        , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+                expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                        Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             }
 
             // $links一覧取得
@@ -1487,8 +1487,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .statusCode(HttpStatus.SC_OK)
                     .debug();
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
         } finally {
@@ -1542,8 +1542,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .statusCode(HttpStatus.SC_OK)
                     .debug();
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
         } finally {
@@ -1597,8 +1597,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .statusCode(HttpStatus.SC_OK)
                     .debug();
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, targetEntityType, targetUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                    Setup.TEST_ODATA, targetEntityType, targetUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
         } finally {
@@ -1644,8 +1644,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, "SalesDetail", fromUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                     Setup.TEST_ODATA, "SalesDetail", fromUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -1685,8 +1685,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, fromEntityTypeName, fromUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                     Setup.TEST_ODATA, fromEntityTypeName, fromUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -1729,8 +1729,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                     .debug();
 
             ArrayList<String> expectedUriList = new ArrayList<String>();
-            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1
-                    , Setup.TEST_ODATA, "Sales", toUserDataId));
+            expectedUriList.add(UrlUtils.userdata(Setup.TEST_CELL1, Setup.TEST_BOX1,
+                     Setup.TEST_ODATA, "Sales", toUserDataId));
             // レスポンスボディのチェック
             ODataCommon.checkLinResponseBody(resList.bodyAsJson(), expectedUriList);
 
@@ -1817,9 +1817,8 @@ public class UserDataLinkTest extends AbstractUserDataTest {
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    private void linkUserData(String toEntity, String toUserId
-            , String fromEntity
-            , String fromUserId) {
+    private void linkUserData(String toEntity, String toUserId,
+             String fromEntity, String fromUserId) {
 
         // ユーザデータ-ユーザデータの$links作成
         String targetUri = UrlUtils.cellRoot(Setup.TEST_CELL1) + Setup.TEST_BOX1 + "/"

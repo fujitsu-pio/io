@@ -42,6 +42,7 @@ import com.fujitsu.dc.core.event.EventUtils;
 import com.fujitsu.dc.core.model.Box;
 import com.fujitsu.dc.core.model.BoxCmp;
 import com.fujitsu.dc.core.model.Cell;
+import com.fujitsu.dc.core.model.CellCmp;
 import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.file.BinaryDataAccessException;
 import com.fujitsu.dc.core.model.lock.UnitUserLockManager;
@@ -157,7 +158,6 @@ public class UnitCtlResource extends ODataResource {
 
     @Override
     public void beforeDelete(final String entitySetName, final OEntityKey oEntityKey) {
-
         EntityResponse er = this.getODataProducer()
                 .getEntity(entitySetName, oEntityKey, new EntityQueryInfo.Builder().build());
 
@@ -170,29 +170,35 @@ public class UnitCtlResource extends ODataResource {
             String cellId = oew.getUuid();
             cell = ModelFactory.cell(cellId, uriInfo);
 
-            // Cell配下にイベントログが存在する場合は削除
-            String owner = cell.getOwner();
-            try {
-                EventUtils.deleteEventLog(cellId, owner);
-            } catch (BinaryDataAccessException e) {
-                log.warn("Failed to delete eventlog. CellName=[" + this.cell.getName() + "] owner=[" + owner + "] "
-                        + e.getMessage());
-            }
-
             // Cell配下が空っぽじゃなければ409エラー
             if (!cell.isEmpty()) {
                 throw DcCoreException.OData.CONFLICT_HAS_RELATED;
             }
+
+
         }
     }
 
     @Override
     public void afterDelete(final String entitySetName, final OEntityKey oEntityKey) {
         if (Cell.EDM_TYPE_NAME.equals(entitySetName)) {
-            // デフォルトボックスの削除
+            // Cell配下にイベントログが存在する場合は削除
+            String owner = cell.getOwner();
+            try {
+                EventUtils.deleteEventLog(this.cell.getId(), owner);
+            } catch (BinaryDataAccessException e) {
+                log.warn("Failed to delete eventlog. CellName=[" + this.cell.getName() + "] owner=[" + owner + "] "
+                        + e.getMessage());
+            }
+
+            // delete Main Box DavCmp
             Box box = new Box(this.cell, null);
             BoxCmp boxCmp = ModelFactory.boxCmp(box);
-            boxCmp.delete(null);
+            boxCmp.delete(null, false);
+
+            // delete cell DavCmp
+            CellCmp cellCmp = ModelFactory.cellCmp(this.cell);
+            cellCmp.delete(null, false);
         }
     }
 

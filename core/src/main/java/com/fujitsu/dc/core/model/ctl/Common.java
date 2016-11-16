@@ -73,7 +73,7 @@ public class Common {
     public static final String DC_FORMAT_PATTERN_SCHEMA_URI = "schema-uri";
     /** 拡張スキーマFormat定義. */
     public static final String DC_FORMAT_PATTERN_CELL_URL = "cell-url";
-    /** 拡張スキーマFormat定義.1つ以上のスペース区切り英数字 */
+    /** 拡張スキーマFormat定義.1つ以上のスペース区切り英数字. */
     public static final String DC_FORMAT_PATTERN_USUSST = "unordered-set-of-unique-space-separated-tokens";
     /** 先頭が-,_以外で始まる半角英数大小文字,-,_が1文字から128文字. */
     public static final String PATTERN_NAME = "^[a-zA-Z0-9][a-zA-Z0-9-_]{0,127}$";
@@ -314,7 +314,7 @@ public class Common {
                 DC_NAMESPACE.getUri(), DC_NAMESPACE.getPrefix(),
                 DC_FORMAT, DC_FORMAT_PATTERN_REGEX + "('" + Common.PATTERN_MESSAGE_PRIORITY + "')");
     }
-    
+
     /**
      * Account Type 項目に対するdc:FormatのAnnotationを返却.
      * @return EdmAnnotation
@@ -322,7 +322,7 @@ public class Common {
     public static EdmAnnotation<?> createFormatAccountTypeAnnotation() {
         return new EdmAnnotationAttribute(
                 DC_NAMESPACE.getUri(), DC_NAMESPACE.getPrefix(),
-                DC_FORMAT, DC_FORMAT_PATTERN_USUSST + "('" + Account.TYPE_VALUE_BASIC +"', '" + Account.TYPE_VALUE_OIDC_GOOGLE + "')" );
+                DC_FORMAT, DC_FORMAT_PATTERN_USUSST + "('" + Account.TYPE_VALUE_BASIC + "', '"
+                + Account.TYPE_VALUE_OIDC_GOOGLE + "')");
     }
-    
 }

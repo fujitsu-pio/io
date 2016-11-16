@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * barファイルのエクスポート、インストール関連のクラス群です.
+ * classes related to bar file install & export.
  */
 package com.fujitsu.dc.core.bar;
 
