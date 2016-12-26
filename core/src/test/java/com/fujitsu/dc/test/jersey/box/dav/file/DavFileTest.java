@@ -288,6 +288,43 @@ public class DavFileTest extends JerseyTest {
     }
 
     /**
+     * FileをEtagなしPUTで更新し更新後データを正常に取得できる.
+     */
+    @Test
+    public final void FileをEtagなしPUTで更新し更新後もデータを正常に取得できる() {
+        try {
+            // PUT
+            TResponse resp = this.putFileRequest(FILE_NAME, FILE_BODY, null, Setup.TEST_BOX1)
+                    .returns()
+                    .statusCode(HttpStatus.SC_CREATED);
+            String etag = resp.getHeader(HttpHeaders.ETAG);
+            assertNotNull(etag);
+            // GET
+            TResponse getRes = this.getFileRequest(FILE_NAME, TEST_BOX1, null)
+                    .returns()
+                    .statusCode(HttpStatus.SC_OK);
+            int cl1 = Integer.parseInt(getRes.getHeader(HttpHeaders.CONTENT_LENGTH));
+            assertEquals(FILE_BODY.length(), cl1);
+            // PUT 
+            TResponse resp2 = this.putFileRequest(FILE_NAME, FILE_BODY2, null, Setup.TEST_BOX1)
+                    .returns()
+                    .statusCode(HttpStatus.SC_NO_CONTENT);
+            String etag2 = resp2.getHeader(HttpHeaders.ETAG);
+            assertNotNull(etag2);
+            // GET 
+            getRes = this.getFileRequest(FILE_NAME, TEST_BOX1, null)
+                    .returns()
+                    .statusCode(HttpStatus.SC_OK);
+            int cl2 = Integer.parseInt(getRes.getHeader(HttpHeaders.CONTENT_LENGTH));
+            assertEquals(FILE_BODY2.length(), cl2);
+        } finally {
+            this.deleteFileRequest(FILE_NAME, null, Setup.TEST_BOX1).returns()
+                    .statusCode(HttpStatus.SC_NO_CONTENT);
+        }
+    }
+
+    
+    /**
      * FileをETAGつきPUTで更新してDELETEする.
      */
     @Test

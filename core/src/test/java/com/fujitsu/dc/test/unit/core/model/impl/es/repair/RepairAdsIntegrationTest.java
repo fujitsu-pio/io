@@ -178,8 +178,8 @@ public class RepairAdsIntegrationTest extends AbstractCase {
                     .get(0).get("source")).get("a"));
             assertEquals(((JSONObject) adsResponceBefore.get(0).get("source")).get("n"), ((JSONObject) adsResponceAfter
                     .get(0).get("source")).get("n"));
-            assertEquals(((JSONObject) adsResponceBefore.get(0).get("source")).get("l"), ((JSONObject) adsResponceAfter
-                    .get(0).get("source")).get("l"));
+            assertEquals(((JSONObject) adsResponceBefore.get(0).get("source")).get("ll"), ((JSONObject) adsResponceAfter
+                    .get(0).get("source")).get("ll"));
             assertEquals(
                     ((JSONObject) adsResponceBefore.get(0).get("source")).get("h"),
                     ((JSONObject) adsResponceBefore.get(0).get("source")).get("h"));
@@ -291,9 +291,9 @@ public class RepairAdsIntegrationTest extends AbstractCase {
             assertEquals(((JSONObject) adsResponceBefore.get(0).get("source")).get("n"), ((JSONObject)
                     adsResponceAfter
                             .get(0).get("source")).get("n"));
-            assertEquals(((JSONObject) adsResponceBefore.get(0).get("source")).get("l"), ((JSONObject)
+            assertEquals(((JSONObject) adsResponceBefore.get(0).get("source")).get("ll"), ((JSONObject)
                     adsResponceAfter
-                            .get(0).get("source")).get("l"));
+                            .get(0).get("source")).get("ll"));
             assertEquals(((JSONObject) adsResponceBefore.get(0).get("source")).get("t"), ((JSONObject)
                     adsResponceAfter
                             .get(0).get("source")).get("t"));
