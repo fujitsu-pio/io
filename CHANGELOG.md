@@ -2,9 +2,8 @@
 
 IMPROVEMENTS:
   - core *[UriUtils.java, CellEsImpl.java,TokenEndPointResource.java etc]* :<br>
-
-   * A new custom URL scheme `personium-localunit` is introduced for more flexible server operation.
-   * It is now supported in major APIs handling URL.
+    A new custom URL scheme `personium-localunit` is introduced for more flexible server operation.<br> 
+    It is now supported in major APIs handling URL.
    * You can write `personium-localunit:/cell1/` instead of `https://myunit.example/cell1/` in fields such as  `Box.Schema` or `ExtCell.Url` when referring within the same Unit.
  
    * In previous versions, Unit FQDN change requires data conversion in most cases.
