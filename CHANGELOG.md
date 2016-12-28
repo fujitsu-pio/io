@@ -1,3 +1,23 @@
+## 1.4.1
+
+IMPROVEMENTS:
+  - core *[UriUtils.java, CellEsImpl.java,TokenEndPointResource.java etc]* :<br>
+
+   * A new custom URL scheme `personium-localunit` is introduced for more flexible server operation.
+   * It is now supported in major APIs handling URL.
+   * You can write `personium-localunit:/cell1/` instead of `https://myunit.example/cell1/` in fields such as  `Box.Schema` or `ExtCell.Url` when referring within the same Unit.
+ 
+   * In previous versions, Unit FQDN change requires data conversion in most cases.
+   * By using this new URL scheme, links among Cells on a Unit can be kept without data conversion after Unit FQDN change.
+ 
+BUG FIXES:
+
+  - core *[DcEngineSvcCollectionResource.java etc]*, engine *[FsServiceResourceSourceManager.java etc]*: <br>
+    (Issue #27)The script file could not be loaded for enabling custom API was fixed.
+
+  - core *[DavCmpFsImpl.java]*: 
+    (Issue #29)The bug that the content length is always reset to 0 at updating WebDAV file was fixed.<br>
+
 ## 1.4.0
 
 BREAKING CHANGES:
