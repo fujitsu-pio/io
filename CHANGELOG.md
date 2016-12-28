@@ -13,10 +13,10 @@ IMPROVEMENTS:
 BUG FIXES:
 
   - core *[DcEngineSvcCollectionResource.java etc]*, engine *[FsServiceResourceSourceManager.java etc]*: <br>
-    (Issue #27)The script file could not be loaded for enabling custom API was fixed.
+    The script file could not be loaded for enabling custom API was fixed. (Issue #27)
 
-  - core *[DavCmpFsImpl.java]*: 
-    (Issue #29)The bug that the content length is always reset to 0 at updating WebDAV file was fixed.<br>
+  - core *[DavCmpFsImpl.java]*:<br> 
+    The bug that the content length is always reset to 0 at updating WebDAV file was fixed.(Issue #29)
 
 ## 1.4.0
 
