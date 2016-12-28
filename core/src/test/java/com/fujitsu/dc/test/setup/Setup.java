@@ -193,7 +193,6 @@ public class Setup extends AbstractCase {
 
         // ExtCellの登録
         conf1.extCellUrl.add(UrlUtils.cellRoot(TEST_CELL2));
-
         conf2.extCellUrl.add(UrlUtils.cellRoot(TEST_CELL1));
 
         // 関係
@@ -273,7 +272,6 @@ public class Setup extends AbstractCase {
 
         // TODO OIDC用のTestCell作成
         // IDToken取得機構を作るときに対応予定
-
     }
 
     /**

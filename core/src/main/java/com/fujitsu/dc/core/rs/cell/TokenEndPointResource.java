@@ -77,6 +77,7 @@ import com.fujitsu.dc.core.model.ModelFactory;
 import com.fujitsu.dc.core.model.ctl.Account;
 import com.fujitsu.dc.core.odata.DcODataProducer;
 import com.fujitsu.dc.core.odata.OEntityWrapper;
+import com.fujitsu.dc.core.utils.UriUtils;
 
 /**
  * 認証処理を司るJAX-RSリソース.
@@ -140,8 +141,10 @@ public class TokenEndPointResource {
             @FormParam(Key.ID_TOKEN) final String idToken,
             @HeaderParam(HttpHeaders.HOST) final String host) {
 
+        // Accept unit local scheme url.
+        String target = UriUtils.convertSchemeFromLocalUnitToHttp(cell.getUnitUrl(), dcTarget);
         // dc_target がURLでない場合はヘッダInjectionの脆弱性を産んでしまう。(改行コードが入っているなど)
-        String target = this.checkDcTarget(dcTarget);
+        target = this.checkDcTarget(target);
 
         if (null != dcTarget) {
             issueCookie = false;

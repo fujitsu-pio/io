@@ -32,9 +32,11 @@ import org.junit.runner.RunWith;
 import com.fujitsu.dc.core.DcCoreAuthzException;
 import com.fujitsu.dc.core.DcCoreException;
 import com.fujitsu.dc.core.auth.OAuth2Helper;
+import com.fujitsu.dc.core.utils.UriUtils;
 import com.fujitsu.dc.test.categories.Integration;
 import com.fujitsu.dc.test.categories.Regression;
 import com.fujitsu.dc.test.categories.Unit;
+import com.fujitsu.dc.test.jersey.AbstractCase;
 import com.fujitsu.dc.test.jersey.DcException;
 import com.fujitsu.dc.test.jersey.DcResponse;
 import com.fujitsu.dc.test.jersey.DcRestAdapter;
@@ -42,6 +44,7 @@ import com.fujitsu.dc.test.jersey.DcRunner;
 import com.fujitsu.dc.test.jersey.ODataCommon;
 import com.fujitsu.dc.test.setup.Setup;
 import com.fujitsu.dc.test.unit.core.UrlUtils;
+import com.fujitsu.dc.test.utils.BoxUtils;
 import com.fujitsu.dc.test.utils.ResourceUtils;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
@@ -64,6 +67,7 @@ public class BoxUrlTest extends ODataCommon {
                 "com.fujitsu.dc.core.rs.DcCoreApplication");
         INIT_PARAMS.put("com.sun.jersey.config.feature.DisableWADL",
                 "true");
+
     }
 
     /**
@@ -90,6 +94,92 @@ public class BoxUrlTest extends ODataCommon {
                     requestheaders);
             assertEquals(HttpStatus.SC_OK, res.getStatusCode());
             assertEquals(UrlUtils.boxRoot(Setup.TEST_CELL1, Setup.TEST_BOX1), res.getFirstHeader(HttpHeaders.LOCATION));
+        } catch (DcException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 指定したローカルユニットschemaのBoxURLがLocalUnitで取得できること.
+     */
+    @Test
+    public final void schemaパラメタとしてhttpURLの指定でlocalunitURLをschemaとするBoxが取得できること() {
+        try {
+            // テスト準備
+            // スキーマ設定(Box更新)
+            // Setupでセル1にBoxのSchemaとして登録されている urlをhttpからpersonium-localunitに一時的に更新。
+            BoxUtils.update(Setup.TEST_CELL1, AbstractCase.MASTER_TOKEN_NAME,
+                    Setup.TEST_BOX1, "*", Setup.TEST_BOX1,
+                    UriUtils.SCHEME_UNIT_URI + Setup.TEST_CELL_SCHEMA1 + "/", HttpStatus.SC_NO_CONTENT);
+
+            // テスト実施
+            DcRestAdapter rest = new DcRestAdapter();
+            DcResponse res = null;
+
+            HashMap<String, String> requestheaders = new HashMap<String, String>();
+            requestheaders.put(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN);
+
+            String httpUrl = UrlUtils.cellRoot(Setup.TEST_CELL_SCHEMA1);
+            res = rest.getAcceptEncodingGzip(
+                    UrlUtils.boxUrl(Setup.TEST_CELL1, httpUrl), requestheaders);
+            assertEquals(HttpStatus.SC_OK, res.getStatusCode());
+            assertEquals(UrlUtils.boxRoot(Setup.TEST_CELL1, Setup.TEST_BOX1),
+                    res.getFirstHeader(HttpHeaders.LOCATION));
+
+        } catch (DcException e) {
+            fail(e.getMessage());
+        } finally {
+            // Box Schema更新（元に戻す）
+            BoxUtils.update(Setup.TEST_CELL1, AbstractCase.MASTER_TOKEN_NAME,
+                    Setup.TEST_BOX1, "*", Setup.TEST_BOX1,
+                    UrlUtils.cellRoot(Setup.TEST_CELL_SCHEMA1), HttpStatus.SC_NO_CONTENT);
+        }
+    }
+
+    /**
+     * schemaパラメタとしてhttpURLの指定でlocalunitURLをschemaとするBoxが取得できること.
+     */
+    @Test
+    public final void schemaパラメタとしてlocalunitURLの指定でhttpURLをschemaとするBoxが取得できること() {
+        try {
+            // Setupを流用
+            DcRestAdapter rest = new DcRestAdapter();
+            DcResponse res = null;
+
+            HashMap<String, String> requestheaders = new HashMap<String, String>();
+            requestheaders.put(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN);
+
+            String localunitUrl = UriUtils.SCHEME_UNIT_URI + Setup.TEST_CELL_SCHEMA1 + "/";
+            res = rest.getAcceptEncodingGzip(
+                    UrlUtils.boxUrl(Setup.TEST_CELL1, localunitUrl), requestheaders);
+            assertEquals(HttpStatus.SC_OK, res.getStatusCode());
+            assertEquals(UrlUtils.boxRoot(Setup.TEST_CELL1, Setup.TEST_BOX1),
+                    res.getFirstHeader(HttpHeaders.LOCATION));
+        } catch (DcException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 指定したローカルユニットschemaのBoxURLが不正な場合にエラーで返却されること.
+     * http、https、persoium-localunit以外.
+     */
+    @Test
+    public final void 指定したローカルユニットschemaのBoxURLが不正な場合にエラーで返却されること() {
+        try {
+            DcRestAdapter rest = new DcRestAdapter();
+            DcResponse res = null;
+
+            HashMap<String, String> requestheaders = new HashMap<String, String>();
+            requestheaders.put(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN);
+
+            String boxSchema = "testbox1";
+            // ボックススキーマ名のみ
+            String boxRoot = boxSchema + "/";
+            String boxUrl = UrlUtils.boxUrl(Setup.TEST_CELL1, boxRoot);
+
+            res = rest.getAcceptEncodingGzip(boxUrl, requestheaders);
+            assertEquals(HttpStatus.SC_BAD_REQUEST, res.getStatusCode());
         } catch (DcException e) {
             fail(e.getMessage());
         }

@@ -773,7 +773,7 @@ public abstract class AbstractODataResource {
      * @param op OProperty
      */
     protected void validatePropertyUri(String propName, OProperty<?> op) {
-        if (!ODataUtils.isValidUri(propName, op.getValue().toString())) {
+        if (!ODataUtils.isValidUri(op.getValue().toString())) {
             throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propName);
         }
     }
