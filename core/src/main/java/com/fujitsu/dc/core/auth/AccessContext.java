@@ -50,6 +50,7 @@ import com.fujitsu.dc.core.model.jaxb.Ace;
 import com.fujitsu.dc.core.model.jaxb.Acl;
 import com.fujitsu.dc.core.odata.OEntityWrapper;
 import com.fujitsu.dc.core.rs.cell.AuthResourceUtils;
+import com.fujitsu.dc.core.utils.UriUtils;
 
 /**
  * アクセス文脈情報.
@@ -666,8 +667,9 @@ public final class AccessContext {
 
         // トークン内のスキーマチェック(Boxレベル以下かつマスタートークン以外のアクセスの場合のみ)
         if (box != null) {
-            String boxSchema = box.getSchema();
+            String boxSchema = UriUtils.convertSchemeFromLocalUnitToHttp(cell.getUnitUrl(), box.getSchema());
             String tokenSchema = this.getSchema();
+
             // ボックスのスキーマが未設定の場合チェックしない
             if (boxSchema != null) {
                 if (tokenSchema == null) {

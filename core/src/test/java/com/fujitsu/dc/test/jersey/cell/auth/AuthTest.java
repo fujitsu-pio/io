@@ -23,6 +23,8 @@ import static org.junit.Assert.fail;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.junit.Test;
@@ -31,18 +33,26 @@ import org.junit.runner.RunWith;
 
 import com.fujitsu.dc.common.auth.token.AbstractOAuth2Token.TokenParseException;
 import com.fujitsu.dc.common.auth.token.CellLocalRefreshToken;
+import com.fujitsu.dc.common.auth.token.Role;
 import com.fujitsu.dc.common.auth.token.TransCellRefreshToken;
 import com.fujitsu.dc.common.utils.DcCoreUtils;
 import com.fujitsu.dc.core.auth.OAuth2Helper;
+import com.fujitsu.dc.core.model.ctl.ExtCell;
+import com.fujitsu.dc.core.model.ctl.Relation;
 import com.fujitsu.dc.test.categories.Integration;
 import com.fujitsu.dc.test.categories.Regression;
 import com.fujitsu.dc.test.categories.Unit;
 import com.fujitsu.dc.test.jersey.AbstractCase;
 import com.fujitsu.dc.test.jersey.DcRunner;
+import com.fujitsu.dc.test.jersey.box.acl.jaxb.Acl;
 import com.fujitsu.dc.test.setup.Setup;
 import com.fujitsu.dc.test.unit.core.UrlUtils;
+import com.fujitsu.dc.test.utils.DavResourceUtils;
+import com.fujitsu.dc.test.utils.ExtCellUtils;
 import com.fujitsu.dc.test.utils.Http;
+import com.fujitsu.dc.test.utils.RelationUtils;
 import com.fujitsu.dc.test.utils.ResourceUtils;
+import com.fujitsu.dc.test.utils.RoleUtils;
 import com.fujitsu.dc.test.utils.TResponse;
 import com.sun.jersey.test.framework.JerseyTest;
 
@@ -336,6 +346,310 @@ public class AuthTest extends JerseyTest {
                 .returns()
                 .statusCode(HttpStatus.SC_OK);
 
+    }
+
+    /**
+     * トークン認証ートランセルトークン取得＿LocalUnitトークン発行のテスト.
+     */
+    @Test
+    public final void トークン認証ートランセルトークン取得＿localunitスキーム宛のトークン発行できること() {
+        // TEST_CELL1のパスワード認証にてTEST_CELL2宛トークンを発行
+        TResponse res =
+                Http.request("authn/password-tc-c0.txt")
+                        .with("remoteCell", TEST_CELL1)
+                        .with("username", "account1")
+                        .with("password", "password1")
+                        .with("dc_target", "personium-localunit:/" + TEST_CELL2 + "/")
+                        .returns()
+                        .statusCode(HttpStatus.SC_OK);
+
+        JSONObject json = res.bodyAsJson();
+        String transCellAccessToken = (String) json.get(OAuth2Helper.Key.ACCESS_TOKEN);
+
+        // 発行されたトークンをTEST_CELL2で検証
+        Http.request("authn/saml-tc-c0.txt")
+                .with("remoteCell", TEST_CELL2)
+                .with("assertion", transCellAccessToken)
+                .with("dc_target", "personium-localunit:/" + TEST_APP_CELL1 + "/")
+                .returns()
+                .statusCode(HttpStatus.SC_OK);
+
+    }
+
+    /**
+     * 外部セルのurlがlocalunitの場合でもトークン発行できること.
+     */
+    @Test
+    public final void ターゲットhttp外部セルのurlがlocalunitの場合でもトークン発行できること_外部セルにロールが直接わりあてられている場合() {
+        String httpCell1Url = UrlUtils.cellRoot(TEST_CELL1);
+        String httpCell2Url = UrlUtils.cellRoot(TEST_CELL2);
+        String localunitCell1Url = "personium-localunit:/" + TEST_CELL1 + "/";
+        String transCellAccessToken = null;
+        String testfile = "testfile.txt";
+        String testrole = "transCellTestRole";
+        String roleUrl = UrlUtils.roleUrl(TEST_CELL2, null, testrole);
+        // main box を使用（box1にはACL設定がありテストには不適切であるため）
+        String testBox = "__";
+
+        // dcTargetの値がhttpの場合
+        try {
+            // テスト準備  （MASTER_TOKENで実施）
+            // 1.ExtCell更新
+            // Setupでセル２に外部セルとして登録されているセル１のhttpのURLをpersonium-localunitに一時的に更新。
+            ExtCellUtils.update(MASTER_TOKEN, TEST_CELL2, httpCell1Url, localunitCell1Url, HttpStatus.SC_NO_CONTENT);
+
+            // Role作成
+            RoleUtils.create(TEST_CELL2, MASTER_TOKEN, testrole, HttpStatus.SC_CREATED);
+
+            // 2.セル2の設定として、この外部セルにロール１を割当。
+            // Setupで作成されたrole1を紐づけ。
+            Http.request("cell/link-extCell-role.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("cellName", DcCoreUtils.encodeUrlComp(localunitCell1Url))
+                    .with("token", MASTER_TOKEN)
+                    .with("roleUrl", roleUrl)
+                    .returns().statusCode(HttpStatus.SC_NO_CONTENT);
+
+            // 3.リソースを配置
+            Http.request("box/dav-put.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("token", MASTER_TOKEN)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .with("contentType", javax.ws.rs.core.MediaType.TEXT_PLAIN)
+                    .with("source", "testFileBody")
+                    .returns().statusCode(HttpStatus.SC_CREATED);
+            // 4.ACL設定 (リソース権限を割り当てる)
+            setAcl(TEST_CELL2, testBox, MASTER_TOKEN, testfile, "../__/" + testrole, "read");
+
+            // ここからがテストの実施
+            // TEST_CELL1のパスワード認証にてTEST_CELL2宛トークンを発行
+            TResponse res1 =
+                Http.request("authn/password-tc-c0.txt")
+                    .with("remoteCell", TEST_CELL1)
+                    .with("username", "account1")
+                    .with("password", "password1")
+                    .with("dc_target", httpCell2Url)
+                    .returns()
+                    .statusCode(HttpStatus.SC_OK);
+
+            JSONObject json = res1.bodyAsJson();
+            transCellAccessToken = (String) json.get(OAuth2Helper.Key.ACCESS_TOKEN);
+
+            // 発行されたトークンをTEST_CELL2で検証
+            TResponse res2 =
+                Http.request("authn/saml-cl-c0.txt")
+                    .with("remoteCell", TEST_CELL2)
+                    .with("assertion", transCellAccessToken)
+                    .returns().statusCode(HttpStatus.SC_OK);
+
+            JSONObject jsonLocal = res2.bodyAsJson();
+            String localCellAccessToken = (String) jsonLocal.get(OAuth2Helper.Key.ACCESS_TOKEN);
+
+            // ここで取得できたlocalCellAccessTokenにRole1が割りあたっていることを検証する。
+
+            // テキストファイルが取得ができること(localCellAccessToken)
+            Http.request("box/dav-get.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .with("token", localCellAccessToken)
+                    .returns().statusCode(HttpStatus.SC_OK);
+
+            // テキストファイルが取得ができること(transCellAccessToken)
+            Http.request("box/dav-get.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .with("token", transCellAccessToken)
+                    .returns().statusCode(HttpStatus.SC_OK);
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        } finally {
+            // 4.ACLを元に戻す
+            resetAcl(TEST_CELL2, testBox, MASTER_TOKEN, testfile);
+
+            // 3.テキストを削除
+            TResponse resResource = Http.request("box/dav-delete.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("token", MASTER_TOKEN)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .returns();
+            resResource.statusCode(HttpStatus.SC_NO_CONTENT);
+
+            // 2.割り当てを解除
+            TResponse tresponse = null;
+            tresponse = Http.request("cell/link-delete.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("sourceEntity", "Role")
+                    .with("sourceKey", "'" + testrole + "'")
+                    .with("navPropName", "_ExtCell")
+                    .with("navPropKey", "'" + DcCoreUtils.encodeUrlComp(localunitCell1Url) + "'")
+                    .with("token", "Bearer " + MASTER_TOKEN)
+                    .with("ifMatch", "*")
+                    .returns();
+            tresponse.statusCode(HttpStatus.SC_NO_CONTENT);
+
+            // ロール削除
+            RoleUtils.delete(TEST_CELL2, MASTER_TOKEN, null, testrole);
+
+            // 1.ExtCell更新（元に戻す）
+            ExtCellUtils.update(MASTER_TOKEN, TEST_CELL2, localunitCell1Url, httpCell1Url, HttpStatus.SC_NO_CONTENT);
+        }
+    }
+
+    /**
+     * 外部セルのurlがlocalunitの場合でもトークン発行できること.
+     */
+    @Test
+    public final void 外部セルのurlがlocalunitの場合でもトークン発行できること_外部セルにリレーションが割り当てられさらにリレーションにロールが割り当てられている場合() {
+        String httpCell1Url = UrlUtils.cellRoot(TEST_CELL1);
+        String httpCell2Url = UrlUtils.cellRoot(TEST_CELL2);
+        String localunitCell1Url = "personium-localunit:/" + TEST_CELL1 + "/";
+        String transCellAccessToken = null;
+        String testfile = "testfile.txt";
+        String testrole = "transCellTestRole";
+        String testrelation = "testRelation";
+        String roleUrl = UrlUtils.roleUrl(TEST_CELL2, null, testrole);
+        // main box を使用（box1にはACL設定がありテストには不適切であるため）
+        String testBox = "__";
+
+        // dcTargetの値がhttpの場合
+        try {
+            // テスト準備  （MASTER_TOKENで実施）
+            // 1.ExtCell更新
+            // Setupでセル２に外部セルとして登録されているセル１のhttpのURLをpersonium-localunitに一時的に更新。
+            ExtCellUtils.update(MASTER_TOKEN, TEST_CELL2, httpCell1Url, localunitCell1Url, HttpStatus.SC_NO_CONTENT);
+
+            // Role作成
+            RoleUtils.create(TEST_CELL2, MASTER_TOKEN, testrole, HttpStatus.SC_CREATED);
+
+            // Relation作成
+            // Cell1にRelationを作成する
+            JSONObject body = new JSONObject();
+            body.put("Name", testrelation);
+            body.put("_Box.Name", null);
+            RelationUtils.create(TEST_CELL2, MASTER_TOKEN, body, HttpStatus.SC_CREATED);
+
+            // Cell1のExtCellとRelationを結びつけ
+            ResourceUtils.linksWithBody(TEST_CELL2, Relation.EDM_TYPE_NAME, testrelation, "null",
+                    ExtCell.EDM_TYPE_NAME, UrlUtils.extCellResource(TEST_CELL2, localunitCell1Url),
+                    MASTER_TOKEN, HttpStatus.SC_NO_CONTENT);
+            // Cell1のRelationとRoleを結びつけ
+            ResourceUtils.linksWithBody(TEST_CELL2, Relation.EDM_TYPE_NAME, testrelation, "null",
+                    Role.EDM_TYPE_NAME, roleUrl, MASTER_TOKEN, HttpStatus.SC_NO_CONTENT);
+
+            // 3.リソースを配置
+            Http.request("box/dav-put.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("token", MASTER_TOKEN)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .with("contentType", javax.ws.rs.core.MediaType.TEXT_PLAIN)
+                    .with("source", "testFileBody")
+                    .returns().statusCode(HttpStatus.SC_CREATED);
+            // 4.ACL設定 (リソース権限を割り当てる)
+            setAcl(TEST_CELL2, testBox, MASTER_TOKEN, testfile, "../__/" + testrole, "read");
+
+            // ここからがテストの実施
+            // TEST_CELL1のパスワード認証にてTEST_CELL2宛トークンを発行
+            TResponse res1 =
+                Http.request("authn/password-tc-c0.txt")
+                    .with("remoteCell", TEST_CELL1)
+                    .with("username", "account1")
+                    .with("password", "password1")
+                    .with("dc_target", httpCell2Url)
+                    .returns()
+                    .statusCode(HttpStatus.SC_OK);
+
+            JSONObject json = res1.bodyAsJson();
+            transCellAccessToken = (String) json.get(OAuth2Helper.Key.ACCESS_TOKEN);
+
+            // 発行されたトークンをTEST_CELL2で検証
+            TResponse res2 =
+                Http.request("authn/saml-cl-c0.txt")
+                    .with("remoteCell", TEST_CELL2)
+                    .with("assertion", transCellAccessToken)
+                    .returns().statusCode(HttpStatus.SC_OK);
+
+            JSONObject jsonLocal = res2.bodyAsJson();
+            String localCellAccessToken = (String) jsonLocal.get(OAuth2Helper.Key.ACCESS_TOKEN);
+
+            // ここで取得できたlocalCellAccessTokenにRole1が割りあたっていることを検証する。
+
+            // テキストファイルが取得ができること(localCellAccessToken)
+            Http.request("box/dav-get.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .with("token", localCellAccessToken)
+                    .returns().statusCode(HttpStatus.SC_OK);
+
+            // テキストファイルが取得ができること(transCellAccessToken)
+            Http.request("box/dav-get.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .with("token", transCellAccessToken)
+                    .returns().statusCode(HttpStatus.SC_OK);
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        } finally {
+            System.out.println("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+            // 4.ACLを元に戻す
+            resetAcl(TEST_CELL2, testBox, MASTER_TOKEN, testfile);
+
+            // 3.テキストを削除
+            TResponse resResource = Http.request("box/dav-delete.txt")
+                    .with("cellPath", TEST_CELL2)
+                    .with("token", MASTER_TOKEN)
+                    .with("box", testBox)
+                    .with("path", testfile)
+                    .returns();
+            resResource.statusCode(HttpStatus.SC_NO_CONTENT);
+
+            // Cell1のRelationとRoleの削除
+            ResourceUtils.linksDelete(TEST_CELL2, Relation.EDM_TYPE_NAME, testrelation, "null",
+                    Role.EDM_TYPE_NAME, "_Box.Name=null,Name='" + testrole + "'", MASTER_TOKEN);
+
+            // Cell1のExtCellとRelationの削除
+            ResourceUtils.linksDelete(TEST_CELL2, Relation.EDM_TYPE_NAME, testrelation,
+                    "null", ExtCell.EDM_TYPE_NAME,
+                    "'" + DcCoreUtils.encodeUrlComp(localunitCell1Url) + "'", MASTER_TOKEN);
+
+            // Cell1のRelationを削除
+            RelationUtils.delete(TEST_CELL2, MASTER_TOKEN, testrelation, null, HttpStatus.SC_NO_CONTENT);
+
+            // ロール削除
+            RoleUtils.delete(TEST_CELL2, MASTER_TOKEN, null, testrole);
+
+            // 1.ExtCell更新（元に戻す）
+            ExtCellUtils.update(MASTER_TOKEN, TEST_CELL2, localunitCell1Url, httpCell1Url, HttpStatus.SC_NO_CONTENT);
+        }
+    }
+
+    private TResponse setAcl(String cellName, String boxName, String token, String collection,
+            String role, String... privileges)
+            throws JAXBException {
+        Acl acl = new Acl();
+        for (String privilege : privileges) {
+            acl.getAce().add(DavResourceUtils.createAce(false, role, privilege));
+        }
+        acl.setXmlbase(String.format("%s/%s/__role/%s/", UrlUtils.getBaseUrl(), cellName, boxName));
+        return DavResourceUtils.setAcl(token, cellName, boxName, collection, acl, HttpStatus.SC_OK);
+    }
+
+    private TResponse resetAcl(String cellName, String boxName, String token, String collection) {
+        Acl acl = new Acl();
+        acl.setXmlbase(String.format("%s/%s/__role/%s/", UrlUtils.getBaseUrl(), cellName, boxName));
+        try {
+            return DavResourceUtils.setAcl(token, cellName, boxName, collection, acl, HttpStatus.SC_OK);
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -216,6 +216,7 @@ public class ODataEntityResource extends AbstractODataResource {
      */
     EntityResponse getEntity(String expand, String select, UriInfo resUriInfo) {
         EntityQueryInfo queryInfo = null;
+
         if (resUriInfo != null) {
             queryInfo = queryInfo(expand, select, resUriInfo);
         }

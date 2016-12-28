@@ -23,7 +23,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.fujitsu.dc.engine.DcEngineException;
 import com.fujitsu.dc.engine.source.ISourceManager;
-import com.fujitsu.dc.engine.source.ServiceResourceSourceManager;
+import com.fujitsu.dc.engine.source.EsServiceResourceSourceManager;
+import com.fujitsu.dc.engine.source.FsServiceResourceSourceManager;
 
 /**
  * DC-Engineサーブレットクラス.
@@ -65,9 +66,14 @@ public class ServiceResource extends AbstractService {
 
     @Override
     public ISourceManager getServiceCollectionManager() throws DcEngineException {
+        ISourceManager svcRsSourceManager = null;
         // ソースの管理情報を取得
-        ServiceResourceSourceManager svcRsSourceManager = new ServiceResourceSourceManager(
-                getIndex(), getType(), getId(), getRoutingId());
+        if (this.fsPath != null) {
+          svcRsSourceManager = new FsServiceResourceSourceManager(this.fsPath);
+        } else {
+          svcRsSourceManager = new EsServiceResourceSourceManager(
+              getIndex(), getType(), getId(), getRoutingId());
+        }
         return svcRsSourceManager;
     }
 }

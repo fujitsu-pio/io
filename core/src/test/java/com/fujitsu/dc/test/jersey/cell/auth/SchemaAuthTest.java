@@ -48,7 +48,6 @@ import com.fujitsu.dc.test.utils.DavResourceUtils;
 import com.fujitsu.dc.test.utils.Http;
 import com.fujitsu.dc.test.utils.UserDataUtils;
 import com.fujitsu.dc.test.utils.ResourceUtils;
-import com.fujitsu.dc.test.utils.RoleUtils;
 import com.fujitsu.dc.test.utils.TResponse;
 import com.sun.jersey.test.framework.JerseyTest;
 
@@ -531,63 +530,80 @@ public class SchemaAuthTest extends JerseyTest {
      * スキーマ認証スキーマ値チェックの確認.
      * @throws TokenParseException トークンパースエラー
      */
+    @SuppressWarnings("deprecation")
     @Test
     public final void スキーマ認証スキーマ値チェックの確認() throws TokenParseException {
-        String cell01 = "cell1352701";
-        String cell02 = "cell1352702";
-        String schema01 = "cell13527schema";
+        String userCell = "cell20161221";
+        String schemaCell = "cell20161221schema";
         String user = "user";
         String pass = "password";
-        String testbox03 = "testbox03";
-        String testbox04 = "testbox04";
+        String boxWithHttpSchemaUrl = "testschemabox1";
+        String boxWithNonSchemaCellSchemaUrl = "testschemabox2";
+        String boxWithLocalUnitSchemaUrl = "testschemabox3";
         String role = "role";
         String colName = "col";
+        String aTokenStr = null;
+
         try {
             // セルの作成
-            CellUtils.create(cell01, MASTER_TOKEN, HttpStatus.SC_CREATED);
-            CellUtils.create(cell02, MASTER_TOKEN, HttpStatus.SC_CREATED);
-            CellUtils.create(schema01, MASTER_TOKEN, HttpStatus.SC_CREATED);
+            CellUtils.create(userCell, MASTER_TOKEN, HttpStatus.SC_CREATED);
+            CellUtils.create(schemaCell, MASTER_TOKEN, HttpStatus.SC_CREATED);
 
             // Accountの作成
-            AccountUtils.create(MASTER_TOKEN, cell01, user, pass, HttpStatus.SC_CREATED);
-            AccountUtils.create(MASTER_TOKEN, cell02, user, pass, HttpStatus.SC_CREATED);
-            AccountUtils.create(MASTER_TOKEN, schema01, user, pass, HttpStatus.SC_CREATED);
+            AccountUtils.create(MASTER_TOKEN, userCell, user, pass, HttpStatus.SC_CREATED);
+            AccountUtils.create(MASTER_TOKEN, schemaCell, user, pass, HttpStatus.SC_CREATED);
 
             // Boxの作成
-            BoxUtils.createWithSchema(cell02, testbox03, MASTER_TOKEN, UrlUtils.cellRoot(schema01));
-            BoxUtils.createWithSchema(cell02, testbox04, MASTER_TOKEN, UrlUtils.cellRoot(cell01));
+            BoxUtils.createWithSchema(userCell, boxWithHttpSchemaUrl, MASTER_TOKEN, UrlUtils.cellRoot(schemaCell));
+            BoxUtils.createWithSchema(userCell, boxWithNonSchemaCellSchemaUrl, MASTER_TOKEN,
+                    UrlUtils.cellRoot(userCell));
+            BoxUtils.createWithSchema(userCell, boxWithLocalUnitSchemaUrl,
+                    MASTER_TOKEN, "personium-localunit:/" + schemaCell + "/");
 
             // Roleの作成
-            RoleUtils.create(cell02, MASTER_TOKEN, testbox03, role, HttpStatus.SC_CREATED);
+//            RoleUtils.create(userCell, MASTER_TOKEN, boxWithHttpSchemaUrl, role, HttpStatus.SC_CREATED);
+//            RoleUtils.create(userCell, MASTER_TOKEN, boxWithLocalUnitSchemaUrl, role, HttpStatus.SC_CREATED);
 
             // RoleとAccountの$links
-            ResourceUtils.linkAccountRole(cell02, MASTER_TOKEN, user, testbox03,
-                    role, HttpStatus.SC_NO_CONTENT);
+//            ResourceUtils.linkAccountRole(userCell, MASTER_TOKEN, user, boxWithHttpSchemaUrl,
+//                    role, HttpStatus.SC_NO_CONTENT);
+//            ResourceUtils.linkAccountRole(userCell, MASTER_TOKEN, user, boxWithLocalUnitSchemaUrl,
+//                    role, HttpStatus.SC_NO_CONTENT);
 
             // BoxにConfidentialレベルの設定
-            this.setAclSchema(testbox03, "", UrlUtils.roleResource(cell02, testbox03, ""),
-                    OAuth2Helper.SchemaLevel.PUBLIC, cell02, role, DEFAULT_PRIVILEGE);
-            this.setAclSchema(testbox04, "", UrlUtils.roleResource(cell02, testbox03, ""),
-                    OAuth2Helper.SchemaLevel.PUBLIC, cell02, role, DEFAULT_PRIVILEGE);
+//            this.setAclSchema(boxWithHttpSchemaUrl, "", UrlUtils.roleResource(userCell, boxWithHttpSchemaUrl, ""),
+//                    OAuth2Helper.SchemaLevel.PUBLIC, userCell, role, DEFAULT_PRIVILEGE);
+//            this.setAclSchema(boxWithNonSchemaCellSchemaUrl, "",
+//                    UrlUtils.roleResource(userCell, boxWithHttpSchemaUrl, ""),
+//                    OAuth2Helper.SchemaLevel.PUBLIC, userCell, role, DEFAULT_PRIVILEGE);
+//            this.setAclSchema(boxWithLocalUnitSchemaUrl, "",
+//                    UrlUtils.roleResource(userCell, boxWithLocalUnitSchemaUrl, ""),
+//                    OAuth2Helper.SchemaLevel.PUBLIC, userCell, role, DEFAULT_PRIVILEGE);
 
             // ACLの設定（今回テストではACL設定は無関係のため、ALLで設定）
-            DavResourceUtils.setACL(cell02, MASTER_TOKEN, HttpStatus.SC_OK, cell02 + "/" + testbox03,
+            DavResourceUtils.setACL(userCell, MASTER_TOKEN, HttpStatus.SC_OK,
+                    userCell + "/" + boxWithHttpSchemaUrl,
                     "box/acl-setting-all.txt", role, "<D:read/></D:privilege><D:privilege><D:write/>",
                     OAuth2Helper.SchemaLevel.PUBLIC);
-            DavResourceUtils.setACL(cell02, MASTER_TOKEN, HttpStatus.SC_OK, cell02 + "/" + testbox04,
+            DavResourceUtils.setACL(userCell, MASTER_TOKEN, HttpStatus.SC_OK,
+                    userCell + "/" + boxWithNonSchemaCellSchemaUrl,
+                    "box/acl-setting-all.txt", role, "<D:read/></D:privilege><D:privilege><D:write/>",
+                    OAuth2Helper.SchemaLevel.PUBLIC);
+            DavResourceUtils.setACL(userCell, MASTER_TOKEN, HttpStatus.SC_OK,
+                    userCell + "/" + boxWithLocalUnitSchemaUrl,
                     "box/acl-setting-all.txt", role, "<D:read/></D:privilege><D:privilege><D:write/>",
                     OAuth2Helper.SchemaLevel.PUBLIC);
 
             // スキーマ認証用トランスセルトークンの取得
-            JSONObject appAuthJson = getTransTokenByAppAuth(schema01, user, pass, UrlUtils.cellRoot(cell02));
+            JSONObject appAuthJson = getTransTokenByAppAuth(schemaCell, user, pass, UrlUtils.cellRoot(userCell));
             String appToken = (String) appAuthJson.get(OAuth2Helper.Key.ACCESS_TOKEN);
 
             // Queryでスキーマ認証
             TResponse res = Http.request("authn/password-cl-cp.txt")
-                    .with("remoteCell", cell02)
+                    .with("remoteCell", userCell)
                     .with("username", user)
                     .with("password", pass)
-                    .with("client_id", UrlUtils.cellRoot(schema01))
+                    .with("client_id", UrlUtils.cellRoot(schemaCell))
                     .with("client_secret", appToken)
                     .returns()
                     .statusCode(HttpStatus.SC_OK);
@@ -595,47 +611,55 @@ public class SchemaAuthTest extends JerseyTest {
             JSONObject json = res.bodyAsJson();
 
             String rTokenStr = (String) json.get(OAuth2Helper.Key.REFRESH_TOKEN);
-            String aTokenStr = (String) json.get(OAuth2Helper.Key.ACCESS_TOKEN);
+            aTokenStr = (String) json.get(OAuth2Helper.Key.ACCESS_TOKEN);
 
-            // コレクションの作成（testbox03はスキーマと、トークンのスキーマが一致するため作成可能）
-            DavResourceUtils.createWebDavCollection("box/mkcol.txt", cell02, testbox03 + "/" + colName, aTokenStr,
-                    HttpStatus.SC_CREATED);
-            // コレクションの作成（testbox04はスキーマと、トークンのスキーマが一致しないため作成不可）
-            DavResourceUtils.createWebDavCollection("box/mkcol.txt", cell02, testbox04 + "/" + colName, aTokenStr,
-                    HttpStatus.SC_FORBIDDEN);
+            // コレクションの作成（boxWithHttpSchemaUrlはスキーマと、トークンのスキーマが一致するため作成可能）
+            DavResourceUtils.createWebDavCollection("box/mkcol.txt", userCell,
+                    boxWithHttpSchemaUrl + "/" + colName,
+                    aTokenStr, HttpStatus.SC_CREATED);
+
+            // コレクションの作成（boxWithNonSchemaCellSchemaUrlはスキーマと、トークンのスキーマが一致しないため作成不可）
+            DavResourceUtils.createWebDavCollection("box/mkcol.txt", userCell,
+                    boxWithNonSchemaCellSchemaUrl + "/" + colName,
+                    aTokenStr, HttpStatus.SC_FORBIDDEN);
+
+            // コレクションの作成（boxWithLocalUnitSchemaUrlはスキーマと、トークンのスキーマが一致するため作成可能）
+            DavResourceUtils.createWebDavCollection("box/mkcol.txt", userCell,
+                    boxWithLocalUnitSchemaUrl + "/" + colName,
+                    aTokenStr, HttpStatus.SC_CREATED);
 
             // リフレッシュトークン認証
-            TResponse refreshRes = ResourceUtils.refreshTokenAuthCl(cell02, rTokenStr);
-            String raTokenStr = (String) refreshRes.bodyAsJson().get(OAuth2Helper.Key.ACCESS_TOKEN);
-
-            // コレクションの削除（testbox03はスキーマと、トークンのスキーマが一致するため削除可能）
-            DavResourceUtils.deleteCollection(cell02, testbox03, colName, raTokenStr, HttpStatus.SC_NO_CONTENT);
-            // コレクションの作成（testbox04はスキーマと、トークンのスキーマが一致しないため作成不可）
-            DavResourceUtils.createWebDavCollection("box/mkcol.txt", cell02, testbox04 + "/" + colName, raTokenStr,
-                    HttpStatus.SC_FORBIDDEN);
-
+            TResponse refreshRes = ResourceUtils.refreshTokenAuthCl(userCell, rTokenStr);
+            aTokenStr = (String) refreshRes.bodyAsJson().get(OAuth2Helper.Key.ACCESS_TOKEN);
         } finally {
+            // コレクションの削除（testbox03はスキーマと、トークンのスキーマが一致するため削除可能）
+            DavResourceUtils.deleteCollection(userCell, boxWithHttpSchemaUrl, colName, MASTER_TOKEN,
+                    HttpStatus.SC_NO_CONTENT);
+            // コレクションの削除（testbox05はスキーマと、トークンのスキーマが一致するため削除可能）
+            DavResourceUtils.deleteCollection(userCell, boxWithLocalUnitSchemaUrl, colName, MASTER_TOKEN,
+                    HttpStatus.SC_NO_CONTENT);
+
             // RoleとAccountの$linksの削除
-            ResourceUtils.linkAccountRollDelete(cell02, MASTER_TOKEN, user, testbox03, role);
+//            ResourceUtils.linkAccountRollDelete(userCell, MASTER_TOKEN, user, boxWithHttpSchemaUrl, role);
 
             // Roleの削除
-            RoleUtils.delete(cell02, MASTER_TOKEN, testbox03, role);
+//            RoleUtils.delete(userCell, MASTER_TOKEN, boxWithHttpSchemaUrl, role);
 
             // Boxの削除
-            BoxUtils.delete(cell02, MASTER_TOKEN, testbox03);
-            BoxUtils.delete(cell02, MASTER_TOKEN, testbox04);
+            BoxUtils.delete(userCell, MASTER_TOKEN, boxWithHttpSchemaUrl);
+            BoxUtils.delete(userCell, MASTER_TOKEN, boxWithNonSchemaCellSchemaUrl);
+            BoxUtils.delete(userCell, MASTER_TOKEN, boxWithLocalUnitSchemaUrl);
 
             // Accountの削除
-            AccountUtils.delete(schema01, MASTER_TOKEN, user, HttpStatus.SC_NO_CONTENT);
-            AccountUtils.delete(cell02, MASTER_TOKEN, user, HttpStatus.SC_NO_CONTENT);
-            AccountUtils.delete(cell01, MASTER_TOKEN, user, HttpStatus.SC_NO_CONTENT);
+            AccountUtils.delete(schemaCell, MASTER_TOKEN, user, HttpStatus.SC_NO_CONTENT);
+            AccountUtils.delete(userCell, MASTER_TOKEN, user, HttpStatus.SC_NO_CONTENT);
 
             // セルの削除
-            CellUtils.delete(MASTER_TOKEN, schema01, -1);
-            CellUtils.delete(MASTER_TOKEN, cell02, -1);
-            CellUtils.delete(MASTER_TOKEN, cell01, -1);
+            CellUtils.delete(MASTER_TOKEN, schemaCell, -1);
+            CellUtils.delete(MASTER_TOKEN, userCell, -1);
         }
     }
+
 
     /**
      * デフォルトボックスに対するスキーマ認証の確認.

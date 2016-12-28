@@ -516,7 +516,7 @@ public abstract class EsODataProducer implements DcODataProducer {
      * キーに従い一件取得を行う.
      * @param entitySet EdmEntitySet
      * @param oEntityKey OEntityKey
-     * @param queryInfo queryInfo
+     * @param queryInfo EntityQueryInfo
      * @return EntitySetDocHandler
      */
     EntitySetDocHandler retrieveWithKey(EdmEntitySet entitySet, OEntityKey oEntityKey, EntityQueryInfo queryInfo) {

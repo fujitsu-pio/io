@@ -82,6 +82,7 @@ import com.fujitsu.dc.core.model.impl.es.doc.OEntityDocHandler;
 import com.fujitsu.dc.core.model.impl.es.odata.CellCtlODataProducer;
 import com.fujitsu.dc.core.model.lock.CellLockManager;
 import com.fujitsu.dc.core.odata.OEntityWrapper;
+import com.fujitsu.dc.core.utils.UriUtils;
 
 /**
  * Cell object implemented using ElasticSearch.
@@ -166,7 +167,7 @@ public final class CellEsImpl implements Cell {
         Box loadedBox = null;
         try {
             ODataProducer op = ModelFactory.ODataCtl.cellCtl(this);
-            EntityResponse er = op.getEntity("Box", OEntityKey.create(boxName), null);
+            EntityResponse er = op.getEntity(Box.EDM_TYPE_NAME, OEntityKey.create(boxName), null);
             loadedBox = new Box(this, er.getEntity());
             BoxCache.cache(loadedBox);
             return loadedBox;
@@ -181,19 +182,25 @@ public final class CellEsImpl implements Cell {
 
     @Override
     public Box getBoxForSchema(String boxSchema) {
+        // スキーマ名一覧の取得（別名を含む）
+        List<String> boxSchemas = UriUtils.getUrlVariations(this.getUnitUrl(), boxSchema);
+
         ODataProducer op = ModelFactory.ODataCtl.cellCtl(this);
-        BoolCommonExpression filter = OptionsQueryParser.parseFilter("Schema eq '" + boxSchema + "'");
-        QueryInfo qi = QueryInfo.newBuilder().setFilter(filter).build();
-        try {
-            EntitiesResponse er = op.getEntities("Box", qi);
-            List<OEntity> entList = er.getEntities();
-            if (entList.size() != 1) {
+        for (int i = 0; i < boxSchemas.size(); i++) {
+            BoolCommonExpression filter = OptionsQueryParser.parseFilter("Schema eq '" + boxSchemas.get(i) + "'");
+            QueryInfo qi = QueryInfo.newBuilder().setFilter(filter).build();
+            try {
+                EntitiesResponse er = op.getEntities(Box.EDM_TYPE_NAME, qi);
+                List<OEntity> entList = er.getEntities();
+                if (entList.size() == 1) {
+                    return new Box(this, entList.get(0));
+                }
+                continue;
+            } catch (RuntimeException e) {
                 return null;
             }
-            return new Box(this, entList.get(0));
-        } catch (RuntimeException e) {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -426,7 +433,7 @@ public final class CellEsImpl implements Cell {
             Map<String, Object> s = (Map<String, Object>) src.get("s");
             Map<String, Object> l = (Map<String, Object>) src.get("l");
             String roleName = (String) s.get(KEY_NAME);
-            String boxId = (String) l.get("Box");
+            String boxId = (String) l.get(Box.EDM_TYPE_NAME);
             String boxName = null;
             String schema = null;
             if (boxId != null) {
@@ -487,13 +494,22 @@ public final class CellEsImpl implements Cell {
             EntitiesResponse response = null;
             // 検索結果出力件数設定
             QueryInfo qi = QueryInfo.newBuilder().setTop(TOP_NUM).setInlineCount(InlineCount.NONE).build();
-            try {
-                // ExtCell-Roleのリンク情報取得
-                response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME, OEntityKey.create(extCell),
-                        "_" + Role.EDM_TYPE_NAME, qi);
-            } catch (DcCoreException dce) {
-                if (DcCoreException.OData.NO_SUCH_ENTITY != dce) {
-                    throw dce;
+
+            List<String> list = UriUtils.getUrlVariations(this.getUnitUrl(), extCell);
+            for (int i = 0; i < list.size(); i++) {
+                String extCellUrl = list.get(i);
+                try {
+                    // ExtCell-Roleのリンク情報取得
+                    response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME,
+                            OEntityKey.create(extCellUrl),
+                            "_" + Role.EDM_TYPE_NAME, qi);
+                } catch (DcCoreException dce) {
+                    if (DcCoreException.OData.NO_SUCH_ENTITY != dce) {
+                        throw dce;
+                    }
+                }
+                if (response != null) {
+                    break;
                 }
             }
             if (response == null) {
@@ -524,15 +540,23 @@ public final class CellEsImpl implements Cell {
         // ExtCell-Role結びつけに対応するRoleの取得
         ODataProducer op = ModelFactory.ODataCtl.cellCtl(this);
         EntitiesResponse response = null;
-        try {
-            // 検索結果出力件数設定
-            QueryInfo qi = QueryInfo.newBuilder().setTop(TOP_NUM).setInlineCount(InlineCount.NONE).build();
-            // ExtCell-Relationのリンク情報取得
-            response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME, OEntityKey.create(extCell),
-                    "_" + Relation.EDM_TYPE_NAME, qi);
-        } catch (DcCoreException dce) {
-            if (DcCoreException.OData.NO_SUCH_ENTITY != dce) {
-                throw dce;
+        // 検索結果出力件数設定
+        QueryInfo qi = QueryInfo.newBuilder().setTop(TOP_NUM).setInlineCount(InlineCount.NONE).build();
+        List<String> list = UriUtils.getUrlVariations(this.getUnitUrl(), extCell);
+        for (int i = 0; i < list.size(); i++) {
+            try {
+                String extCellUrl = list.get(i);
+                // ExtCell-Relationのリンク情報取得
+                response = (EntitiesResponse) op.getNavProperty(ExtCell.EDM_TYPE_NAME,
+                        OEntityKey.create(extCellUrl),
+                        "_" + Relation.EDM_TYPE_NAME, qi);
+            } catch (DcCoreException dce) {
+                if (DcCoreException.OData.NO_SUCH_ENTITY != dce) {
+                    throw dce;
+                }
+            }
+            if (response != null) {
+                break;
             }
         }
         if (response == null) {
@@ -750,6 +774,15 @@ public final class CellEsImpl implements Cell {
         this.url = url;
     }
 
+    /**
+     * このCellのUnit URLを返します.
+     * @return unitUrl 文字列
+     */
+    @Override
+    public String getUnitUrl() {
+        return UriUtils.getUnitUrl(this.getUrl());
+    }
+
     static final String KEY_NAME = "Name";
     static final String KEY_SCHEMA = "Schema";
 
@@ -965,5 +998,4 @@ public final class CellEsImpl implements Cell {
         cellAccessor.cellBulkDeletion(this.getId(), unitUserNameWithOutPrefix);
         log.info("Cell Entity Resource Deletion End.");
     }
-
 }

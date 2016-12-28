@@ -74,7 +74,7 @@ public class BoxUrlResource {
             }
         } else {
             // クエリ指定がある場合は、schemaのチェックをおこなう
-            if (!ODataUtils.isValidUri("schema", querySchema)) {
+            if (!ODataUtils.isValidSchemaUri(querySchema)) {
                 throw DcCoreException.OData.QUERY_INVALID_ERROR.params("schema", querySchema);
             }
         }
