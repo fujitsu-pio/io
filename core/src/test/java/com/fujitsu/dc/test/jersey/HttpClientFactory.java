@@ -53,7 +53,7 @@ public class HttpClientFactory extends DefaultHttpClient {
     /** PORT HTTP. */
     private static final int PORTHTTP = 80;
     /** 接続タイムアウト値. */
-    private static final int TIMEOUT = 60000; // 20000;
+    private static final int TIMEOUT = 75000; // 20000;
 
     /**
      * HTTPClientオブジェクトを作成.

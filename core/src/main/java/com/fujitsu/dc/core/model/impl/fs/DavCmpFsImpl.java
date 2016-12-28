@@ -610,7 +610,7 @@ public class DavCmpFsImpl implements DavCmp {
             // Update Metadata
             this.metaFile.setUpdated(now);
             this.metaFile.setContentType(contentType);
-            this.metaFile.setContentLength(tmpFile.length());
+            this.metaFile.setContentLength(contentFile.length());
             this.metaFile.save();
         } catch (IOException ex) {
             throw DcCoreException.Dav.FS_INCONSISTENCY_FOUND.reason(ex);
@@ -892,8 +892,8 @@ public class DavCmpFsImpl implements DavCmp {
 
     /**
      * delete this resource.
-     * @param ifMatch
-     *            ifMatch header
+     * @param ifMatch ifMatch header
+     * @param recursive bool
      * @return JaxRS応答オブジェクトビルダ
      */
     @Override
@@ -1111,6 +1111,13 @@ public class DavCmpFsImpl implements DavCmp {
      */
     public DavMetadataFile getDavMetadataFile() {
         return this.metaFile;
+    }
+    
+    /**
+     * @return FsPath
+     */
+    public String getFsPath() {
+        return this.fsPath;
     }
 
     private String getContentFilePath() {

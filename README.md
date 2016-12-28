@@ -26,18 +26,6 @@ http://personium.io/docs/
 Wiki pages are also available.
 https://github.com/personium/io/wiki
 
-## Note
-
-	This project started as a proprietary service platform development
-	to accelerate Fujitsu's social innovations business.
-
-	As of Dec. 2014, this project is still on the way from properietary
-	to open source, and thus this product is not ready to be comfortably
-	used by everyone yet.
-
-	We are going to prepare missing parts, e.g. documents, tools, etc.,
-	to resolve this situation as soon as possible.
-
 ## Set up
 
 1. Try Personium  on your machine !

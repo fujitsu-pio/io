@@ -66,6 +66,7 @@ import com.fujitsu.dc.core.model.DavCmp;
 import com.fujitsu.dc.core.model.DavMoveResource;
 import com.fujitsu.dc.core.model.DavRsCmp;
 import com.fujitsu.dc.core.model.impl.es.DavCmpEsImpl;
+import com.fujitsu.dc.core.model.impl.fs.DavCmpFsImpl;
 
 /**
  * DcEngineSvcCollectionResourceを担当するJAX-RSリソース.
@@ -301,15 +302,17 @@ public final class DcEngineSvcCollectionResource {
 
         req.addHeader("X-Baseurl", baseUrl);
         req.addHeader("X-Request-Uri", uriInfo.getRequestUri().toString());
-        // サービスコレクションのINDEX・ID・TYPEをヘッダに追加
-        if (davCmp instanceof DavCmpEsImpl) {
-            DavCmpEsImpl test = (DavCmpEsImpl) davCmp;
-            req.addHeader("X-Dc-Es-Index", test.getEsColType().getIndex().getName());
-            req.addHeader("X-Dc-Es-Id", test.getNodeId());
-            req.addHeader("X-Dc-Es-Type", test.getEsColType().getType());
+        if (davCmp instanceof DavCmpFsImpl) {
+            DavCmpFsImpl dcmp = (DavCmpFsImpl) davCmp;
+            req.addHeader("X-Dc-Fs-Path", dcmp.getFsPath());
+        } else if (davCmp instanceof DavCmpEsImpl) {
+            DavCmpEsImpl dcmp = (DavCmpEsImpl) davCmp;
+            req.addHeader("X-Dc-Es-Index", dcmp.getEsColType().getIndex().getName());
+            req.addHeader("X-Dc-Es-Id", dcmp.getNodeId());
+            req.addHeader("X-Dc-Es-Type", dcmp.getEsColType().getType());
             req.addHeader("X-Dc-Es-Routing-Id", this.davRsCmp.getCell().getId());
-            req.addHeader("X-Dc-Box-Schema", this.davRsCmp.getBox().getSchema());
         }
+        req.addHeader("X-Dc-Box-Schema", this.davRsCmp.getBox().getSchema());
 
         // リレイまでのヘッダを追加
         MultivaluedMap<String, String> multivalueHeaders = headers.getRequestHeaders();

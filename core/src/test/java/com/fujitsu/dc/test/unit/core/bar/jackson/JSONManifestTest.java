@@ -49,7 +49,7 @@ public class JSONManifestTest {
         json.put("bar_version", "1");
         json.put("box_version", "1");
         json.put("DefaultPath", "boxName");
-        json.put("schema", "http://app1.example.com");
+        json.put("schema", "http://app1.example.com/");
         JsonParser jp = f.createJsonParser(json.toJSONString());
         ObjectMapper mapper = new ObjectMapper();
         jp.nextToken();

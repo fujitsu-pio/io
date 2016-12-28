@@ -46,9 +46,9 @@ import com.fujitsu.dc.engine.utils.DcEngineConfig;
 /**
  * サービスコレクションの情報からソースの情報を管理する.
  */
-public class ServiceResourceSourceManager implements ISourceManager {
+public class EsServiceResourceSourceManager implements ISourceManager {
     /** ログオブジェクト. */
-    private static Logger log = LoggerFactory.getLogger(ServiceResourceSourceManager.class);
+    private static Logger log = LoggerFactory.getLogger(EsServiceResourceSourceManager.class);
 
     /** ESインデックス. */
     private String index;
@@ -78,7 +78,7 @@ public class ServiceResourceSourceManager implements ISourceManager {
      * @param id 対象サービスコレクションのESのID
      * @param routingId 対象サービスコレクションのESのルーティングID
      */
-    public ServiceResourceSourceManager(String index, String type, String id, String routingId) {
+    public EsServiceResourceSourceManager(String index, String type, String id, String routingId) {
         this.index = index;
         this.type = type;
         this.id = id;

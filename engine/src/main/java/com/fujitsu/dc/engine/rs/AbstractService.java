@@ -81,6 +81,9 @@ public abstract class AbstractService {
     /** リクエストヘッダから取得するRoutingID. */
     @HeaderParam("X-Dc-Es-Routing-Id")
     private String routingId;
+    /** リクエストヘッダから取得するRoutingID. */
+    @HeaderParam("X-Dc-Fs-Path")
+    protected String fsPath;
 
     /** サービスサブジェクト. */
     String serviceSubject;
@@ -272,7 +275,7 @@ public abstract class AbstractService {
         msg.append(req.getRequestURL());
         msg.append(" url:");
         msg.append(cell);
-        msg.append(" scheme:");
+        msg.append(" schema:");
         msg.append(scheme);
         msg.append(" svcName:");
         msg.append(svcName);

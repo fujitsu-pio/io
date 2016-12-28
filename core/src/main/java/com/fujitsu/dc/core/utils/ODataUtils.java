@@ -299,20 +299,20 @@ public final class ODataUtils {
 
     /**
      * プロパティ項目の値をURIかチェックする.
-     * @param propName プロパティ名
      * @param propValue チェック値
      * @return true:バリデートOK、falseバリデートNG
      */
-    public static boolean isValidUri(String propName, String propValue) {
+    public static boolean isValidUri(String propValue) {
         URI uri;
         try {
             uri = new URI(propValue);
             String scheme = uri.getScheme();
             // Scheme check
             if (uri.getScheme() == null
-                    || (!(scheme.equals("http"))
-                            && !(scheme.equals("https"))
-                            && !(scheme.equals("urn")))) {
+                    || (!(scheme.equals(UriUtils.SCHEME_HTTP))
+                     && !(scheme.equals(UriUtils.SCHEME_HTTPS))
+                     && !(scheme.equals(UriUtils.SCHEME_URN)))
+                     && !(scheme.equals(UriUtils.SCHEME_LOCALUNIT))) {
                 return false;
             }
             // 文字列長チェック
@@ -331,6 +331,15 @@ public final class ODataUtils {
      * @return true if valid
      */
     public static boolean isValidSchemaUri(String str) {
+        return isValidUrn(str) || isValidCellUrl(str);
+    }
+
+    /**
+     * Check if string is valid Schema Urn.
+     * @param str Input string
+     * @return true if valid
+     */
+    private static boolean isValidUrn(String str) {
         boolean isValidLength = str.length() <= URI_MAX_LENGTH;
         URI uri;
         try {
@@ -339,8 +348,9 @@ public final class ODataUtils {
             return false;
         }
         String scheme = uri.getScheme();
-        boolean isUrn = scheme != null && (scheme.equals("urn")) && isValidLength;
-        return isUrn || isValidCellUrl(str);
+        boolean isUrn = scheme != null
+                && (scheme.equals(UriUtils.SCHEME_URN));
+        return isValidLength && isUrn;
     }
 
     /**
@@ -358,8 +368,9 @@ public final class ODataUtils {
         }
         String scheme = uri.getScheme();
         boolean isValidScheme = scheme != null
-                && ((scheme.equals("http"))
-                        || (scheme.equals("https")));
+                && ((scheme.equals(UriUtils.SCHEME_HTTP))
+                || (scheme.equals(UriUtils.SCHEME_HTTPS))
+                || (scheme.equals(UriUtils.SCHEME_LOCALUNIT)));
         boolean isNormalized = uri.normalize().toString().equals(str);
         boolean hasTrailingSlash = str.endsWith("/");
         return isValidLength && isValidScheme && isNormalized && hasTrailingSlash;

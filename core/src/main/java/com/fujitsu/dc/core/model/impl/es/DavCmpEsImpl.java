@@ -1065,6 +1065,7 @@ public class DavCmpEsImpl implements DavCmp, EsDocHandler {
     /**
      * リソースを削除する.
      * @param ifMatch ifMatchヘッダ
+     * @param recursive bool
      * @return JaxRS応答オブジェクトビルダ
      */
     @Override

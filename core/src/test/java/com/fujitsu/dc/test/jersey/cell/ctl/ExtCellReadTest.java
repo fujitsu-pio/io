@@ -75,4 +75,22 @@ public class ExtCellReadTest extends ODataCommon {
     public final void Urlが真偽値の場合400エラーを返却すること() {
         ExtCellUtils.extCellAccess(HttpMethod.GET, cellName, "false", token, "", HttpStatus.SC_BAD_REQUEST);
     }
+
+    /**
+     * Urlがhttpの場合正常に動作すること.
+     */
+    @Test
+    public final void Urlがhttpの場合正常に動作すること() {
+        String extCellHttpUrl = "http://localhost:9998/testcell2/";
+        ExtCellUtils.get(token, "testcell1", extCellHttpUrl, HttpStatus.SC_OK);
+    }
+
+    /**
+     * returns_404_on_GET_with_matching_localunit_url_key_even_if_http_scheme_entity_exists.
+     */
+    @Test
+    public final void returns_404_on_GET_with_matching_localunit_url_key_even_if_http_scheme_entity_exists() {
+        String extCellUnitUrl = "personium-localunit:/testcell1/";
+        ExtCellUtils.get(token, "testcell2", extCellUnitUrl, HttpStatus.SC_NOT_FOUND);
+    }
 }

@@ -647,7 +647,7 @@ public final class MessageODataResource extends AbstractODataResource {
             String[] uriList = propValue.split(",");
             for (String uri : uriList) {
                 if (uri.length() != 0) {
-                    if (!ODataUtils.isValidUri(propKey, uri)) {
+                    if (!ODataUtils.isValidUri(uri)) {
                         throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propKey);
                     }
                 } else {
@@ -656,7 +656,7 @@ public final class MessageODataResource extends AbstractODataResource {
             }
         } else {
             // CSV形式で複数指定されていた場合
-            if (!ODataUtils.isValidUri(propKey, propValue)) {
+            if (!ODataUtils.isValidUri(propValue)) {
                 throw DcCoreException.OData.REQUEST_FIELD_FORMAT_ERROR.params(propValue);
             }
         }

@@ -51,7 +51,7 @@ public class ExtCellCreateTest extends ODataCommon {
      */
     @Test
     public final void ExtCell作成の正常系のテスト() {
-        String extCellUrl = UrlUtils.cellRoot("cellHoge");
+        String extCellUrl = UrlUtils.cellRoot("cellHoge1");
 
         try {
             ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_CREATED);
@@ -128,4 +128,17 @@ public class ExtCellCreateTest extends ODataCommon {
         ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_BAD_REQUEST);
     }
 
+    /**
+     * Urlにローカルユニットを指定した場合正常に作成されること.
+     */
+    @Test
+    public final void ExtCell作成時Urlをローカルユニット指定した場合正常に作成されることを確認() {
+        String extCellUrl = "personium-localunit:/testcell2/";
+        try {
+            ExtCellUtils.create(token, cellName, extCellUrl, HttpStatus.SC_CREATED);
+        } finally {
+            System.out.println("delete extCell");
+            ExtCellUtils.delete(token, cellName, extCellUrl, -1);
+        }
+    }
 }

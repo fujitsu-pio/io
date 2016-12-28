@@ -1936,6 +1936,7 @@ public class UserDataListFilterTest extends AbstractUserDataTest {
     /**
      * 範囲検索クエリの値に4096文字の文字列を指定して対象のデータを取得できること.
      */
+    @Ignore
     @SuppressWarnings("unchecked")
     @Test
     public final void 範囲検索クエリの値に4096文字の文字列を指定して対象のデータを取得できること() {

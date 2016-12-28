@@ -56,6 +56,12 @@ public interface Cell {
     String getUrl();
 
     /**
+     * returns Unit URL string for this cell.
+     * @return Unit URL string
+     */
+    String getUnitUrl();
+
+    /**
      * It gets the URI of the Cell of the Owner Unit User.
      * @return Cell name
      */
@@ -196,4 +202,5 @@ public interface Cell {
      */
     EdmEntityType.Builder EDM_TYPE_BUILDER = EdmEntityType.newBuilder().setNamespace(Common.EDM_NS_UNIT_CTL)
             .setName(EDM_TYPE_NAME).addProperties(Enumerable.create(PROPS).toList()).addKeys(KEYS);
+
 }

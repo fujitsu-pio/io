@@ -45,7 +45,7 @@ import com.fujitsu.dc.test.categories.Unit;
 public class RepairAdsCompleteTest {
 
     static Logger log = LoggerFactory.getLogger(RepairAdsCompleteTest.class);
-    private static final String PIO_VERSION_DUMMY = "1.3.18-test";
+    private static final String PIO_VERSION_DUMMY = "1.4.1-test";
     private static final String TEST_ADS_LOGDIR = "./testdir";
 
     /**

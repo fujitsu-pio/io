@@ -336,6 +336,25 @@ public class BoxCrudTest extends ODataCommon {
     }
 
     /**
+     * BOX新規登録時にSchemaをURL形式personium_localunit文字を指定して場合_201になることを確認.
+     */
+    @Test
+    public void BOX新規登録時にSchemaをURL形式personium_localunit文字を指定して場合_201になることを確認() {
+        DcRequest req = DcRequest.post(UrlUtils.cellCtl(CELL_NAME, ENTITY_TYPE_BOX));
+        String[] key = {"Name", "Schema" };
+        String[] value = {"testBox", "personium-localunit:/schema/" };
+        req.header(HttpHeaders.AUTHORIZATION, BEARER_MASTER_TOKEN).addJsonBody(key, value);
+        try {
+            DcResponse res = request(req);
+            
+            // 201になることを確認
+            assertEquals(HttpStatus.SC_CREATED, res.getStatusCode());
+        } finally {
+            deleteBoxRequest("testBox").returns();
+        }
+    }
+
+    /**
      * BOX新規登録時にSchemaをURN形式文字を指定して場合_201になることを確認.
      */
     @Test
@@ -740,8 +759,9 @@ public class BoxCrudTest extends ODataCommon {
      * @return リクエストオブジェクト
      */
     public static Http deleteBoxRequest(String name) {
-        return Http.request("cell/box-delete.txt").with("cellPath", CELL_NAME)
-                .with("token", AbstractCase.MASTER_TOKEN_NAME).with("boxPath", name);
+        return Http.request("cell/box-delete.txt")
+                .with("cellPath", CELL_NAME)
+                .with("token", AbstractCase.MASTER_TOKEN_NAME)
+                .with("boxPath", name);
     }
-
 }
